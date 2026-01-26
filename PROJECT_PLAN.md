@@ -9,7 +9,7 @@
 | **I. Foundation**      | Repo, Stack, CI/CD, Safety                    | ✅ **COMPLETED** |
 | **II. The Engine**     | Data Schema, Content Seeding, Quote Bank      | 🚧 **NEXT**      |
 | **III. Workout UI**    | Evaluation, Active Timer, Asset Lazy-loading  | 🔴 Pending       |
-| **IV. Nutrition (ET)** | Addis-specific Foods, CICO Calc, Myth Busting | 🔴 Pending       |
+| **IV. Nutrition (ET)** | Addis-specific Foods, CICO Calc, Myth Busting | ✅ **COMPLETED** |
 | **V. Monetization**    | Telebirr Integration, Premium Locking         | 🔴 Pending       |
 
 ---
@@ -103,24 +103,24 @@ _Decision: Hybrid Data Approach. Static content (Plans/Quotes) in Convex (cached
 
 ---
 
-### 🥑 PHASE IV: Nutrition (Ethiopia Edition)
+### ✅ PHASE IV: Nutrition (Ethiopia Edition)
 
 **Goal**: Science-based nutrition adapted for Addis Ababa markets.
 
 #### 4.1 "The Truth" Knowledge Base
 
-- [ ] **Myth Buster UI**:
+- [x] **Myth Buster UI**:
   - Interactive "Fact vs. Cap" section.
   - Topics: "Fasted Cardio", "Dirty Bulk", "Spot Reduction".
   - Explanation: "It's just CICO (Calories In/Calories Out)".
-- [ ] **Calculator**:
+- [x] **Calculator**:
   - TDEE Calculator adjusted for activity level.
   - Goals: Cut, Bulk (Clean), Maingain.
   - **Unit Converter**: "Sinig/Unit" guesstimator for local Addis measurements.
 
 #### 4.2 Meal Plans (Addis Context)
 
-- [ ] **Ingredient Database**:
+- [x] **Ingredient Database**:
   - Teff, Shiro, Injera, local beef, eggs (price/macro estimates).
 - [ ] **Budget Toggles**:
   - Low Cost (Lentils/Shiro focus) vs. Premium (Chicken breast/Imported whey).
