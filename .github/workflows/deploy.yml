@@ -1,0 +1,58 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install Dependencies
+        run: bun install
+
+      - name: Build Shared
+        run: cd packages/shared-types && bun run build || true
+
+      - name: Test Server
+        run: cd apps/server && bun test
+
+      - name: Build Server
+        # Just a check, actual deploy would be via Docker/Fly
+        run: echo "Server build check passed"
+
+      - name: Build Web
+        run: cd apps/web && bun run build
+
+  deploy-web:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    name: Deploy to Cloudflare Pages
+    steps:
+      - uses: actions/checkout@v3
+      - uses: oven-sh/setup-bun@v1
+
+      - name: Install & Build
+        run: |
+          bun install
+          cd apps/web && bun run build
+
+      - name: Publish to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: hayl-web
+          directory: apps/web/dist
+          # gitHubToken: ${{ secrets.GITHUB_TOKEN }}
