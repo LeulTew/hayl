@@ -144,4 +144,39 @@ export default defineSchema({
     details: v.string(),
     timestamp: v.number(),
   }).index("by_action_time", ["action", "timestamp"]),
+
+  // --- 5. NUTRITION ---
+
+  ingredients: defineTable({
+    name: v.string(),
+    amharicName: v.optional(v.string()),
+    calories: v.number(), // per 100g
+    protein: v.number(),
+    carbs: v.number(),
+    fats: v.number(),
+    fiber: v.number(),
+    category: v.union(
+      v.literal("grain"),
+      v.literal("legume"),
+      v.literal("meat"),
+      v.literal("vegetable"),
+      v.literal("other")
+    ),
+    isLocal: v.boolean(),
+  }).searchIndex("search_name", { searchField: "name" }),
+
+  mealPlans: defineTable({
+    title: v.string(),
+    description: v.string(),
+    goal: v.union(v.literal("cut"), v.literal("bulk"), v.literal("maintain")),
+    budget: v.union(v.literal("low"), v.literal("medium"), v.literal("high")),
+    totalCalories: v.number(),
+    meals: v.array(v.object({
+      name: v.string(),
+      ingredients: v.array(v.object({
+        ingredientId: v.id("ingredients"),
+        amountGrams: v.number(),
+      })),
+    })),
+  }),
 });

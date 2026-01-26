@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { BentoList, type BentoItem } from './components/ui/BentoList';
 import { useWakeLock } from './hooks/useWakeLock';
 import { useSessionTimer } from './hooks/useSessionTimer';
+import { MacroCalculator } from './components/nutrition/MacroCalculator';
+import { IngredientSearch } from './components/nutrition/IngredientSearch';
+import { MythBuster } from './components/nutrition/MythBuster';
 
 // Demo Data
 const PROGRAMS: BentoItem[] = [
@@ -13,7 +16,7 @@ const PROGRAMS: BentoItem[] = [
 function App() {
   const { isLocked, requestLock, releaseLock } = useWakeLock();
   const timer = useSessionTimer();
-  const [activeTab, setActiveTab] = useState<'programs' | 'history'>('programs');
+  const [activeTab, setActiveTab] = useState<'programs' | 'history' | 'nutrition'>('programs');
 
   return (
     <div className="min-h-screen bg-hayl-bg text-hayl-text font-sans p-6 pb-20 transition-colors duration-fast">
@@ -76,12 +79,28 @@ function App() {
             >
                 HISTORY
             </button>
+            <button 
+                onClick={() => setActiveTab('nutrition')}
+                className={`pb-1 text-lg font-heading font-bold tracking-wide transition-colors ${activeTab === 'nutrition' ? 'text-hayl-text border-b-2 border-hayl-text' : 'text-hayl-muted hover:text-hayl-text'}`}
+            >
+                NUTRITION
+            </button>
         </div>
 
-        <BentoList 
-            items={PROGRAMS} 
-            onItemClick={(id) => console.log('Clicked', id)} 
-        />
+        {activeTab === 'programs' && (
+            <BentoList 
+                items={PROGRAMS} 
+                onItemClick={(id) => console.log('Clicked', id)} 
+            />
+        )}
+        
+        {activeTab === 'nutrition' && (
+            <div className="space-y-8 animate-in fade-in zoom-in-95 duration-300">
+                <MacroCalculator />
+                <IngredientSearch />
+                <MythBuster />
+            </div>
+        )}
       </main>
 
     </div>
