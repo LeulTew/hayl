@@ -1,0 +1,3 @@
+[install]
+# equivalent to npm config set save-exact true
+exact = true
