@@ -1,0 +1,17 @@
+node_modules
+.env
+.DS_Store
+dist
+out
+build
+coverage
+
+# Backend/Bun
+bun.lockb
+
+# Convex
+convex/_generated/
+
+# Reference Docs (Strictly developer eyes only)
+assets/reference-docs/*
+!assets/reference-docs/.keep
