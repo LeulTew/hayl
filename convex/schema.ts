@@ -2,100 +2,146 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export default defineSchema({
-  users: defineTable({
-    name: v.string(),
-    tokenIdentifier: v.string(),
-    country: v.string(),
-    isPremium: v.boolean(),
-    subscriptionProvider: v.union(
-      v.literal('telebirr'),
-      v.literal('chapa'),
-      v.literal('stripe'),
-      v.literal('none')
-    ),
-    lastPaymentId: v.optional(v.string()),
-    subscriptionExpiry: v.optional(v.number()),
-  }).index("by_token", ["tokenIdentifier"]),
+  // --- 1. PROGRAM DEFINITIONS ---
 
   programs: defineTable({
     slug: v.string(),
     title: v.string(),
-    description: v.string(),
-    difficulty: v.string(), // 'amateur'|'intermediate'|'elite'
+    canonicalVersion: v.string(),
+    difficulty: v.union(
+      v.literal("beginner"),
+      v.literal("intermediate"),
+      v.literal("elite")
+    ),
+    splitType: v.union(
+      v.literal("2-day"),
+      v.literal("3-day"),
+      v.literal("4-day"),
+      v.literal("upper-lower"),
+      v.literal("ppl")
+    ),
     isPremium: v.boolean(),
-    canonicalVersion: v.number(), // increment on significant edits
-    metadata: v.object({
-      durationOptions: v.array(v.number()), // e.g., [60,90]
-      splitOptions: v.array(v.string()), // '2day','3day'...
-    }),
-  }),
+    published: v.boolean(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }).index("by_slug", ["slug"]),
 
-  // Nested structure is stored as typed object with controlled shapes
-  workouts: defineTable({
+  // --- 2. DERIVED WORKOUT STRUCTURE ---
+
+  derivedPlans: defineTable({
     programId: v.id("programs"),
-    title: v.string(),
-    order: v.number(),
+    version: v.string(),
+
+    author: v.string(),
+    
+    // VARIANT ENGINE: Support combinatoric complexity (Duration x Split x Level)
+    variant: v.object({
+      difficulty: v.union(v.literal("amateur"), v.literal("intermediate"), v.literal("elite")),
+      splitFreq: v.string(), // e.g. "2-day", "4-day", "2-day-twice"
+      durationMinutes: v.number(), // 60, 90
+      
+      // Future-proofing: Allow arbitrary tags for new categorization dimensions
+      tags: v.optional(v.array(v.string())), 
+    }),
+
+    source_refs: v.array(v.object({
+      docId: v.string(),
+      page: v.optional(v.number()),
+      note: v.string(),
+    })),
+
+    requires_human_review: v.boolean(),
+    reviewedBy: v.optional(v.string()),
+
     days: v.array(v.object({
-      dayIndex: v.number(),
       title: v.string(),
+      dayIndex: v.number(),
       phases: v.array(v.object({
-        phaseType: v.union(v.literal('warmup'), v.literal('workout'), v.literal('stretch')),
+        name: v.union(
+          v.literal("warmup"),
+          v.literal("main"),
+          v.literal("accessory"),
+          v.literal("stretch")
+        ),
         items: v.array(v.object({
           exerciseId: v.id("exercises"),
-          reps: v.string(),
           sets: v.number(),
-          tempo: v.optional(v.string()),
-          notes: v.optional(v.string())
-        }))
-      }))
-    }))
-  }),
+          reps: v.string(),
+          rpe: v.optional(v.number()),
+          restSeconds: v.number(),
+          note: v.optional(v.string()),
+        })),
+      })),
+    })),
+
+    changelog: v.string(),
+    createdAt: v.number(),
+  }).index("by_program_version", ["programId", "version"]),
+
+  // --- 3. EXERCISES & ASSETS ---
 
   exercises: defineTable({
     name: v.string(),
     muscleGroup: v.string(),
-    assetIds: v.array(v.string()), // references to assets table
-    canonicalAliases: v.array(v.string()),
+
+    visualAsset: v.optional(v.object({
+      url: v.string(),
+      type: v.union(
+        v.literal("mp4"),
+        v.literal("gif"),
+        v.literal("webm")
+      ),
+      licenseType: v.union(
+        v.literal("licensed"),
+        v.literal("public_domain"),
+        v.literal("own_creation")
+      ),
+      robotsChecked: v.boolean(),
+      originalSource: v.string(),
+      ingestedBy: v.string(),
+      checksum: v.string(),
+      contentLength: v.number(),
+    })),
+
     instructions: v.string(),
   }).searchIndex("search_name", { searchField: "name" }),
 
-  assets: defineTable({
-    exerciseId: v.optional(v.id("exercises")),
-    originalSource: v.string(),
-    robotsChecked: v.boolean(),
-    licenseType: v.optional(v.string()),
-    licenseText: v.optional(v.string()),
-    cachedUrl: v.string(),
-    thumbnailUrl: v.optional(v.string()),
-    ingestDate: v.number(),
-    uploader: v.optional(v.string()),
-  }),
-
-  derivedPlans: defineTable({
-    title: v.string(),
-    source_refs: v.array(v.object({ docId: v.string(), anchor: v.optional(v.string()), note: v.optional(v.string()) })),
-    days: v.any(), // intentionally generic but avoid v.any() in mutation validations
-    changelog: v.string(),
+  quotes: defineTable({
+    text: v.string(),
     author: v.string(),
-    published: v.boolean(),
-    requires_human_review: v.boolean(),
+    tags: v.array(v.string()),
+    contextTrigger: v.optional(v.string()),
   }),
 
-  payments: defineTable({
-    userId: v.optional(v.id("users")),
-    provider: v.union(v.literal('telebirr'), v.literal('chapa'), v.literal('stripe')),
+  // --- 4. USERS & PAYMENTS ---
+
+  users: defineTable({
+    tokenIdentifier: v.string(),
+    name: v.string(),
+    isPremium: v.boolean(),
+    currentProgramId: v.optional(v.id("programs")),
+    createdAt: v.number(),
+  }).index("by_token", ["tokenIdentifier"]),
+
+  telebirrTransactions: defineTable({
     transactionId: v.string(),
+    userId: v.id("users"),
     amountCents: v.number(),
-    currency: v.string(),
-    state: v.string(),
+    currency: v.literal("ETB"),
+    status: v.union(
+      v.literal("PENDING"),
+      v.literal("COMPLETED"),
+      v.literal("FAILED")
+    ),
+    rawPayload: v.string(),
     receivedAt: v.number(),
-  }).index("by_transaction", ["transactionId"]),
+  }).index("by_txn_id", ["transactionId"]),
 
   auditLogs: defineTable({
-    actor: v.optional(v.string()),
-    correlationId: v.string(),
     action: v.string(),
+    actor: v.string(),
+    contextId: v.optional(v.string()),
     details: v.string(),
-    createdAt: v.number()
-  })
+    timestamp: v.number(),
+  }).index("by_action_time", ["action", "timestamp"]),
 });

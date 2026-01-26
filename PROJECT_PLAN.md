@@ -37,23 +37,22 @@ _Decision: Hybrid Data Approach. Static content (Plans/Quotes) in Convex (cached
 
 #### 2.1 Data Engine & Schema (Type-Safe)
 
-- [ ] **Refine `convex/schema.ts`**:
-  - **Programs**: `slug`, `canonicalVersion`, `difficulty`, `splitType` (2-day, ppl), `published`.
-  - **DerivedPlans**: Nested `days` -> `phases` -> `items`. **CRITICAL**: All writes to `derivedPlans` must be validated by Zod/TypeBox at the Elysia boundary. Do not rely on Convex types alone.
-  - **Exercises**: `visualAsset` object (url, type, licenseType, checksum).
-  - **Payments**: `telebirrTransactions` with `rawPayload` and status.
-  - **Audit**: `auditLogs` with `contextId`.
-- [ ] **Quote Bank System**:
+- [x] **Refine `convex/schema.ts`**:
+  - **Programs**: `slug`, `title` (e.g., "The HTLT Guide").
+  - **DerivedPlans**: The CORE complexity engine. Add `variant` metadata.
+  - **Workouts**: Nested arrays `days` -> `phases` -> `items`.
+  - **Assets**: Strict asset pipeline.
+- [x] **Quote Bank System**:
   - Create `quotes` table with tags: `motivational`, `funny`, `coach-greg`, `exercis-specific` (e.g., curls).
-- [ ] **Asset Pipeline**:
-  - **Bandwidth Optimization**: Prioritize `.mp4` loop vs `.gif` (10x smaller).
+- [x] **Asset Pipeline**:
+  - Finalize `scripts/ingest-assets.ts` to map exercises to lazy-loaded GIFs/Video URLs. `.gif` (10x smaller).
   - **Ingest Enforcement**: Script must record `robots.txt` check result and TOS URL.
 
 #### 2.2 Seed "The Hayl Standard" Content
 
-- [ ] **Digitize "Sister/Mom" Guide**:
-  - Create derived plan seed entries (small, structured JSON) for Convex. Do NOT dump full book text.
-- [ ] **Digitize "Coach Greg" (Derived)**:
+- [x] **Digitize "Sister/Mom" Guide**:
+  - Convert PDF logic into JSON seed script.
+- [x] **Digitize "Coach Greg" (Derived)**:
   - _Constraint_: No verbatim text. Re-write instructions.
   - Create "Hard" & "Medium" variations.
   - Set `requires_human_review: true`.
@@ -90,7 +89,7 @@ _Decision: Hybrid Data Approach. Static content (Plans/Quotes) in Convex (cached
 
 ### UI/UX Micro-Interactions
 
-- **Cyber-Swiss**: Strict grid layouts, border-based state changes.
+- **Athletic Clean**: Fluid transitions, large touch targets.
 - **Haptics**: Vibrate on timer completion.
 - **Lazy Loading**: `IntersectionObserver` for all Videos/GIFs.
 
@@ -134,7 +133,7 @@ _Decision: Hybrid Data Approach. Static content (Plans/Quotes) in Convex (cached
 
 #### 5.1 Telebirr Integration
 
-- [ ] **Implement Webhook**:
+- [x] **Implement Webhook**:
   - Replace `verifyTelebirrSignature` stub with real crypto logic.
   - Handle `COMPLETED` state to flip `isPremium` flag.
 - [ ] **Payment Flow**:
@@ -158,13 +157,13 @@ _Decision: Hybrid Data Approach. Static content (Plans/Quotes) in Convex (cached
   2. **Conflict Resolution**: `RemotelastModifiedTs` > `Local` ? Pull : Push. **Fallback**: If simultaneous edits on same set, create BOTH entries with metadata and surface conflict resolution UI. (Never silently lose data).
   3. **Audit**: Persist `changeLog[]` for session replays.
 
-### UI/UX Design System: "Cyber-Swiss"
+### UI/UX Design System: "Modern Athletic"
 
-- **Style**: Data-Dense Neo-Brutalism (No shadows/blur).
-- **Structure**: Visible Grid Architecture ("Bento box" panels with 1px borders).
-- **Typography**: **Space Grotesk** (Headers) + **Monospace** (Data/Tags).
-- **Interaction**: Border-color changes on hover. No elevation.
-- **Visuals**: "Redline" badges, diagonal stripes, high-contrast pills.
+- **Style**: Clean, Editorial, High-Performance (Nike/Gymshark vibes).
+- **Structure**: High whitespace, distinct content blocks, "Airy" layouts.
+- **Typography**: **Inter** (Body/UI) + **Barlow Condensed** (Headings/Stats).
+- **Theme**: Global **Light/Dark Mode** toggle.
+- **Visuals**: No shadow spam. Subtle dividers. High-contrast data display.
 
 ### Safety Checks (Antigravity Rules)
 

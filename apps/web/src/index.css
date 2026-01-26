@@ -1,9 +1,38 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  /* Light Mode (Athletic Clean) */
+  --hayl-bg: #ffffff;
+  --hayl-surface: #f4f4f5; /* Zinc 100 */
+  --hayl-text: #18181b; /* Zinc 900 */
+  --hayl-muted: #71717a; /* Zinc 500 */
+  --hayl-accent: #000000; /* Black is the new active/accent */
+  --hayl-border: #e4e4e7; /* Zinc 200 */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Dark Mode (Stealth Performance) */
+    --hayl-bg: #09090b; /* Zinc 950 */
+    --hayl-surface: #18181b; /* Zinc 900 */
+    --hayl-text: #fafafa; /* Zinc 50 */
+    --hayl-muted: #a1a1aa; /* Zinc 400 */
+    --hayl-accent: #ffffff; /* White accent */
+    --hayl-border: #27272a; /* Zinc 800 */
+  }
+}
+
+@theme {
+  --color-hayl-bg: var(--hayl-bg);
+  --color-hayl-surface: var(--hayl-surface);
+  --color-hayl-text: var(--hayl-text);
+  --color-hayl-muted: var(--hayl-muted);
+  --color-hayl-accent: var(--hayl-accent);
+  --color-hayl-border: var(--hayl-border);
+
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-heading: "Barlow Condensed", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --shadow-subtle: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 }
