@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useQuery } from "convex/react";
-import { api } from "../../../../convex/_generated/api";
 import { useActiveSession } from "../../hooks/useActiveSession";
+// Convex imports (resolved via placeholders)
+import { api } from "../../../../../convex/_generated/api";
 import { RestTimerOverlay } from "./RestTimerOverlay";
 
 interface WorkoutItem {

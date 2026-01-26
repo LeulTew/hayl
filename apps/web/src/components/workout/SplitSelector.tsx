@@ -1,3 +1,7 @@
+import { useQuery } from "convex/react";
+// Convex imports (resolved via placeholders)
+import { api } from "../../../../../convex/_generated/api";
+
 // Fallback types for local development (Convex codegen usually provides these)
 interface Plan {
     _id: string;
@@ -16,7 +20,6 @@ interface SplitSelectorProps {
 }
 
 export function SplitSelector({ programId, onSelect, onCancel }: SplitSelectorProps) {
-  // @ts-expect-error - Dynamic dispatch to bypass missing generated imports
   const plans = useQuery(api.programs.getDerivedPlans, { programId }) as Plan[] | undefined;
 
   if (plans === undefined) {

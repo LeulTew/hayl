@@ -38,6 +38,7 @@ function App() {
   // Sync view with active session on mount
   useEffect(() => {
     if (activeSession && view.type !== 'workout') {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setView(prev => {
             if (prev.type === 'workout') return prev;
             return { type: 'workout', data: { planId: activeSession.planId } };
