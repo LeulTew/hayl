@@ -1,10 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BentoList, type BentoItem } from './components/ui/BentoList';
 import { useWakeLock } from './hooks/useWakeLock';
 import { useSessionTimer } from './hooks/useSessionTimer';
 import { MacroCalculator } from './components/nutrition/MacroCalculator';
 import { IngredientSearch } from './components/nutrition/IngredientSearch';
 import { MythBuster } from './components/nutrition/MythBuster';
+import { SplitSelector } from './components/workout/SplitSelector';
+import { WorkoutSession } from './components/workout/WorkoutSession';
+import { useActiveSession } from './hooks/useActiveSession';
 
 // Demo Data
 const PROGRAMS: BentoItem[] = [
@@ -16,11 +19,51 @@ const PROGRAMS: BentoItem[] = [
 function App() {
   const { isLocked, requestLock, releaseLock } = useWakeLock();
   const timer = useSessionTimer();
+  const { activeSession, startSession } = useActiveSession();
+  
   const [activeTab, setActiveTab] = useState<'programs' | 'history' | 'nutrition'>('programs');
+  const [view, setView] = useState<{ type: 'home' | 'split-selector' | 'workout', data?: { programId?: string, planId?: string } }>({ type: 'home' });
+
+  const handleProgramClick = (id: string) => {
+      setView({ type: 'split-selector', data: { programId: id } });
+  };
+
+  const handleStartWorkout = async (planId: string, dayIndex: number) => {
+      if (view.data?.programId) {
+        await startSession(view.data.programId, planId, dayIndex);
+        setView({ type: 'workout', data: { planId } });
+      }
+  };
+
+  // Sync view with active session on mount
+  useEffect(() => {
+    if (activeSession && view.type !== 'workout') {
+        setView(prev => {
+            if (prev.type === 'workout') return prev;
+            return { type: 'workout', data: { planId: activeSession.planId } };
+        });
+    }
+  }, [activeSession, view.type]);
 
   return (
     <div className="min-h-screen bg-hayl-bg text-hayl-text font-sans p-6 pb-20 transition-colors duration-fast">
       
+      {/* View Overlays */}
+      {view.type === 'split-selector' && view.data?.programId && (
+          <div className="fixed inset-0 z-40 bg-hayl-bg/80 backdrop-blur-sm p-6 pt-20 overflow-y-auto">
+              <SplitSelector 
+                programId={view.data.programId} 
+                onSelect={handleStartWorkout}
+                onCancel={() => setView({ type: 'home' })}
+              />
+          </div>
+      )}
+
+      {view.type === 'workout' && view.data?.planId && (
+          <div className="fixed inset-0 z-40 bg-hayl-bg p-6 pt-10 overflow-y-auto">
+              <WorkoutSession planId={view.data.planId} />
+          </div>
+      )}
       {/* Header */}
       <header className="mb-10 pt-4">
         <div className="flex justify-between items-end">
@@ -90,7 +133,7 @@ function App() {
         {activeTab === 'programs' && (
             <BentoList 
                 items={PROGRAMS} 
-                onItemClick={(id) => console.log('Clicked', id)} 
+                onItemClick={handleProgramClick} 
             />
         )}
         

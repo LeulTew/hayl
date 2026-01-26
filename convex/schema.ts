@@ -76,7 +76,9 @@ export default defineSchema({
 
     changelog: v.string(),
     createdAt: v.number(),
-  }).index("by_program_version", ["programId", "version"]),
+  })
+    .index("by_program_version", ["programId", "version"])
+    .index("by_programId", ["programId"]),
 
   // --- 3. EXERCISES & ASSETS ---
 

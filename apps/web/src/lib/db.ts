@@ -5,9 +5,16 @@ export interface LocalSession {
   id?: number; // local auto-inc
   sessionId: string; // UUID for sync
   programId: string;
+  planId: string; // The specific derivedPlan ID
   startTime: number;
   endTime?: number;
   state: 'active' | 'completed' | 'discarded'; 
+  
+  // RESUME-ABILITY: Track where the user is
+  currentDayIndex: number;
+  currentExerciseIndex: number;
+  currentSetIndex: number;
+
   logs: LogEntry[]; 
   lastModifiedTs: number;
 }
