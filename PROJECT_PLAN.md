@@ -38,22 +38,21 @@ _Decision: Hybrid Data Approach. Static content (Plans/Quotes) in Convex (cached
 #### 2.1 Data Engine & Schema (Type-Safe)
 
 - [ ] **Refine `convex/schema.ts`**:
-  - **Programs**: `slug`, `canonicalVersion`, `metadata` (duration/split options).
-  - **Workouts**: Nested arrays for `days` -> `phases` -> `items` (Typed Objects, not JSON blobs). Use `programId` linkage.
-  - **Assets**: Add `robotsChecked`, `licenseType`, `ingestDate`, `originalSource`.
-  - **Payments**: Add `transactionId` index for idempotency.
-  - **Audit**: Add `auditLogs` table.
+  - **Programs**: `slug`, `canonicalVersion`, `difficulty`, `splitType` (2-day, ppl), `published`.
+  - **DerivedPlans**: Nested `days` -> `phases` -> `items`. **CRITICAL**: All writes to `derivedPlans` must be validated by Zod/TypeBox at the Elysia boundary. Do not rely on Convex types alone.
+  - **Exercises**: `visualAsset` object (url, type, licenseType, checksum).
+  - **Payments**: `telebirrTransactions` with `rawPayload` and status.
+  - **Audit**: `auditLogs` with `contextId`.
 - [ ] **Quote Bank System**:
   - Create `quotes` table with tags: `motivational`, `funny`, `coach-greg`, `exercis-specific` (e.g., curls).
 - [ ] **Asset Pipeline**:
   - **Bandwidth Optimization**: Prioritize `.mp4` loop vs `.gif` (10x smaller).
-  - Finalize `scripts/ingest-assets.ts` to map exercises to lazy-loaded GIFs/Video URLs.
   - **Ingest Enforcement**: Script must record `robots.txt` check result and TOS URL.
 
 #### 2.2 Seed "The Hayl Standard" Content
 
 - [ ] **Digitize "Sister/Mom" Guide**:
-  - Convert PDF logic into JSON seed script.
+  - Create derived plan seed entries (small, structured JSON) for Convex. Do NOT dump full book text.
 - [ ] **Digitize "Coach Greg" (Derived)**:
   - _Constraint_: No verbatim text. Re-write instructions.
   - Create "Hard" & "Medium" variations.
@@ -62,6 +61,7 @@ _Decision: Hybrid Data Approach. Static content (Plans/Quotes) in Convex (cached
 #### 2.3 Payment Infrastructure (Production Ready)
 
 - [ ] **Telebirr Webhook**:
+  - Document signing spec in `docs/research/telebirr.md` (include sample test vector).
   - Implement cryptographic signature verification.
   - **Idempotency**: Check `transactionId` before mutation.
   - **Reconciliation**: Audit log every state change (`PENDING` -> `COMPLETED`).
@@ -155,7 +155,7 @@ _Decision: Hybrid Data Approach. Static content (Plans/Quotes) in Convex (cached
 - **Primary Store**: `IndexedDB` (via **Dexie.js**) for active sessions.
 - **Sync Protocol**:
   1. `sessionId` + `lastModifiedTs` per record.
-  2. **Conflict Resolution**: `RemotelastModifiedTs` > `Local` ? Pull : Push.
+  2. **Conflict Resolution**: `RemotelastModifiedTs` > `Local` ? Pull : Push. **Fallback**: If simultaneous edits on same set, create BOTH entries with metadata and surface conflict resolution UI. (Never silently lose data).
   3. **Audit**: Persist `changeLog[]` for session replays.
 
 ### UI/UX Design System: "Cyber-Swiss"
