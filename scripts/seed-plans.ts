@@ -13,28 +13,38 @@ const plans = [
   {
     title: "Hayl Foundations",
     source_refs: [{ docId: "starter-week-gf", note: "exact copy; authoritative" }],
+    // derivedPlans.days is v.any(), but we structure it to match our 'workouts' logic
     days: [
-      { title: "Day 1", blocks: [{ name: "Goblet Squat", sets: 3, reps: "10", restSeconds: 90 }] }
-      // TODO: Populate full week from reference
-    ],
+        {
+            dayIndex: 1,
+            title: "Legs & Core",
+            phases: [
+                {
+                    phaseType: "workout",
+                    items: [
+                        { exerciseName: "Goblet Squat", sets: 3, reps: "10", notes: "Deep stretch" }
+                    ]
+                }
+            ]
+        }
+    ], 
     changelog: "Initial seed from provided starter doc (exact)",
     author: "seed-script",
-    published: true
+    published: true,
+    requires_human_review: false // Authoritative plan
   },
   {
       title: "3-day mom/sis",
-      source_refs: [{ docId: "starter-week-gf", note: "exact copy; authoritative" }],
+      source_refs: [{ docId: "mom-sis-pdf", note: "derived" }],
       days: [], 
-      changelog: "Initial seed",
+      changelog: "Derived from PDF",
       author: "seed-script",
-      published: true
+      published: false,
+      requires_human_review: true // Derived plan requires review
   }
 ];
 
-// Placeholder for mutation call - will fail until mutation is defined in backend
+// Placeholder for mutation call
 // await client.mutation('mutations:createDerivedPlan', plan);
-console.log('Seeding script ready. Define mutations:createDerivedPlan in Convex first.');
+console.log('Seeding script ready. Ensure mutations:createDerivedPlan accepts this structure.');
 console.log('Plans to seed:', JSON.stringify(plans, null, 2));
-
-// Place holder logic for now
-console.log('seeded hayl foundations (simulation)');

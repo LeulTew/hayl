@@ -35,16 +35,20 @@
 **Goal**: Structure complex workout splits and create the "Quote Bank".
 _Decision: Hybrid Data Approach. Static content (Plans/Quotes) in Convex (cached), User Progress in LocalStorage + Sync._
 
-#### 2.1 Advanced Workout Schema
+#### 2.1 Data Engine & Schema (Type-Safe)
 
 - [ ] **Refine `convex/schema.ts`**:
-  - Support nested splits: `Program` -> `Split (3-day/4-day)` -> `Day` -> `Phase (Warmup/Lift)` -> `Block`.
-  - Add `difficulty` (Amateur, Intermediate, Elite).
-  - Add `duration` (60m, 90m).
+  - **Programs**: `slug`, `canonicalVersion`, `metadata` (duration/split options).
+  - **Workouts**: Nested arrays for `days` -> `phases` -> `items` (Typed Objects, not JSON blobs). Use `programId` linkage.
+  - **Assets**: Add `robotsChecked`, `licenseType`, `ingestDate`, `originalSource`.
+  - **Payments**: Add `transactionId` index for idempotency.
+  - **Audit**: Add `auditLogs` table.
 - [ ] **Quote Bank System**:
   - Create `quotes` table with tags: `motivational`, `funny`, `coach-greg`, `exercis-specific` (e.g., curls).
 - [ ] **Asset Pipeline**:
+  - **Bandwidth Optimization**: Prioritize `.mp4` loop vs `.gif` (10x smaller).
   - Finalize `scripts/ingest-assets.ts` to map exercises to lazy-loaded GIFs/Video URLs.
+  - **Ingest Enforcement**: Script must record `robots.txt` check result and TOS URL.
 
 #### 2.2 Seed "The Hayl Standard" Content
 
@@ -53,6 +57,14 @@ _Decision: Hybrid Data Approach. Static content (Plans/Quotes) in Convex (cached
 - [ ] **Digitize "Coach Greg" (Derived)**:
   - _Constraint_: No verbatim text. Re-write instructions.
   - Create "Hard" & "Medium" variations.
+  - Set `requires_human_review: true`.
+
+#### 2.3 Payment Infrastructure (Production Ready)
+
+- [ ] **Telebirr Webhook**:
+  - Implement cryptographic signature verification.
+  - **Idempotency**: Check `transactionId` before mutation.
+  - **Reconciliation**: Audit log every state change (`PENDING` -> `COMPLETED`).
 
 ---
 
@@ -69,6 +81,7 @@ _Decision: Hybrid Data Approach. Static content (Plans/Quotes) in Convex (cached
 
 #### 3.2 The "Hyper-Timer"
 
+- [ ] **Wake Lock**: Implement `Screen Wake Lock API` to prevent phone sleeping during workouts.
 - [ ] **Global Timer**: Tracks total session duration.
 - [ ] **Set Timer (Smart)**:
   - Interactive "Done" button for sets.
@@ -98,6 +111,7 @@ _Decision: Hybrid Data Approach. Static content (Plans/Quotes) in Convex (cached
 - [ ] **Calculator**:
   - TDEE Calculator adjusted for activity level.
   - Goals: Cut, Bulk (Clean), Maingain.
+  - **Unit Converter**: "Sinig/Unit" guesstimator for local Addis measurements.
 
 #### 4.2 Meal Plans (Addis Context)
 
@@ -130,22 +144,16 @@ _Decision: Hybrid Data Approach. Static content (Plans/Quotes) in Convex (cached
 
 ## 🛠️ Technical Decisions & Standards
 
-### Data Storage Strategy
+### Technical Strategy: Offline & Sync
 
-| Type                    | Storage                   | Reason                                |
-| :---------------------- | :------------------------ | :------------------------------------ |
-| **Workout Plans**       | Convex (DB)               | Complex structure, centrally updated. |
-| **Logic/Quotes**        | Application Code / Convex | Fast retrieval, random access.        |
-| **User Logs (Active)**  | LocalStorage (Primary)    | Works offline in gym basements.       |
-| **User Logs (History)** | Convex (Sync)             | Persistent history across devices.    |
-
-### UI/UX Micro-Interactions
-
-- **Glassmorphism**: Dark mode default for gym usage.
-- **Haptics**: Vibrate on timer completion.
-- **Lazy Loading**: `IntersectionObserver` for all GIFs.
+- **Primary Store**: `IndexedDB` (via local-first wrapper) for active sessions.
+- **Sync Protocol**:
+  1. `sessionId` + `lastModifiedTs` per record.
+  2. **Conflict Resolution**: `RemotelastModifiedTs` > `Local` ? Pull : Push.
+  3. **Audit**: Persist `changeLog[]` for session replays.
 
 ### Safety Checks (Antigravity Rules)
 
 - **Copyright**: All "Derived" plans must link to `source_refs` and pass human review.
 - **CICO**: Nutrition advice must strictly adhere to thermodynamic laws (CICO). No fad diets.
+- **Asset Compliance**: Every asset record MUST have `licenseType` and `robotsChecked` boolean.

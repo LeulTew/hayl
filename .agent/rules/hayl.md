@@ -1,3 +1,7 @@
+---
+trigger: always_on
+---
+
 # 🧲 ANTIGRAVITY AI DEVELOPMENT RULES (STRICT, NON-NEGOTIABLE)
 
 These rules are **hard constraints** for the AI agent operating in the `hayl` repository.  
