@@ -88,6 +88,12 @@ _Decision: Hybrid Data Approach. Static content (Plans/Quotes) in Convex (cached
   - Auto-starts rest timer based on intensity (e.g., 90s for compounds, 60s for iso).
   - "Too fast/Too slow" feedback toasts based on user input time.
 
+### UI/UX Micro-Interactions
+
+- **Cyber-Swiss**: Strict grid layouts, border-based state changes.
+- **Haptics**: Vibrate on timer completion.
+- **Lazy Loading**: `IntersectionObserver` for all Videos/GIFs.
+
 #### 3.3 Interactive Cards
 
 - [ ] **Exercise Card**:
@@ -146,11 +152,19 @@ _Decision: Hybrid Data Approach. Static content (Plans/Quotes) in Convex (cached
 
 ### Technical Strategy: Offline & Sync
 
-- **Primary Store**: `IndexedDB` (via local-first wrapper) for active sessions.
+- **Primary Store**: `IndexedDB` (via **Dexie.js**) for active sessions.
 - **Sync Protocol**:
   1. `sessionId` + `lastModifiedTs` per record.
   2. **Conflict Resolution**: `RemotelastModifiedTs` > `Local` ? Pull : Push.
   3. **Audit**: Persist `changeLog[]` for session replays.
+
+### UI/UX Design System: "Cyber-Swiss"
+
+- **Style**: Data-Dense Neo-Brutalism (No shadows/blur).
+- **Structure**: Visible Grid Architecture ("Bento box" panels with 1px borders).
+- **Typography**: **Space Grotesk** (Headers) + **Monospace** (Data/Tags).
+- **Interaction**: Border-color changes on hover. No elevation.
+- **Visuals**: "Redline" badges, diagonal stripes, high-contrast pills.
 
 ### Safety Checks (Antigravity Rules)
 
