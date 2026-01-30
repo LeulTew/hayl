@@ -7,8 +7,8 @@
 | Phase                  | Focus                                         | Status           |
 | :--------------------- | :-------------------------------------------- | :--------------- |
 | **I. Foundation**      | Repo, Stack, CI/CD, Safety                    | ✅ **COMPLETED** |
-| **II. The Engine**     | Data Schema, Content Seeding, Quote Bank      | 🚧 **NEXT**      |
-| **III. Workout UI**    | Evaluation, Active Timer, Asset Lazy-loading  | 🔴 Pending       |
+| **II. The Engine**     | Data Schema, Content Seeding, Quote Bank      | ✅ **COMPLETED** |
+| **III. Workout UI**    | Evaluation, Active Timer, Asset Lazy-loading  | 🚧 **NEXT**      |
 | **IV. Nutrition (ET)** | Addis-specific Foods, CICO Calc, Myth Busting | ✅ **COMPLETED** |
 | **V. Monetization**    | Telebirr Integration, Premium Locking         | 🔴 Pending       |
 
@@ -57,13 +57,9 @@ _Decision: Hybrid Data Approach. Static content (Plans/Quotes) in Convex (cached
   - Create "Hard" & "Medium" variations.
   - Set `requires_human_review: true`.
 
-#### 2.3 Payment Infrastructure (Production Ready)
+#### 2.3 Payment Infrastructure (Moved to Phase V)
 
-- [ ] **Telebirr Webhook**:
-  - Document signing spec in `docs/research/telebirr.md` (include sample test vector).
-  - Implement cryptographic signature verification.
-  - **Idempotency**: Check `transactionId` before mutation.
-  - **Reconciliation**: Audit log every state change (`PENDING` -> `COMPLETED`).
+- _Refactored to Phase V for better separation of concerns._
 
 ---
 
