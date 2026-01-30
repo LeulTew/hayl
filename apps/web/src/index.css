@@ -14,10 +14,13 @@
   --font-heading: "Barlow Condensed", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
 
-  --shadow-glow: 0 0 20px -5px var(--hayl-accent);
+  /* Subtle Shadows for Depth (Premium Athletic) */
+  --shadow-subtle: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-premium:
+    0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 
-  --animate-fade-in: fadeIn 1s ease-out forwards;
-  --animate-slide-up: slideUp 0.5s ease-out forwards;
+  --animate-fade-in: fadeIn 0.4s ease-out forwards;
+  --animate-slide-up: slideUp 0.3s ease-out forwards;
 
   @keyframes fadeIn {
     from {
@@ -30,7 +33,7 @@
 
   @keyframes slideUp {
     from {
-      transform: translateY(20px);
+      transform: translateY(16px);
       opacity: 0;
     }
     to {
@@ -40,29 +43,60 @@
   }
 }
 
-/* Custom Utilities that might not be auto-generated */
+/* Custom Utilities */
 .font-heading {
-  font-family: var(--font-heading);
+  font-family: "Barlow Condensed", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+}
+
+.athletic-border {
+  border: 1px solid var(--hayl-border);
+}
+
+.athletic-card {
+  background: var(--hayl-surface);
+  border: 1px solid var(--hayl-border);
+  border-radius: 1.5rem; /* 24px - Airy/Nike feel */
+  padding: 1.5rem;
 }
 
 :root {
-  /* Light Mode (Athletic Clean) */
-  --hayl-bg: #ffffff;
-  --hayl-surface: #f4f4f5; /* Zinc 100 */
-  --hayl-text: #18181b; /* Zinc 900 */
+  /* Light Mode (Modern Athletic - Premium White/Gray) */
+  --hayl-bg: #fdfdfd;
+  --hayl-surface: #ffffff;
+  --hayl-text: #09090b; /* Zinc 950 */
   --hayl-muted: #71717a; /* Zinc 500 */
-  --hayl-accent: #000000; /* Black is the new active/accent */
+  --hayl-accent: #09090b;
   --hayl-border: #e4e4e7; /* Zinc 200 */
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    /* Dark Mode (Stealth Performance) */
-    --hayl-bg: #09090b; /* Zinc 950 */
-    --hayl-surface: #18181b; /* Zinc 900 */
-    --hayl-text: #fafafa; /* Zinc 50 */
-    --hayl-muted: #a1a1aa; /* Zinc 400 */
-    --hayl-accent: #ffffff; /* White accent */
-    --hayl-border: #27272a; /* Zinc 800 */
+    --hayl-bg: #09090b;
+    --hayl-surface: #09090b;
+    --hayl-text: #fafafa;
+    --hayl-muted: #a1a1aa;
+    --hayl-accent: #fafafa;
+    --hayl-border: #27272a;
   }
+}
+
+/* Manual Overrides */
+.dark {
+  --hayl-bg: #09090b;
+  --hayl-surface: #09090b;
+  --hayl-text: #fafafa;
+  --hayl-muted: #a1a1aa;
+  --hayl-accent: #fafafa;
+  --hayl-border: #27272a;
+}
+
+.light {
+  --hayl-bg: #fdfdfd;
+  --hayl-surface: #ffffff;
+  --hayl-text: #09090b;
+  --hayl-muted: #71717a;
+  --hayl-accent: #09090b;
+  --hayl-border: #e4e4e7;
 }
