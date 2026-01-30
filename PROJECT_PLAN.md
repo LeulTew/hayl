@@ -69,16 +69,16 @@ _Decision: Hybrid Data Approach. Static content (Plans/Quotes) in Convex (cached
 
 #### 3.1 Architecture & Navigation
 
-- [ ] **Split Selector**: UI to choose frequency (2-day, 3-day, 4-day) and duration.
-- [ ] **Tabs System**:
+- [x] **Split Selector**: UI to choose frequency (2-day, 3-day, 4-day) and duration.
+- [x] **Tabs System**:
   - _Top Level_: Split Days (Day 1, Day 2...).
   - _Sub Level_: Phases (Warmup, Workout, Stretch).
 
 #### 3.2 The "Hyper-Timer"
 
-- [ ] **Wake Lock**: Implement `Screen Wake Lock API` to prevent phone sleeping during workouts.
-- [ ] **Global Timer**: Tracks total session duration.
-- [ ] **Set Timer (Smart)**:
+- [x] **Wake Lock**: Implement `Screen Wake Lock API` to prevent phone sleeping during workouts.
+- [x] **Global Timer**: Tracks total session duration.
+- [x] **Set Timer (Smart)**:
   - Interactive "Done" button for sets.
   - Auto-starts rest timer based on intensity (e.g., 90s for compounds, 60s for iso).
   - "Too fast/Too slow" feedback toasts based on user input time.
@@ -91,7 +91,7 @@ _Decision: Hybrid Data Approach. Static content (Plans/Quotes) in Convex (cached
 
 #### 3.3 Interactive Cards
 
-- [ ] **Exercise Card**:
+- [x] **Exercise Card**:
   - Lazy-loaded GIF cover.
   - Collapsible "Pro Tips" (Video embed/Text).
   - **Quote Injection**: Display a random context-aware quote (e.g., "Cheat on your curls...").
