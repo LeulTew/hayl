@@ -8,9 +8,9 @@
 | :--------------------- | :-------------------------------------------- | :--------------- |
 | **I. Foundation**      | Repo, Stack, CI/CD, Safety                    | ✅ **COMPLETED** |
 | **II. The Engine**     | Data Schema, Content Seeding, Quote Bank      | ✅ **COMPLETED** |
-| **III. Workout UI**    | Evaluation, Active Timer, Asset Lazy-loading  | 🚧 **NEXT**      |
+| **III. Workout UI**    | Evaluation, Active Timer, Asset Lazy-loading  | ✅ **COMPLETED** |
 | **IV. Nutrition (ET)** | Addis-specific Foods, CICO Calc, Myth Busting | ✅ **COMPLETED** |
-| **V. Monetization**    | Telebirr Integration, Premium Locking         | 🔴 Pending       |
+| **V. Monetization**    | Telebirr Integration, Premium Locking         | 🚧 **NEXT**      |
 
 ---
 

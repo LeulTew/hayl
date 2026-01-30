@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery } from "convex/react";
 import { useActiveSession } from "../../hooks/useActiveSession";
 import { useWakeLock } from "../../hooks/useWakeLock";
 import { api } from "../../../../../convex/_generated/api";
-import { Id } from "../../../../../convex/_generated/dataModel";
+import type { Id } from "../../../../../convex/_generated/dataModel";
 import { RestTimer } from "./RestTimer";
 import { GlobalTimer } from "./GlobalTimer";
 import { ExerciseCard } from "./ExerciseCard";
@@ -54,11 +54,11 @@ interface WorkoutSessionProps {
 export function WorkoutSession({ planId }: WorkoutSessionProps) {
   const { activeSession, logSet, nextExercise, finishSession, discardSession } = useActiveSession();
   const { requestLock, releaseLock, isLocked } = useWakeLock();
-  const plan = useQuery(api.programs.getPlan, { planId }) as WorkoutPlan | undefined;
+  const plan = useQuery(api.programs.getPlan, { planId: planId as Id<'derivedPlans'> }) as WorkoutPlan | undefined;
   
   // Local state
   const [restTimer, setRestTimer] = useState<{ active: boolean; seconds: number }>({ active: false, seconds: 0 });
-  const [activePhaseIndex, setActivePhaseIndex] = useState(0);
+  const [, setActivePhaseIndex] = useState(0);
   
   // Input refs for weight/reps
   const weightInputRef = useRef<HTMLInputElement>(null);

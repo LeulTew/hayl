@@ -1,6 +1,6 @@
 import { useQuery } from 'convex/react';
 import { api } from '../../../../../convex/_generated/api';
-import { Id } from '../../../../../convex/_generated/dataModel';
+import type { Id } from '../../../../../convex/_generated/dataModel';
 import { memo } from 'react';
 
 interface ExerciseCardProps {
@@ -18,7 +18,7 @@ interface ExerciseCardProps {
   exerciseNumber: number;
   totalExercises: number;
   /** Callback when a set is completed */
-  onSetComplete: (weight: number, reps: number) => void;
+  onSetComplete?: (weight: number, reps: number) => void;
 }
 
 /**
@@ -38,7 +38,7 @@ function ExerciseCardComponent({
   currentSetIndex,
   exerciseNumber,
   totalExercises,
-  onSetComplete,
+  onSetComplete: _onSetComplete,
 }: ExerciseCardProps) {
   // Fetch exercise details
   const exercise = useQuery(api.exercises.getExercise, { id: exerciseId });
