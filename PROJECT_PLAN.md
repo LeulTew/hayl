@@ -153,13 +153,14 @@ _Decision: Hybrid Data Approach. Static content (Plans/Quotes) in Convex (cached
   2. **Conflict Resolution**: `RemotelastModifiedTs` > `Local` ? Pull : Push. **Fallback**: If simultaneous edits on same set, create BOTH entries with metadata and surface conflict resolution UI. (Never silently lose data).
   3. **Audit**: Persist `changeLog[]` for session replays.
 
-### UI/UX Design System: "Modern Athletic"
+### UI/UX Design System: "Modern Athletic Hybrid"
 
-- **Style**: Clean, Editorial, High-Performance (Nike/Gymshark vibes).
-- **Structure**: High whitespace, distinct content blocks, "Airy" layouts.
-- **Typography**: **Inter** (Body/UI) + **Barlow Condensed** (Headings/Stats).
-- **Theme**: Global **Light/Dark Mode** toggle.
-- **Visuals**: No shadow spam. Subtle dividers. High-contrast data display.
+- **Style**: Premium, Airy, Performance-Focused (Nike/Gymshark inspired).
+- **Structure**: Extra-rounded corners (rounded-2xl, rounded-[2.5rem], rounded-full), subtle borders.
+- **Typography**: **Inter** (Body/UI) + **Barlow Condensed Black Italic** (Headings/Stats).
+- **Theme**: Premium Light/Dark Mode with manual toggle (Zinc palette).
+- **Visuals**: Subtle premium shadows, generous whitespace, SVG icons (no emojis).
+- **Navigation**: TubeLight Navbar with framer-motion lamp animations.
 
 ### Safety Checks (Antigravity Rules)
 
