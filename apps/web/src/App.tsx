@@ -5,11 +5,18 @@ import { SplitSelector } from './components/workout/SplitSelector';
 import { WorkoutSession } from './components/workout/WorkoutSession';
 import { useActiveSession } from './hooks/useActiveSession';
 
-type ViewState = 
+export type TopLevelView = 'dashboard' | 'exercises' | 'nutrition' | 'profile';
+
+export type ViewState = 
   | { type: 'landing' }
-  | { type: 'dashboard' }
   | { type: 'split-selector'; data: { programId: string } }
-  | { type: 'workout'; data: { planId: string } };
+  | { type: 'workout'; data: { planId: string } }
+  | { type: TopLevelView };
+
+import { ExerciseLibrary } from './components/exercises/ExerciseLibrary';
+import { NutritionHub } from './components/nutrition/NutritionHub';
+import { ProfileView } from './components/profile/ProfileView';
+import { GlobalNav } from './components/navigation/GlobalNav';
 
 function App() {
   const { activeSession, startSession } = useActiveSession();
@@ -20,7 +27,7 @@ function App() {
   // Sync view with active session on mount or session change
   useEffect(() => {
     if (activeSession) {
-      if (view.type !== 'workout' || view.data.planId !== activeSession.planId) {
+      if (view.type !== 'workout' || (view.type === 'workout' && view.data.planId !== activeSession.planId)) {
         setView({ type: 'workout', data: { planId: activeSession.planId } });
       }
     } else if (view.type === 'workout') {
@@ -28,6 +35,12 @@ function App() {
       setView({ type: 'dashboard' });
     }
   }, [activeSession, view.type]);
+
+  const isTopLevelView = (type: string): type is TopLevelView => {
+    return ['dashboard', 'exercises', 'nutrition', 'profile'].includes(type);
+  };
+
+  const currentActiveTab = isTopLevelView(view.type) ? view.type : 'dashboard';
 
   const handleStartWorkout = async (planId: string, dayIndex: number) => {
     if (view.type === 'split-selector') {
@@ -44,12 +57,21 @@ function App() {
         <LandingPage onEnter={() => setView({ type: 'dashboard' })} />
       )}
 
-      {/* 2. Dashboard View */}
-      {view.type === 'dashboard' && (
-        <div className="p-6 pb-20">
+      {/* 2. Top Level Views */}
+      <div className={`${(view.type === 'landing' || view.type === 'workout' || view.type === 'split-selector') ? 'hidden' : 'block'} p-6 pb-32`}>
+        {view.type === 'dashboard' && (
           <Dashboard onSelectProgram={(id) => setView({ type: 'split-selector', data: { programId: id } })} />
-        </div>
-      )}
+        )}
+        {view.type === 'exercises' && (
+          <ExerciseLibrary />
+        )}
+        {view.type === 'nutrition' && (
+          <NutritionHub />
+        )}
+        {view.type === 'profile' && (
+          <ProfileView />
+        )}
+      </div>
 
       {/* 3. Split Selector Overlay */}
       {view.type === 'split-selector' && (
@@ -68,6 +90,13 @@ function App() {
           <WorkoutSession planId={view.data.planId} />
         </div>
       )}
+
+      {/* 5. Global Navigation Bar */}
+      <GlobalNav 
+        currentView={currentActiveTab} 
+        onViewChange={(newView: TopLevelView) => setView({ type: newView })}
+        isHidden={view.type === 'landing' || view.type === 'workout' || view.type === 'split-selector'}
+      />
 
     </div>
   );
