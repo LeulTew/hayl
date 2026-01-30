@@ -51,77 +51,84 @@ function ExerciseCardComponent({
 
   if (!exercise) {
     return (
-      <div className="bg-hayl-surface rounded-xl p-6 animate-pulse">
-        <div className="h-6 bg-hayl-border rounded w-1/2 mb-4" />
-        <div className="aspect-video bg-hayl-border rounded mb-4" />
-        <div className="h-4 bg-hayl-border rounded w-3/4" />
+      <div className="bg-hayl-surface neo-border p-6 animate-pulse">
+        <div className="h-6 bg-hayl-muted/20 neo-border w-1/2 mb-4" />
+        <div className="aspect-video bg-hayl-muted/10 neo-border mb-4" />
+        <div className="h-4 bg-hayl-muted/20 neo-border w-3/4" />
       </div>
     );
   }
 
   return (
-    <article className="bg-hayl-surface rounded-xl border border-hayl-border overflow-hidden">
-      {/* Header */}
-      <div className="p-4 border-b border-hayl-border">
-        <div className="flex justify-between items-start mb-2">
-          <span className="text-[10px] font-bold font-heading text-hayl-accent uppercase tracking-widest">
-            Exercise {exerciseNumber}/{totalExercises}
-          </span>
-          <span className="text-[10px] font-bold text-hayl-muted uppercase">
-            {exercise.muscleGroup}
-          </span>
+    <article className="bg-hayl-surface rounded-[2.5rem] border border-hayl-border overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-700">
+      {/* Header Section */}
+      <div className="p-8 pb-4">
+        <div className="flex justify-between items-start mb-6">
+          <div className="flex gap-2">
+            <span className="text-[10px] font-bold font-heading text-hayl-bg bg-hayl-text uppercase tracking-widest px-3 py-1 rounded-full">
+              Card {exerciseNumber}/{totalExercises}
+            </span>
+            <span className="text-[10px] font-bold font-heading text-hayl-muted uppercase tracking-widest bg-hayl-muted/10 px-3 py-1 rounded-full italic">
+              {exercise.muscleGroup}
+            </span>
+          </div>
         </div>
-        <h2 className="text-2xl font-heading font-bold uppercase tracking-tight">
+        <h2 className="text-6xl font-heading font-black italic tracking-tighter leading-[0.85] text-hayl-text lowercase">
           {exercise.name}
         </h2>
       </div>
 
-      {/* Visual Placeholder (Future: Lazy-loaded GIF) */}
-      <div className="aspect-video bg-gradient-to-br from-hayl-bg to-hayl-surface flex items-center justify-center relative">
-        <div className="text-center">
-          <p className="font-heading font-bold text-hayl-muted uppercase tracking-widest text-sm">
-            Demo Coming Soon
-          </p>
-        </div>
-        {/* Badge */}
-        <div className="absolute top-3 right-3 bg-hayl-bg/80 backdrop-blur-sm px-2 py-1 rounded text-[10px] font-bold uppercase">
-          {sets} × {reps}
+      {/* Visual Hub */}
+      <div className="px-8 pb-8">
+        <div className="aspect-video bg-hayl-bg rounded-[2rem] border border-hayl-border flex items-center justify-center relative overflow-hidden group">
+          <div className="text-center opacity-30 group-hover:opacity-100 transition-opacity">
+            <p className="font-heading font-bold text-hayl-muted uppercase tracking-[0.4em] text-[10px]">
+              Visual Stream Pending
+            </p>
+          </div>
+          {/* Workload Badge */}
+          <div className="absolute top-6 right-6 bg-hayl-text text-hayl-bg px-5 py-2 rounded-full font-heading font-bold uppercase italic text-sm tracking-widest shadow-premium">
+            {sets} × {reps}
+          </div>
         </div>
       </div>
 
-      {/* Quote Injection */}
+      {/* Quote Focus */}
       {quote && (
-        <div className="px-4 py-3 bg-hayl-accent/5 border-t border-hayl-border">
-          <blockquote className="text-sm italic text-hayl-muted">
+        <div className="px-8 py-6 bg-hayl-bg border-y border-hayl-border">
+          <blockquote className="text-base font-heading font-bold uppercase italic tracking-tight leading-snug">
             "{quote.text}"
-            <footer className="text-[10px] font-bold mt-1 text-hayl-accent uppercase">
-              — {quote.author}
+            <footer className="text-[9px] opacity-40 mt-3 flex items-center gap-3 tracking-widest">
+              <span className="w-6 h-[1px] bg-hayl-text/20" /> {quote.author}
             </footer>
           </blockquote>
         </div>
       )}
 
-      {/* Pro Tips (Collapsible) */}
-      <details className="group border-t border-hayl-border">
-        <summary className="px-4 py-3 cursor-pointer font-heading font-bold text-sm uppercase tracking-widest text-hayl-muted hover:text-hayl-text transition-colors list-none flex justify-between items-center">
-          Pro Tips
-          <span className="group-open:rotate-180 transition-transform">▼</span>
+      {/* Insights (Collapsible) */}
+      <details className="group border-b border-hayl-border last:border-b-0">
+        <summary className="px-8 py-5 cursor-pointer font-heading font-bold text-xs uppercase tracking-[0.2em] text-hayl-text hover:bg-hayl-bg transition-colors list-none flex justify-between items-center">
+          Performance Notes
+          <svg className="w-4 h-4 group-open:rotate-180 transition-transform opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
         </summary>
-        <div className="px-4 pb-4">
-          <p className="text-sm text-hayl-muted leading-relaxed">
+        <div className="px-8 pb-8 pt-2">
+          <p className="font-sans text-xs font-bold uppercase tracking-wide text-hayl-muted leading-relaxed">
             {exercise.instructions}
           </p>
         </div>
       </details>
 
-      {/* Set Info Footer */}
-      <div className="px-4 py-3 bg-hayl-bg border-t border-hayl-border flex justify-between items-center text-xs font-bold uppercase">
-        <span>
-          Set {currentSetIndex + 1} of {sets}
-        </span>
-        <span className="text-hayl-muted">
-          Rest: {restSeconds}s
-        </span>
+      {/* Control Footer */}
+      <div className="px-8 py-5 bg-hayl-surface border-t border-hayl-border flex justify-between items-center font-heading font-bold uppercase tracking-[0.15em]">
+        <div className="flex items-center gap-4">
+          <div className="w-2 h-2 rounded-full bg-hayl-text" />
+          <span className="text-xs">Set <span className="text-hayl-text">{currentSetIndex + 1}</span> <span className="text-hayl-muted/40">/ {sets}</span></span>
+        </div>
+        <div className="flex items-center gap-2 text-hayl-muted text-[10px] tracking-[0.2em]">
+          <span>REST {restSeconds}S</span>
+        </div>
       </div>
     </article>
   );

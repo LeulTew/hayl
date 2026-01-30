@@ -15,38 +15,40 @@ interface BentoListProps {
 
 export function BentoList({ items, onItemClick, className = '' }: BentoListProps) {
   return (
-    <div className={`flex flex-col gap-2 ${className}`}>
+    <div className={`flex flex-col gap-4 ${className}`}>
       {items.map((item) => (
         <div 
           key={item.id} 
           onClick={() => onItemClick?.(item.id)}
           className="
             group
-            p-5 
+            p-6 
             bg-hayl-surface 
-            rounded-lg 
-            shadow-subtle hover:shadow-md 
-            transition-all duration-fast cursor-pointer
+            rounded-2xl
+            border border-hayl-border
+            hover:border-hayl-text
+            hover:bg-hayl-bg
+            transition-all duration-300 cursor-pointer
             flex justify-between items-center
-            border border-transparent hover:border-hayl-border
           "
         >
           <div className="flex flex-col">
-            <h3 className="font-heading font-bold text-hayl-text text-xl uppercase tracking-wide leading-none group-hover:text-hayl-accent transition-colors">
+            <h3 className="font-heading font-bold text-hayl-text text-2xl tracking-tight leading-none transition-colors">
                 {item.title}
             </h3>
             {item.subtitle && (
-                <p className="font-sans text-sm text-hayl-muted mt-1 font-medium">
+                <p className="font-sans text-xs text-hayl-muted mt-2 font-bold uppercase tracking-widest">
                     {item.subtitle}
                 </p>
             )}
           </div>
           
-          <div className="text-hayl-accent transition-opacity font-heading font-bold text-lg">
-            {item.rightElement || <span className="text-2xl text-hayl-muted font-light group-hover:text-hayl-accent">→</span>}
+          <div className="text-hayl-accent transition-all font-heading font-bold text-xl group-hover:translate-x-1">
+            {item.rightElement || <span>→</span>}
           </div>
         </div>
       ))}
     </div>
+
   );
 }

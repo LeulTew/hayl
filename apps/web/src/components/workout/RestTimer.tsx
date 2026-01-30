@@ -33,53 +33,61 @@ export function RestTimer({ seconds, onComplete, onSkip }: RestTimerProps) {
     }, [timeLeft, onComplete]);
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-hayl-bg/95 backdrop-blur-md animate-in fade-in duration-300">
-            <div className="text-center space-y-8 flex flex-col items-center">
-                <p className="font-heading font-bold text-hayl-muted uppercase tracking-[0.2em] animate-pulse">Rest Interval</p>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-hayl-bg animate-in fade-in duration-300">
+            {/* Background Decorative Grid */}
+            <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
+                 style={{ backgroundImage: 'radial-gradient(var(--hayl-text) 1px, transparent 1px)', backgroundSize: '24px 24px' }} 
+            />
+
+            <div className="relative text-center space-y-16 flex flex-col items-center max-w-sm w-full p-12 rounded-[3rem] border border-hayl-border bg-hayl-surface shadow-premium">
+                <div className="space-y-4">
+                    <p className="font-heading font-black italic text-hayl-text uppercase tracking-[0.4em] text-xs">Rest Interval</p>
+                    <h2 className="text-[10px] font-sans font-bold text-hayl-muted uppercase tracking-[0.3em] opacity-60">Addis Performance Engine</h2>
+                </div>
                 
-                {/* Circular Progress */}
-                <div className="relative w-64 h-64 flex items-center justify-center">
+                {/* Visual Timer */}
+                <div className="relative w-72 h-72 flex items-center justify-center bg-hayl-bg rounded-full border border-hayl-border">
                     <svg className="absolute w-full h-full -rotate-90">
                         <circle
-                            cx="128"
-                            cy="128"
-                            r={radius}
+                            cx="144"
+                            cy="144"
+                            r={radius + 15}
                             stroke="currentColor"
-                            strokeWidth="8"
+                            strokeWidth="4"
                             fill="transparent"
-                            className="text-hayl-surface"
+                            className="text-hayl-border"
                         />
                         <circle
-                            cx="128"
-                            cy="128"
-                            r={radius}
+                            cx="144"
+                            cy="144"
+                            r={radius + 15}
                             stroke="currentColor"
-                            strokeWidth="8"
+                            strokeWidth="4"
                             fill="transparent"
                             strokeDasharray={circumference}
                             style={{ strokeDashoffset: offset, transition: 'stroke-dashoffset 1s linear' }}
-                            className="text-hayl-accent"
+                            className="text-hayl-text"
                             strokeLinecap="round"
                         />
                     </svg>
-                    <div className="text-7xl font-heading font-bold tabular-nums">
+                    <div className="text-8xl font-heading font-black tabular-nums italic tracking-tighter lowercase">
                         {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}
                     </div>
                 </div>
 
-                <div className="space-y-4 w-full px-12">
-                   <button 
+                <div className="flex flex-col gap-4 w-full">
+                    <button 
                         onClick={() => setTimeLeft(prev => prev + 30)}
-                        className="text-xs font-bold font-heading text-hayl-muted uppercase tracking-widest hover:text-hayl-text border border-hayl-border px-4 py-2 rounded-full transition-colors"
+                        className="py-5 bg-hayl-bg rounded-2xl border border-hayl-border font-heading font-bold uppercase tracking-[0.2em] hover:border-hayl-text transition-all text-xs italic"
                     >
-                        +30 Seconds
+                        +30s Logic Extension
                     </button>
                     
                     <button 
                         onClick={onSkip}
-                        className="w-full py-4 rounded-xl font-heading font-bold uppercase tracking-[0.2em] text-hayl-text border-2 border-hayl-text hover:bg-hayl-text hover:text-hayl-bg transition-all"
+                        className="py-6 bg-hayl-text text-hayl-bg rounded-full font-heading font-bold uppercase tracking-[0.3em] hover:scale-[1.02] active:scale-[0.98] transition-all text-xl italic"
                     >
-                        Skip Rest
+                        Skip Rest →
                     </button>
                 </div>
             </div>

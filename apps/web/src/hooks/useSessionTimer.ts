@@ -22,7 +22,7 @@ export function useSessionTimer() {
     }
   }, [isRunning]);
 
-  const stop = useCallback(() => {
+  const reset = useCallback(() => {
     pause();
     setElapsedSeconds(0);
   }, [pause]);
@@ -46,7 +46,7 @@ export function useSessionTimer() {
     isRunning,
     start,
     pause,
-    stop,
+    reset,
     formatted: formatTime(elapsedSeconds)
   };
 }

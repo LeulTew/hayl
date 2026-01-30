@@ -6,61 +6,54 @@ interface LandingPageProps {
 
 export function LandingPage({ onEnter }: LandingPageProps) {
   return (
-    <div className="min-h-screen bg-hayl-bg flex flex-col items-center justify-center p-6 text-center animate-fade-in">
-      {/* Background Decorative Element */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-hayl-accent/5 rounded-full blur-[120px]" />
-        <div className="absolute -bottom-[10%] -right-[10%] w-[50%] h-[50%] bg-hayl-accent/5 rounded-full blur-[150px]" />
-      </div>
-
-      <div className="relative z-10 max-w-2xl space-y-12">
+    <div className="min-h-screen bg-hayl-bg flex flex-col items-center justify-center p-8 text-center animate-fade-in relative overflow-hidden">
+      <div className="relative z-10 max-w-md w-full space-y-24">
         {/* Branding */}
-        <div className="space-y-4">
-          <div className="inline-block bg-hayl-accent text-hayl-bg px-3 py-1 text-xs font-bold font-heading uppercase tracking-tighter rounded-sm mb-4">
-            ALPHA ACCESS
+        <header className="space-y-6">
+          <div className="inline-block bg-hayl-text text-hayl-bg px-5 py-1.5 text-[10px] font-heading font-bold uppercase tracking-[0.25em] rounded-full mb-6">
+            SYSTEM ALPHA 1.0
           </div>
-          <h1 className="text-8xl md:text-9xl font-heading font-bold italic tracking-tighter leading-[0.8] uppercase text-hayl-text">
-            HAYL
-          </h1>
-          <p className="text-sm md:text-base font-sans font-bold text-hayl-muted uppercase tracking-[0.3em] pl-2">
-            Addis Ababa • Ethiopia
+          <div className="relative">
+            <h1 className="text-[10rem] md:text-[12rem] font-heading font-bold italic tracking-tighter leading-[0.75] text-hayl-text">
+              HAYL
+            </h1>
+          </div>
+          <p className="text-[10px] font-sans font-bold text-hayl-muted uppercase tracking-[0.5em] pt-4 px-2 translate-x-1">
+            ADDIS ABABA • ETHIOPIA
           </p>
-        </div>
+        </header>
 
         {/* Mission Statement */}
-        <div className="space-y-6">
-          <h2 className="text-2xl md:text-3xl font-heading font-bold uppercase italic leading-tight max-w-md mx-auto">
-            Ethiopia's Premier <span className="text-hayl-accent border-b-4 border-hayl-accent">Fitness Engine</span>
+        <div className="space-y-8 px-4">
+          <h2 className="text-xl font-heading font-bold uppercase italic tracking-tight leading-relaxed text-hayl-text">
+            Scientific performance engine built for the <span className="underline underline-offset-8 decoration-hayl-muted/30">next generation</span> of athletes.
           </h2>
-          <p className="font-sans text-hayl-muted max-w-sm mx-auto text-sm leading-relaxed">
-            Scientific workout protocols, expert-derived nutrition, and high-performance timers built for the elite. 
-          </p>
         </div>
 
         {/* Call to Action */}
-        <div className="pt-8">
+        <footer className="w-full flex flex-col items-center gap-10">
           <button
             onClick={onEnter}
-            className="group relative w-full md:w-auto px-12 py-5 bg-hayl-text text-hayl-bg font-heading font-bold uppercase tracking-[0.2em] overflow-hidden transition-all hover:scale-105 active:scale-95 shadow-glow"
+            className="w-full py-6 bg-hayl-text text-hayl-bg font-heading font-bold text-2xl uppercase tracking-[0.15em] rounded-full hover:scale-[1.02] active:scale-[0.98] transition-all"
           >
-            <span className="relative z-10">Enter Active Mode</span>
-            <div className="absolute inset-0 bg-hayl-accent translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+            Enter Engine
           </button>
           
-          <div className="mt-8 flex items-center justify-center gap-6 text-[10px] font-bold font-heading text-hayl-muted uppercase tracking-widest">
-            <span>No Waitlist</span>
-            <span className="w-1 h-1 bg-hayl-muted rounded-full" />
-            <span>Open Beta</span>
-            <span className="w-1 h-1 bg-hayl-muted rounded-full" />
-            <span>Science First</span>
+          <div className="flex items-center justify-center gap-6 text-[9px] font-bold font-heading text-hayl-muted/50 uppercase tracking-[0.3em]">
+            <span>NO WAITLIST</span>
+            <span className="w-1 h-1 rounded-full bg-hayl-muted/30" />
+            <span>OPEN BETA</span>
+            <span className="w-1 h-1 rounded-full bg-hayl-muted/30" />
+            <span>SCIENCE FIRST</span>
           </div>
-        </div>
+        </footer>
       </div>
 
-      {/* Footer Quote */}
-      <footer className="absolute bottom-10 left-0 right-0 px-6 text-[10px] font-heading font-bold text-hayl-muted/50 uppercase tracking-tighter">
-        "TRANSFORMING ADDIS, ONE REP AT A TIME."
-      </footer>
+      {/* Decorative Subtle Background Text */}
+      <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 text-[20rem] font-heading font-black opacity-[0.02] pointer-events-none select-none tracking-tighter italic">
+        HAYL
+      </div>
     </div>
+
   );
 }
