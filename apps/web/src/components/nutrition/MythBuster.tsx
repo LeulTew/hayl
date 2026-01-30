@@ -21,9 +21,12 @@ const MYTHS = [
 
 export function MythBuster() {
   return (
-    <div className="bg-hayl-surface p-6 rounded-xl shadow-subtle border border-hayl-border">
-      <h2 className="text-2xl font-heading font-bold mb-4 uppercase">Facts vs Myths</h2>
-      <div className="space-y-4">
+    <div className="bg-hayl-surface p-10 rounded-[2.5rem] border border-hayl-border">
+      <div className="mb-10">
+        <h2 className="text-5xl font-heading font-black uppercase italic tracking-tighter leading-none mb-2 lowercase">Truth engine.</h2>
+        <p className="text-[10px] font-sans font-bold text-hayl-muted uppercase tracking-[0.4em] opacity-60 pl-1">Science-based nutrition clarity</p>
+      </div>
+      <div className="space-y-6">
         {MYTHS.map((myth, i) => (
             <MythCard key={i} question={myth.question} answer={myth.answer} />
         ))}
@@ -38,20 +41,21 @@ function MythCard({ question, answer }: { question: string, answer: string }) {
     return (
         <div 
             onClick={() => setIsOpen(!isOpen)}
-            className="bg-hayl-bg border border-hayl-border rounded overflow-hidden cursor-pointer hover:border-hayl-text transition-colors group"
+            className="bg-hayl-bg rounded-[2rem] border border-hayl-border overflow-hidden cursor-pointer group transition-all"
         >
-            <div className="p-4 flex justify-between items-center bg-hayl-bg">
-                <h3 className="font-bold font-sans text-sm pr-4">{question}</h3>
-                <span className={`transform transition-transform duration-300 text-hayl-muted group-hover:text-hayl-text font-bold ${isOpen ? 'rotate-180' : ''}`}>
-                    ↓
+            <div className={`p-6 flex justify-between items-center bg-hayl-bg group-hover:bg-hayl-surface transition-colors ${isOpen ? 'bg-hayl-surface' : ''}`}>
+                <h3 className="font-heading font-bold uppercase text-lg italic tracking-tight leading-tight pr-6">{question}</h3>
+                <span className={`transform transition-transform duration-500 text-hayl-text opacity-30 font-heading font-bold text-xl ${isOpen ? 'rotate-180 opacity-100' : ''}`}>
+                    ▲
                 </span>
             </div>
             
-            <div className={`transition-all duration-300 ease-in-out overflow-hidden ${isOpen ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}>
-                <div className="p-4 pt-0 text-sm text-hayl-muted border-t border-hayl-border/50">
-                    <p className="mt-2">{answer}</p>
+            <div className={`transition-all duration-500 ease-in-out overflow-hidden ${isOpen ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'}`}>
+                <div className="p-8 pt-2 bg-hayl-text text-hayl-bg">
+                    <p className="font-sans text-xs font-bold uppercase tracking-wide leading-relaxed italic opacity-80">{answer}</p>
                 </div>
             </div>
         </div>
     )
 }
+
