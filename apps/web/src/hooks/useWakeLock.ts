@@ -1,59 +1,134 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 /**
- * Hook to lock screen wake state.
- * Vital for workout apps so screen doesn't dim during a plank/set.
+ * useWakeLock
+ * 
+ * A React hook for the Screen Wake Lock API.
+ * Prevents the device screen from dimming/locking during active workouts.
+ * 
+ * Features:
+ * - Automatic re-acquisition on visibilitychange
+ * - Graceful error handling for unsupported browsers
+ * - Clean release on unmount
+ * 
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/Screen_Wake_Lock_API
  */
 export function useWakeLock() {
+  const [isSupported] = useState(() => 'wakeLock' in navigator);
   const [isLocked, setIsLocked] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  
+  // Use ref to persist sentinel across re-renders
   const wakeLockRef = useRef<WakeLockSentinel | null>(null);
+  
+  // Track if we should auto-reacquire on visibility change
+  const shouldReacquireRef = useRef(false);
 
-  const requestLock = useCallback(async () => {
-    if ('wakeLock' in navigator) {
-      try {
-        const lock = await navigator.wakeLock.request('screen');
-        wakeLockRef.current = lock;
-        setIsLocked(true);
-        
-        lock.addEventListener('release', () => {
-          setIsLocked(false);
-          wakeLockRef.current = null;
-        });
-        
-        console.log('[WakeLock] Acquired');
-      } catch (err) {
-        console.error('[WakeLock] Failed to acquire:', err);
-      }
-    } else {
-        console.warn('[WakeLock] Not supported in this browser');
+  /**
+   * Request a screen wake lock
+   * 
+   * @returns Promise<boolean> - true if lock acquired successfully
+   */
+  const requestLock = useCallback(async (): Promise<boolean> => {
+    if (!isSupported) {
+      setError(new Error('Wake Lock API not supported'));
+      return false;
     }
-  }, []);
 
-  const releaseLock = useCallback(async () => {
+    try {
+      const sentinel = await navigator.wakeLock.request('screen');
+      wakeLockRef.current = sentinel;
+      shouldReacquireRef.current = true;
+      setIsLocked(true);
+      setError(null);
+
+      // Listen for automatic release (tab switch, minimize, etc.)
+      sentinel.addEventListener('release', () => {
+        setIsLocked(false);
+        wakeLockRef.current = null;
+      });
+
+      return true;
+    } catch (err) {
+      // Common failures: low battery, power saver mode, system policy
+      const error = err instanceof Error ? err : new Error('Wake lock request failed');
+      setError(error);
+      setIsLocked(false);
+      return false;
+    }
+  }, [isSupported]);
+
+  /**
+   * Release the current wake lock
+   */
+  const releaseLock = useCallback(async (): Promise<void> => {
+    shouldReacquireRef.current = false;
+    
     if (wakeLockRef.current) {
-      await wakeLockRef.current.release();
+      try {
+        await wakeLockRef.current.release();
+      } catch {
+        // Ignore release errors - lock may already be released
+      }
       wakeLockRef.current = null;
       setIsLocked(false);
-      console.log('[WakeLock] Released');
     }
   }, []);
 
-  // Re-acquire lock when page creates visibility change (e.g. switching tabs and back)
+  // Re-acquire wake lock when tab becomes visible again
   useEffect(() => {
+    if (!isSupported) return;
+
     const handleVisibilityChange = async () => {
-      if (document.visibilityState === 'visible' && !isLocked) {
-        // Optional: Auto-reacquire? Or wait for user action? 
-        // For a workout app, auto-reacquire if we were supposed to be active is good.
-        // For now, we leave manual control to the consumer or valid state.
+      if (
+        document.visibilityState === 'visible' &&
+        shouldReacquireRef.current &&
+        !wakeLockRef.current
+      ) {
+        // Auto-reacquire for workout apps - critical for gym floor use
+        try {
+          const sentinel = await navigator.wakeLock.request('screen');
+          wakeLockRef.current = sentinel;
+          setIsLocked(true);
+          
+          sentinel.addEventListener('release', () => {
+            setIsLocked(false);
+            wakeLockRef.current = null;
+          });
+        } catch {
+          // Silent fail on reacquisition - user can manually retry
+        }
       }
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
+    
     return () => {
-      releaseLock();
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [releaseLock, isLocked]);
+  }, [isSupported]);
 
-  return { isLocked, requestLock, releaseLock };
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (wakeLockRef.current) {
+        wakeLockRef.current.release().catch(() => {
+          // Ignore cleanup errors
+        });
+      }
+    };
+  }, []);
+
+  return {
+    /** Whether the Wake Lock API is supported in this browser */
+    isSupported,
+    /** Whether a wake lock is currently active */
+    isLocked,
+    /** Any error that occurred during the last request */
+    error,
+    /** Request a screen wake lock */
+    requestLock,
+    /** Release the current wake lock */
+    releaseLock,
+  };
 }

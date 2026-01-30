@@ -23,10 +23,10 @@ export const seedExercises = mutation({
     let skipped = 0;
 
     for (const exercise of args.exercises) {
-      // Check for existing exercise by exact name match using search index
+      // Check for existing exercise by exact name match
       const existing = await ctx.db
         .query("exercises")
-        .withSearchIndex("search_name", (q) => q.search("name", exercise.name))
+        .filter((q) => q.eq(q.field("name"), exercise.name))
         .first();
 
       if (!existing) {
@@ -90,3 +90,38 @@ export const listAll = query({
     return await ctx.db.query("exercises").collect();
   },
 });
+
+/**
+ * Batch retrieves multiple exercises by their IDs.
+ * Efficiently fetches exercise details for workout views.
+ * 
+ * @param ids - Array of Convex exercise IDs
+ * @returns Record mapping exercise ID to exercise data (or null if not found)
+ */
+export const getExercisesByIds = query({
+  args: { ids: v.array(v.id("exercises")) },
+  handler: async (ctx: QueryCtx, args) => {
+    const results: Record<string, { name: string; muscleGroup: string; instructions: string } | null> = {};
+    
+    // Batch fetch using Promise.all for efficiency
+    const exercises = await Promise.all(
+      args.ids.map((id) => ctx.db.get(id))
+    );
+    
+    args.ids.forEach((id, index) => {
+      const exercise = exercises[index];
+      if (exercise) {
+        results[id] = {
+          name: exercise.name,
+          muscleGroup: exercise.muscleGroup,
+          instructions: exercise.instructions,
+        };
+      } else {
+        results[id] = null;
+      }
+    });
+    
+    return results;
+  },
+});
+

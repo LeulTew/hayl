@@ -16,3 +16,5 @@ convex/_generated/
 assets/reference-docs/*
 !assets/reference-docs/.keep
 
+
+.env.local
