@@ -35,19 +35,19 @@ jobs:
     needs: build
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    env:
+      FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
       - uses: superfly/flyctl-actions/setup-flyctl@master
 
       - name: Deploy to Fly.io
-        if: secrets.FLY_API_TOKEN != ''
+        if: env.FLY_API_TOKEN != ''
         run: flyctl deploy --remote-only
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
       - name: Skip Deploy (No Token)
-        if: secrets.FLY_API_TOKEN == ''
+        if: env.FLY_API_TOKEN == ''
         run: echo "Skipping Fly.io deploy because FLY_API_TOKEN is not set"
 
   deploy-web:

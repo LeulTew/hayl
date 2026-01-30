@@ -1,8 +1,8 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
-import { RestTimerOverlay } from './RestTimerOverlay';
+import { RestTimer } from './RestTimer';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-describe('RestTimerOverlay', () => {
+describe('RestTimer', () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
@@ -11,7 +11,7 @@ describe('RestTimerOverlay', () => {
     const onComplete = vi.fn();
     const onSkip = vi.fn();
 
-    render(<RestTimerOverlay seconds={10} onComplete={onComplete} onSkip={onSkip} />);
+    render(<RestTimer seconds={10} onComplete={onComplete} onSkip={onSkip} />);
 
     expect(screen.getByText('0:10')).toBeInTheDocument();
 
@@ -24,7 +24,7 @@ describe('RestTimerOverlay', () => {
   });
 
   it('should add 30 seconds when button clicked', async () => {
-    render(<RestTimerOverlay seconds={10} onComplete={vi.fn()} onSkip={vi.fn()} />);
+    render(<RestTimer seconds={10} onComplete={vi.fn()} onSkip={vi.fn()} />);
 
     const addButton = screen.getByText('+30 Seconds');
     fireEvent.click(addButton);
@@ -34,7 +34,7 @@ describe('RestTimerOverlay', () => {
 
   it('should call onSkip when skip button clicked', () => {
     const onSkip = vi.fn();
-    render(<RestTimerOverlay seconds={10} onComplete={vi.fn()} onSkip={onSkip} />);
+    render(<RestTimer seconds={10} onComplete={vi.fn()} onSkip={onSkip} />);
 
     const skipButton = screen.getByText('Skip Rest');
     fireEvent.click(skipButton);

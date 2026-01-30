@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 
-interface RestTimerOverlayProps {
+interface RestTimerProps {
     seconds: number;
     onComplete: () => void;
     onSkip: () => void;
 }
 
-export function RestTimerOverlay({ seconds, onComplete, onSkip }: RestTimerOverlayProps) {
+export function RestTimer({ seconds, onComplete, onSkip }: RestTimerProps) {
     const [timeLeft, setTimeLeft] = useState(seconds);
     const progress = (timeLeft / seconds) * 100;
     

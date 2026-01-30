@@ -1,5 +1,50 @@
 @import "tailwindcss";
 
+@import url("https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:wght@400;700&display=swap");
+
+@theme {
+  --color-hayl-bg: var(--hayl-bg);
+  --color-hayl-surface: var(--hayl-surface);
+  --color-hayl-text: var(--hayl-text);
+  --color-hayl-muted: var(--hayl-muted);
+  --color-hayl-accent: var(--hayl-accent);
+  --color-hayl-border: var(--hayl-border);
+
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-heading: "Barlow Condensed", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --shadow-glow: 0 0 20px -5px var(--hayl-accent);
+
+  --animate-fade-in: fadeIn 1s ease-out forwards;
+  --animate-slide-up: slideUp 0.5s ease-out forwards;
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      transform: translateY(20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+}
+
+/* Custom Utilities that might not be auto-generated */
+.font-heading {
+  font-family: var(--font-heading);
+}
+
 :root {
   /* Light Mode (Athletic Clean) */
   --hayl-bg: #ffffff;
@@ -20,19 +65,4 @@
     --hayl-accent: #ffffff; /* White accent */
     --hayl-border: #27272a; /* Zinc 800 */
   }
-}
-
-@theme {
-  --color-hayl-bg: var(--hayl-bg);
-  --color-hayl-surface: var(--hayl-surface);
-  --color-hayl-text: var(--hayl-text);
-  --color-hayl-muted: var(--hayl-muted);
-  --color-hayl-accent: var(--hayl-accent);
-  --color-hayl-border: var(--hayl-border);
-
-  --font-sans: "Inter", system-ui, sans-serif;
-  --font-heading: "Barlow Condensed", sans-serif;
-  --font-mono: "JetBrains Mono", monospace;
-
-  --shadow-subtle: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 }

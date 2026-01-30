@@ -3,7 +3,7 @@ import { useQuery } from "convex/react";
 import { useActiveSession } from "../../hooks/useActiveSession";
 // Convex imports (resolved via placeholders)
 import { api } from "../../../../../convex/_generated/api";
-import { RestTimerOverlay } from "./RestTimerOverlay";
+import { RestTimer } from "./RestTimer";
 
 interface WorkoutItem {
     exerciseId: string;
@@ -37,7 +37,6 @@ interface WorkoutSessionProps {
 
 export function WorkoutSession({ planId }: WorkoutSessionProps) {
     const { activeSession, logSet, nextExercise, finishSession, discardSession } = useActiveSession();
-    // @ts-expect-error - Dynamic dispatch to bypass missing generated imports
     const plan = useQuery(api.programs.getPlan, { planId }) as WorkoutPlan | undefined;
     const [restTimer, setRestTimer] = useState<{ active: boolean; seconds: number }>({ active: false, seconds: 0 });
 
@@ -58,7 +57,7 @@ export function WorkoutSession({ planId }: WorkoutSessionProps) {
 
     // Flatten exercises for linear navigation
     const allExercises = currentDay.phases.flatMap(
-        (p: { name: string; items: { exerciseId: string; sets: number; reps: string; restSeconds: number }[] }) => p.items.map(
+        (p: { name: string; items: Array<{ exerciseId: string; sets: number; reps: string; restSeconds: number }> }) => p.items.map(
             (i: { exerciseId: string; sets: number; reps: string; restSeconds: number }) => ({ ...i, phase: p.name })
         )
     ) as WorkoutItem[];
@@ -165,7 +164,7 @@ export function WorkoutSession({ planId }: WorkoutSessionProps) {
 
             {/* Overlay */}
             {restTimer.active && (
-                <RestTimerOverlay 
+                <RestTimer 
                     seconds={restTimer.seconds} 
                     onComplete={() => setRestTimer({ active: false, seconds: 0 })} 
                     onSkip={() => setRestTimer({ active: false, seconds: 0 })}

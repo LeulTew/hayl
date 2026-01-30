@@ -1,4 +1,4 @@
-import { mutation } from "./_generated/server";
+import { mutation, query, type QueryCtx, type MutationCtx } from "./_generated/server";
 import { v } from "convex/values";
 
 export const seedIngredients = mutation({
@@ -15,7 +15,7 @@ export const seedIngredients = mutation({
       isLocal: v.boolean(),
     }))
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx: MutationCtx, args: { ingredients: any[] }) => {
     // Basic deduplication based on name
     for (const ing of args.ingredients) {
       const existing = await ctx.db
@@ -30,4 +30,27 @@ export const seedIngredients = mutation({
       }
     }
   },
+});
+
+export const searchFood = query({
+  args: { query: v.string() },
+  handler: async (ctx: QueryCtx, args: { query: string }) => {
+    // Basic search (in real app, use a dedicated search index)
+    return await ctx.db
+      .query("foods")
+      .filter((q: any) =>
+        q.or(
+          q.eq(q.field("name"), args.query),
+          // Simple contains check logic would go here if not using full text search
+        )
+      )
+      .take(10);
+  },
+});
+
+export const getFood = query({
+    args: { id: v.id("foods") },
+    handler: async (ctx: QueryCtx, args: { id: string }) => {
+        return await ctx.db.get(args.id);
+    }
 });
