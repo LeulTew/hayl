@@ -48,14 +48,16 @@ _Decision: Hybrid Data Approach. Static content (Plans/Quotes) in Convex (cached
   - Finalize `scripts/ingest-assets.ts` to map exercises to lazy-loaded GIFs/Video URLs. `.gif` (10x smaller).
   - **Ingest Enforcement**: Script must record `robots.txt` check result and TOS URL.
 
-#### 2.2 Seed "The Hayl Standard" Content
+#### 2.2 Content Creation (The "One by One" Standard)
 
-- [x] **Digitize "Sister/Mom" Guide**:
-  - Convert PDF logic into JSON seed script.
-- [x] **Digitize "Coach Greg" (Derived)**:
-  - _Constraint_: No verbatim text. Re-write instructions.
-  - Create "Hard" & "Medium" variations.
-  - Set `requires_human_review: true`.
+- [ ] **Manual Drafting Phase**:
+  - **Constraint**: NO verbatim copying. All instructions must be re-written in original voice.
+  - **Process**: Read source -> Understand Principle -> Write Original Instruction -> Implement.
+  - **Review**: Human verification of every single exercise description.
+- [ ] **Create "The Hayl Standard" Plans**:
+  - **Sister/Mom Guide**: Digitize the original PDF logic (Beginner friendly).
+  - **Derived Architectures**: Create fresh plans _inspired by_ proven splits (e.g., HTLT structure, PPL) but with fully original strings.
+  - **Variations**: Manually craft "Hard" vs "Medium" logic sets.
 
 #### 2.3 Payment Infrastructure (Moved to Phase V)
 
@@ -153,13 +155,13 @@ _Decision: Hybrid Data Approach. Static content (Plans/Quotes) in Convex (cached
   2. **Conflict Resolution**: `RemotelastModifiedTs` > `Local` ? Pull : Push. **Fallback**: If simultaneous edits on same set, create BOTH entries with metadata and surface conflict resolution UI. (Never silently lose data).
   3. **Audit**: Persist `changeLog[]` for session replays.
 
-### UI/UX Design System: "Modern Athletic Hybrid"
+### UI/UX Design System: "Modern Athletic"
 
-- **Style**: Premium, Airy, Performance-Focused (Nike/Gymshark inspired).
-- **Structure**: Extra-rounded corners (rounded-2xl, rounded-[2.5rem], rounded-full), subtle borders.
-- **Typography**: **Inter** (Body/UI) + **Barlow Condensed Black Italic** (Headings/Stats).
-- **Theme**: Premium Light/Dark Mode with manual toggle (Zinc palette).
-- **Visuals**: Subtle premium shadows, generous whitespace, SVG icons (no emojis).
+- **Style**: Clean, Editorial, High-Performance (Nike/Gymshark vibes).
+- **Structure**: High whitespace, distinct content blocks, "Airy" layouts (Extra-rounded corners).
+- **Typography**: **Inter** (Body/UI) + **Barlow Condensed** (Headings/Stats).
+- **Theme**: Global **Light/Dark Mode** toggle.
+- **Visuals**: No shadow spam. Subtle dividers. High-contrast data display. SVG Icons (No emojis).
 - **Navigation**: TubeLight Navbar with framer-motion lamp animations.
 
 ### Safety Checks (Antigravity Rules)
