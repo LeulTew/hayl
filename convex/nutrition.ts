@@ -1,56 +1,119 @@
 import { mutation, query, type QueryCtx, type MutationCtx } from "./_generated/server";
 import { v } from "convex/values";
 
+/**
+ * Seeds the ingredient database with Ethiopian and global staples.
+ * Deduplicates by name using exact text match.
+ * 
+ * @param ingredients - Array of ingredient objects with macros
+ * @returns void
+ */
 export const seedIngredients = mutation({
   args: {
-    ingredients: v.array(v.object({
-      name: v.string(),
-      amharicName: v.optional(v.string()),
-      calories: v.number(),
-      protein: v.number(),
-      carbs: v.number(),
-      fats: v.number(),
-      fiber: v.number(),
-      category: v.union(v.literal("grain"), v.literal("legume"), v.literal("meat"), v.literal("vegetable"), v.literal("other")),
-      isLocal: v.boolean(),
-    }))
+    ingredients: v.array(
+      v.object({
+        name: v.string(),
+        amharicName: v.optional(v.string()),
+        calories: v.number(),
+        protein: v.number(),
+        carbs: v.number(),
+        fats: v.number(),
+        fiber: v.number(),
+        category: v.union(
+          v.literal("grain"),
+          v.literal("legume"),
+          v.literal("meat"),
+          v.literal("vegetable"),
+          v.literal("other")
+        ),
+        isLocal: v.boolean(),
+      })
+    ),
   },
-  handler: async (ctx: MutationCtx, args: { ingredients: any[] }) => {
-    // Basic deduplication based on name
+  handler: async (ctx: MutationCtx, args) => {
+    let inserted = 0;
+    let skipped = 0;
+
     for (const ing of args.ingredients) {
+      // Check for existing by searching name
       const existing = await ctx.db
         .query("ingredients")
         .withSearchIndex("search_name", (q) => q.search("name", ing.name))
         .first();
 
-      if (!existing) {
-        await ctx.db.insert("ingredients", ing);
+      // Only skip if exact match
+      if (existing && existing.name === ing.name) {
+        skipped++;
       } else {
-          // Optional: Update existing? For now, skip to avoid overwrites
+        await ctx.db.insert("ingredients", ing);
+        inserted++;
       }
     }
+
+    console.log(`[SEED] Ingredients: ${inserted} inserted, ${skipped} skipped`);
   },
 });
 
-export const searchFood = query({
+/**
+ * Searches ingredients by name using full-text search.
+ * 
+ * @param query - The search term
+ * @returns Up to 20 matching ingredients
+ */
+export const searchIngredients = query({
   args: { query: v.string() },
-  handler: async (ctx: QueryCtx, args: { query: string }) => {
-    // Basic search (in real app, use a dedicated search index)
+  handler: async (ctx: QueryCtx, args) => {
+    if (!args.query.trim()) {
+      // Return all local ingredients if no query
+      return await ctx.db
+        .query("ingredients")
+        .filter((q) => q.eq(q.field("isLocal"), true))
+        .take(20);
+    }
+
     return await ctx.db
-      .query("foods")
-      .filter((q: any) =>
-        q.or(
-          q.eq(q.field("name"), args.query),
-          // Simple contains check logic would go here if not using full text search
-        )
-      )
-      .take(10);
+      .query("ingredients")
+      .withSearchIndex("search_name", (q) => q.search("name", args.query))
+      .take(20);
   },
 });
 
-export const getFood = query({
-    args: { id: v.id("foods") },
-    handler: async (ctx: QueryCtx, args: { id: string }) => {
-        return await ctx.db.get(args.id);
-    }
+/**
+ * Gets a single ingredient by ID.
+ * 
+ * @param id - The Convex ID of the ingredient
+ * @returns The ingredient document or null
+ */
+export const getIngredient = query({
+  args: { id: v.id("ingredients") },
+  handler: async (ctx: QueryCtx, args) => {
+    return await ctx.db.get(args.id);
+  },
+});
+
+/**
+ * Lists all ingredients (for admin/dashboard).
+ * 
+ * @returns All ingredients in the database
+ */
+export const listAll = query({
+  args: {},
+  handler: async (ctx: QueryCtx) => {
+    return await ctx.db.query("ingredients").collect();
+  },
+});
+
+/**
+ * Lists only local Ethiopian ingredients.
+ * 
+ * @returns Ethiopian ingredients
+ */
+export const listLocal = query({
+  args: {},
+  handler: async (ctx: QueryCtx) => {
+    return await ctx.db
+      .query("ingredients")
+      .filter((q) => q.eq(q.field("isLocal"), true))
+      .collect();
+  },
 });
