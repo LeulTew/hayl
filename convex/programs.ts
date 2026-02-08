@@ -158,6 +158,10 @@ export const seedDerivedPlan = mutation({
       durationMinutes: v.number(),
       tags: v.optional(v.array(v.string())),
     }),
+    description: v.string(),
+    overview_markdown: v.optional(v.string()),
+    schedule_markdown: v.optional(v.string()),
+    philosophy_markdown: v.optional(v.string()), // <--- Added fields
     source_refs: v.array(
       v.object({
         docId: v.string(),
@@ -214,6 +218,10 @@ export const seedDerivedPlan = mutation({
       version: args.version,
       author: args.author,
       variant: args.variant,
+      description: args.description,
+      overview_markdown: args.overview_markdown,
+      schedule_markdown: args.schedule_markdown,
+      philosophy_markdown: args.philosophy_markdown,
       source_refs: args.source_refs,
       requires_human_review: args.requires_human_review,
       reviewedBy: args.reviewedBy,
