@@ -38,7 +38,6 @@ function ExerciseCardComponent({
   currentSetIndex,
   exerciseNumber,
   totalExercises,
-  onSetComplete: _onSetComplete,
 }: ExerciseCardProps) {
   // Fetch exercise details
   const exercise = useQuery(api.exercises.getExercise, { id: exerciseId });

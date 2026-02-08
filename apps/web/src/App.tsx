@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { LandingPage } from './components/home/LandingPage';
 import { Dashboard } from './components/dashboard/Dashboard';
 import { SplitSelector } from './components/workout/SplitSelector';
@@ -21,20 +21,27 @@ import { GlobalNav } from './components/navigation/GlobalNav';
 function App() {
   const { activeSession, startSession } = useActiveSession();
   
-  // Initial state is landing unless there's an active session
-  const [view, setView] = useState<ViewState>({ type: 'landing' });
-
-  // Sync view with active session on mount or session change
-  useEffect(() => {
-    if (activeSession) {
-      if (view.type !== 'workout' || (view.type === 'workout' && view.data.planId !== activeSession.planId)) {
-        setView({ type: 'workout', data: { planId: activeSession.planId } });
-      }
-    } else if (view.type === 'workout') {
-      // If session ended and we're in workout view, go back to dashboard
-      setView({ type: 'dashboard' });
+  // Initial state logic: If session is active, go straight to workout
+  const [view, setView] = useState<ViewState>(() => {
+    if (activeSession?.id && activeSession.state === 'active') {
+      return { type: 'workout', data: { planId: activeSession.planId } };
     }
-  }, [activeSession, view.type]);
+    return { type: 'landing' };
+  });
+
+  // Render-time redirection: If we are in workout view but have no active session, 
+  // we effectively "fallback" to dashboard.
+  // We can update state lazily or just handle it in the render logic.
+  // For now, let's keep it simple: unique key to force remount if needed, 
+  // or just rely on the user manual navigation if session breaks.
+  
+  // Actually, better pattern:
+  if (view.type === 'workout' && (!activeSession || activeSession.state !== 'active')) {
+     // This is a render-time state update pattern (allowed if conditional)
+     // But to be safer and avoid loop, we just render Dashboard and schedule update
+     setTimeout(() => setView({ type: 'dashboard' }), 0);
+     return <Dashboard onSelectProgram={(id) => setView({ type: 'split-selector', data: { programId: id } })} />;
+  }
 
   const isTopLevelView = (type: string): type is TopLevelView => {
     return ['dashboard', 'exercises', 'nutrition', 'profile'].includes(type);
