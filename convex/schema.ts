@@ -44,6 +44,12 @@ export default defineSchema({
       tags: v.optional(v.array(v.string())), 
     }),
 
+    // --- RICH CONTENT (GUIDE VIEW) ---
+    description: v.string(), // Short snippet for cards
+    overview_markdown: v.optional(v.string()), // Full "Start Here" intro
+    schedule_markdown: v.optional(v.string()), // "How to run this split"
+    philosophy_markdown: v.optional(v.string()), // "Why this works" (Science based)
+
     source_refs: v.array(v.object({
       docId: v.string(),
       page: v.optional(v.number()),
