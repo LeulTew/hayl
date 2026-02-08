@@ -111,6 +111,10 @@ async function main() {
           durationMinutes: 60,
           tags: ["beginner-friendly", "full-body"],
         },
+        description: "A comprehensive introduction to full-body training.",
+        overview_markdown: "## Overview\nA balanced full-body routine.",
+        schedule_markdown: "- **Day 1**: Full Body A\n- **Day 2**: Full Body B\n- **Day 3**: Full Body C",
+        philosophy_markdown: "**Philosophy**\nCompound movements first.",
         source_refs: [
           {
             docId: "hayl-foundations-v1",
