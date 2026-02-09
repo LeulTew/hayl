@@ -10,11 +10,19 @@ Violating these rules is considered a **failure**, not a suggestion.
 The AI must solve problems **directly, completely, and correctly**.
 
 The AI is NOT allowed to:
+
 - bypass issues using `any`, unsafe casts, or placeholders
 - defer correctness “for later”
 - ship partial implementations in critical paths
 
+### 0.1 CONTENT QUALITY IS PARAMOUNT
+
+- **No TODOs in Seed Scripts**: Content must be complete. 50 quotes means 50 quotes, not 5 and a TODO.
+- **Verification**: Every plan must be verified for logic and tone.
+- **Quantity**: We do not rush. We build comprehensive libraries.
+
 If something is difficult:
+
 - slow down
 - reason step by step
 - research or ask
@@ -63,6 +71,7 @@ If the type system fails, **the design is wrong**. Fix the design.
 ### 2.1 Forbidden TODO Zones
 
 The following areas must be **fully implemented**:
+
 - payment verification
 - signature validation
 - authentication and authorization
@@ -76,6 +85,7 @@ Placeholder comments or TODOs in these areas are forbidden.
 ### 2.2 Explicit Blocking Is Required
 
 If the AI cannot safely complete an implementation:
+
 - it must STOP
 - explain exactly what information is missing
 - request that information explicitly
@@ -91,6 +101,7 @@ Guessing is forbidden.
 - After validation, internal code must assume correctness.
 
 Required layers:
+
 1. runtime schema validation
 2. domain/business rule validation
 3. persistence and schema validation
@@ -115,6 +126,7 @@ Required layers:
 Security-critical code must prove that it **fails correctly**.
 
 Examples:
+
 - invalid webhook signature → rejected
 - expired subscription → denied
 - malformed payload → 400 error
@@ -140,6 +152,7 @@ Guessing is not allowed.
 - Names must be explicit and meaningful
 
 Every exported or public function must include documentation explaining:
+
 - purpose
 - inputs
 - outputs
