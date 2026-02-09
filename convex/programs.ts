@@ -127,8 +127,13 @@ export const seedPrograms = mutation({
         insertedIds[program.slug] = id;
         console.log(`[SEED] Program inserted: ${program.title}`);
       } else {
+        // Patch existing program to ensure idempotency update
+        await ctx.db.patch(existing._id, {
+          ...program,
+          updatedAt: Date.now(),
+        });
         insertedIds[program.slug] = existing._id;
-        console.log(`[SEED] Program exists: ${program.title}`);
+        console.log(`[SEED] Program updated: ${program.title}`);
       }
     }
 
@@ -242,6 +247,11 @@ export const seedDerivedPlan = mutation({
 export const wipeDerivedPlans = mutation({
   args: {},
   handler: async (ctx: MutationCtx) => {
+    // Safety check - blocked in production
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("❌ WIPE OPERATION BLOCKED IN PRODUCTION");
+    }
+
     const plans = await ctx.db.query("derivedPlans").collect();
     for (const plan of plans) {
       await ctx.db.delete(plan._id);

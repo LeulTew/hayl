@@ -58,7 +58,7 @@ export function WorkoutSession({ planId }: WorkoutSessionProps) {
   
   // Local state
   const [restTimer, setRestTimer] = useState<{ active: boolean; seconds: number }>({ active: false, seconds: 0 });
-  const [, setActivePhaseIndex] = useState(0);
+  // const [, setActivePhaseIndex] = useState(0); // Removed unused state
   
   // Input refs for weight/reps
   const weightInputRef = useRef<HTMLInputElement>(null);
@@ -216,7 +216,8 @@ export function WorkoutSession({ planId }: WorkoutSessionProps) {
         <PhaseTabs
           phases={phasesInfo}
           activeIndex={currentPhaseIndex}
-          onTabClick={setActivePhaseIndex}
+          onTabClick={() => {}}
+          // Intentionally read-only until we implement session jumping
         />
       </div>
 

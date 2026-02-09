@@ -22,19 +22,14 @@ function GlobalTimerComponent({ startTime, isActive = true }: GlobalTimerProps) 
   useEffect(() => {
     if (!isActive) return;
 
-    let animationFrameId: number;
-    
-    const updateTimer = () => {
+    // Initial update
+    setElapsed(Date.now() - startTime);
+
+    const timer = setInterval(() => {
       setElapsed(Date.now() - startTime);
-      animationFrameId = requestAnimationFrame(updateTimer);
-    };
+    }, 1000);
 
-    // Start the animation loop
-    animationFrameId = requestAnimationFrame(updateTimer);
-
-    return () => {
-      cancelAnimationFrame(animationFrameId);
-    };
+    return () => clearInterval(timer);
   }, [startTime, isActive]);
 
   // Format elapsed time

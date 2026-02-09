@@ -154,25 +154,25 @@ The accessory circuit is where the real work happens. If you still have energy a
             name: "accessory" as const,
             items: [
               // Round 1
-              { exerciseId: exMap.get("Shoulder Press of Choice")!, sets: 1, reps: "20", restSeconds: 30, rpe: 6, note: "Round 1 - Moderate" },
-              { exerciseId: exMap.get("Side Lateral Raises")!, sets: 1, reps: "20", restSeconds: 30, rpe: 6, note: "Round 1 - Moderate" },
-              { exerciseId: exMap.get("Seated Incline Dumbbell Curls")!, sets: 1, reps: "20", restSeconds: 30, rpe: 6, note: "Round 1 - Moderate" },
-              { exerciseId: exMap.get("Triceps Press-Down / Skullcrushers")!, sets: 1, reps: "20", restSeconds: 30, rpe: 6, note: "Round 1 - Moderate" },
-              { exerciseId: exMap.get("Leg Press")!, sets: 1, reps: "20", restSeconds: 30, rpe: 6, note: "Round 1 - Moderate" },
-              { exerciseId: exMap.get("Leg Curl (Seated or Lying)")!, sets: 1, reps: "20", restSeconds: 30, rpe: 6, note: "Round 1 - Moderate" },
-              { exerciseId: exMap.get("Standing / Seated Calf Raise")!, sets: 1, reps: "20", restSeconds: 30, rpe: 6, note: "Round 1 - Moderate" },
+              { exerciseId: getEx("Shoulder Press of Choice"), sets: 1, reps: "20", restSeconds: 30, rpe: 6, note: "Round 1 - Moderate" },
+              { exerciseId: getEx("Side Lateral Raises"), sets: 1, reps: "20", restSeconds: 30, rpe: 6, note: "Round 1 - Moderate" },
+              { exerciseId: getEx("Seated Incline Dumbbell Curls"), sets: 1, reps: "20", restSeconds: 30, rpe: 6, note: "Round 1 - Moderate" },
+              { exerciseId: getEx("Triceps Press-Down / Skullcrushers"), sets: 1, reps: "20", restSeconds: 30, rpe: 6, note: "Round 1 - Moderate" },
+              { exerciseId: getEx("Leg Press"), sets: 1, reps: "20", restSeconds: 30, rpe: 6, note: "Round 1 - Moderate" },
+              { exerciseId: getEx("Leg Curl (Seated or Lying)"), sets: 1, reps: "20", restSeconds: 30, rpe: 6, note: "Round 1 - Moderate" },
+              { exerciseId: getEx("Standing / Seated Calf Raise"), sets: 1, reps: "20", restSeconds: 30, rpe: 6, note: "Round 1 - Moderate" },
               // Round 2
-              { exerciseId: exMap.get("Shoulder Press of Choice")!, sets: 1, reps: "12-15", restSeconds: 45, rpe: 8, note: "Round 2 - Heavy/Hard" },
-              { exerciseId: exMap.get("Side Lateral Raises")!, sets: 1, reps: "12-15", restSeconds: 45, rpe: 8, note: "Round 2 - Heavy/Hard" },
-              { exerciseId: exMap.get("Seated Incline Dumbbell Curls")!, sets: 1, reps: "12-15", restSeconds: 45, rpe: 8, note: "Round 2 - Heavy/Hard" },
-              { exerciseId: exMap.get("Triceps Press-Down / Skullcrushers")!, sets: 1, reps: "12-15", restSeconds: 45, rpe: 8, note: "Round 2 - Heavy/Hard" },
-              { exerciseId: exMap.get("Standing / Seated Calf Raise")!, sets: 1, reps: "12-15", restSeconds: 45, rpe: 8, note: "Round 2 - Heavy/Hard" },
+              { exerciseId: getEx("Shoulder Press of Choice"), sets: 1, reps: "12-15", restSeconds: 45, rpe: 8, note: "Round 2 - Heavy/Hard" },
+              { exerciseId: getEx("Side Lateral Raises"), sets: 1, reps: "12-15", restSeconds: 45, rpe: 8, note: "Round 2 - Heavy/Hard" },
+              { exerciseId: getEx("Seated Incline Dumbbell Curls"), sets: 1, reps: "12-15", restSeconds: 45, rpe: 8, note: "Round 2 - Heavy/Hard" },
+              { exerciseId: getEx("Triceps Press-Down / Skullcrushers"), sets: 1, reps: "12-15", restSeconds: 45, rpe: 8, note: "Round 2 - Heavy/Hard" },
+              { exerciseId: getEx("Standing / Seated Calf Raise"), sets: 1, reps: "12-15", restSeconds: 45, rpe: 8, note: "Round 2 - Heavy/Hard" },
               // Round 3
-              { exerciseId: exMap.get("Shoulder Press of Choice")!, sets: 1, reps: "10-15", restSeconds: 60, rpe: 9, note: "Round 3 - Same weight/Harder" },
-              { exerciseId: exMap.get("Side Lateral Raises")!, sets: 1, reps: "10-15", restSeconds: 60, rpe: 9, note: "Round 3 - Same weight/Harder" },
-              { exerciseId: exMap.get("Seated Incline Dumbbell Curls")!, sets: 1, reps: "10-15", restSeconds: 60, rpe: 9, note: "Round 3 - Same weight/Harder" },
-              { exerciseId: exMap.get("Triceps Press-Down / Skullcrushers")!, sets: 1, reps: "10-15", restSeconds: 60, rpe: 9, note: "Round 3 - Same weight/Harder" },
-              { exerciseId: exMap.get("Standing / Seated Calf Raise")!, sets: 1, reps: "10-15", restSeconds: 60, rpe: 9, note: "Round 3 - Same weight/Harder" },
+              { exerciseId: getEx("Shoulder Press of Choice"), sets: 1, reps: "10-15", restSeconds: 60, rpe: 9, note: "Round 3 - Same weight/Harder" },
+              { exerciseId: getEx("Side Lateral Raises"), sets: 1, reps: "10-15", restSeconds: 60, rpe: 9, note: "Round 3 - Same weight/Harder" },
+              { exerciseId: getEx("Seated Incline Dumbbell Curls"), sets: 1, reps: "10-15", restSeconds: 60, rpe: 9, note: "Round 3 - Same weight/Harder" },
+              { exerciseId: getEx("Triceps Press-Down / Skullcrushers"), sets: 1, reps: "10-15", restSeconds: 60, rpe: 9, note: "Round 3 - Same weight/Harder" },
+              { exerciseId: getEx("Standing / Seated Calf Raise"), sets: 1, reps: "10-15", restSeconds: 60, rpe: 9, note: "Round 3 - Same weight/Harder" },
             ]
           }
         ]

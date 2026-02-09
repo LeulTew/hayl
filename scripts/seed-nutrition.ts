@@ -1,4 +1,5 @@
 import { ConvexHttpClient } from "convex/browser";
+import { api } from "../convex/_generated/api.js";
 // Bun automatically loads .env files
 const convexUrl = process.env.VITE_CONVEX_URL || process.env.CONVEX_URL;
 
@@ -101,8 +102,7 @@ const INGREDIENTS = [
 async function main() {
   console.log(`Checking Convex URL: ${convexUrl}`);
   try {
-      // @ts-ignore - Dynamic dispatch
-      await client.mutation("nutrition:seedIngredients", { ingredients: INGREDIENTS });
+      await client.mutation(api.nutrition.seedIngredients, { ingredients: [...INGREDIENTS] });
       console.log("✅ Successfully seeded nutrition data!");
   } catch(e) {
       console.error("❌ Failed to seed:", e);

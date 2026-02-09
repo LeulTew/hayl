@@ -26,7 +26,7 @@ describe('RestTimer', () => {
   it('should add 30 seconds when button clicked', async () => {
     render(<RestTimer seconds={10} onComplete={vi.fn()} onSkip={vi.fn()} />);
 
-    const addButton = screen.getByText('+30 Seconds');
+    const addButton = screen.getByText('+30s Logic Extension');
     fireEvent.click(addButton);
 
     expect(screen.getByText('0:40')).toBeInTheDocument();
@@ -36,7 +36,7 @@ describe('RestTimer', () => {
     const onSkip = vi.fn();
     render(<RestTimer seconds={10} onComplete={vi.fn()} onSkip={onSkip} />);
 
-    const skipButton = screen.getByText('Skip Rest');
+    const skipButton = screen.getByText('Skip Rest →');
     fireEvent.click(skipButton);
 
     expect(onSkip).toHaveBeenCalled();

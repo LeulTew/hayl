@@ -127,35 +127,35 @@ Part 3 is your chance to catch any muscle groups that need extra attention. If y
           {
             name: "warmup" as const,
             items: [
-              { exerciseId: exMap.get("Squat of Choice")!, sets: 1, reps: "12", restSeconds: 60, note: "Light - Easy. Focus on form." },
+              { exerciseId: getEx("Squat of Choice"), sets: 1, reps: "12", restSeconds: 60, note: "Light - Easy. Focus on form." },
             ]
           },
           {
             name: "main" as const,
             items: [
-              { exerciseId: exMap.get("Squat of Choice")!, sets: 1, reps: "12", restSeconds: 90, rpe: 5, note: "Light - Easy" },
-              { exerciseId: exMap.get("Pull-up / Lat Pull-down")!, sets: 1, reps: "12", restSeconds: 90, rpe: 5, note: "Light - Easy" },
-              { exerciseId: exMap.get("Squat of Choice")!, sets: 1, reps: "10", restSeconds: 120, rpe: 7, note: "Moderate - Moderate" },
-              { exerciseId: exMap.get("Pull-up / Lat Pull-down")!, sets: 1, reps: "10", restSeconds: 120, rpe: 7, note: "Moderate - Moderate" },
-              { exerciseId: exMap.get("Squat of Choice")!, sets: 1, reps: "6-8", restSeconds: 180, rpe: 9, note: "Heavy - Hard" },
-              { exerciseId: exMap.get("Chin-up / Supinated Lat Pull-down")!, sets: 1, reps: "6-8", restSeconds: 180, rpe: 9, note: "Heavy - Hard" },
-              { exerciseId: exMap.get("Squat of Choice")!, sets: 1, reps: "5-8", restSeconds: 180, rpe: 10, note: "Same weight - Hard. Push the limit." },
-              { exerciseId: exMap.get("Chin-up / Supinated Lat Pull-down")!, sets: 1, reps: "5-8", restSeconds: 180, rpe: 10, note: "Same weight - Hard" },
+              { exerciseId: getEx("Squat of Choice"), sets: 1, reps: "12", restSeconds: 90, rpe: 5, note: "Light - Easy" },
+              { exerciseId: getEx("Pull-up / Lat Pull-down"), sets: 1, reps: "12", restSeconds: 90, rpe: 5, note: "Light - Easy" },
+              { exerciseId: getEx("Squat of Choice"), sets: 1, reps: "10", restSeconds: 120, rpe: 7, note: "Moderate - Moderate" },
+              { exerciseId: getEx("Pull-up / Lat Pull-down"), sets: 1, reps: "10", restSeconds: 120, rpe: 7, note: "Moderate - Moderate" },
+              { exerciseId: getEx("Squat of Choice"), sets: 1, reps: "6-8", restSeconds: 180, rpe: 9, note: "Heavy - Hard" },
+              { exerciseId: getEx("Chin-up / Supinated Lat Pull-down"), sets: 1, reps: "6-8", restSeconds: 180, rpe: 9, note: "Heavy - Hard" },
+              { exerciseId: getEx("Squat of Choice"), sets: 1, reps: "5-8", restSeconds: 180, rpe: 10, note: "Same weight - Hard. Push the limit." },
+              { exerciseId: getEx("Chin-up / Supinated Lat Pull-down"), sets: 1, reps: "5-8", restSeconds: 180, rpe: 10, note: "Same weight - Hard" },
 
               // PART 2: Deadlift/Row & Bench/Chest
-              { exerciseId: exMap.get("Deadlift of Choice")!, sets: 1, reps: "12", restSeconds: 90, rpe: 5, note: "Light - Easy. No belt." },
-              { exerciseId: exMap.get("Paused Bench Press")!, sets: 1, reps: "12", restSeconds: 90, rpe: 5, note: "Light - Easy. PAUSE on all sets." },
-              { exerciseId: exMap.get("Deadlift of Choice")!, sets: 1, reps: "8-10", restSeconds: 180, rpe: 7, note: "Moderate - Moderate" },
-              { exerciseId: exMap.get("Paused Bench Press")!, sets: 1, reps: "8-10", restSeconds: 180, rpe: 7, note: "Moderate - Moderate" },
-              { exerciseId: exMap.get("Deadlift of Choice")!, sets: 1, reps: "6-8", restSeconds: 180, rpe: 9, note: "Heavy - Hard. Belt optional." },
-              { exerciseId: exMap.get("Paused Bench Press")!, sets: 1, reps: "6-8", restSeconds: 180, rpe: 9, note: "Heavy - Hard" },
+              { exerciseId: getEx("Deadlift of Choice"), sets: 1, reps: "12", restSeconds: 90, rpe: 5, note: "Light - Easy. No belt." },
+              { exerciseId: getEx("Paused Bench Press"), sets: 1, reps: "12", restSeconds: 90, rpe: 5, note: "Light - Easy. PAUSE on all sets." },
+              { exerciseId: getEx("Deadlift of Choice"), sets: 1, reps: "8-10", restSeconds: 180, rpe: 7, note: "Moderate - Moderate" },
+              { exerciseId: getEx("Paused Bench Press"), sets: 1, reps: "8-10", restSeconds: 180, rpe: 7, note: "Moderate - Moderate" },
+              { exerciseId: getEx("Deadlift of Choice"), sets: 1, reps: "6-8", restSeconds: 180, rpe: 9, note: "Heavy - Hard. Belt optional." },
+              { exerciseId: getEx("Paused Bench Press"), sets: 1, reps: "6-8", restSeconds: 180, rpe: 9, note: "Heavy - Hard" },
               
-              { exerciseId: exMap.get("Row of Choice")!, sets: 1, reps: "12", restSeconds: 120, rpe: 7, note: "Moderate - Moderate" },
-              { exerciseId: exMap.get("Incline Chest Press of Choice")!, sets: 1, reps: "12", restSeconds: 120, rpe: 7, note: "Moderate - Moderate" },
-              { exerciseId: exMap.get("Row of Choice")!, sets: 1, reps: "6-9", restSeconds: 120, rpe: 9, note: "Heavy - Hard" },
-              { exerciseId: exMap.get("Incline Chest Press of Choice")!, sets: 1, reps: "6-9", restSeconds: 120, rpe: 9, note: "Heavy - Hard" },
-              { exerciseId: exMap.get("Row of Choice")!, sets: 1, reps: "5-8", restSeconds: 120, rpe: 10, note: "Same weight - Harder" },
-              { exerciseId: exMap.get("Incline Chest Press of Choice")!, sets: 1, reps: "5-8", restSeconds: 120, rpe: 10, note: "Same weight - Harder" },
+              { exerciseId: getEx("Row of Choice"), sets: 1, reps: "12", restSeconds: 120, rpe: 7, note: "Moderate - Moderate" },
+              { exerciseId: getEx("Incline Chest Press of Choice"), sets: 1, reps: "12", restSeconds: 120, rpe: 7, note: "Moderate - Moderate" },
+              { exerciseId: getEx("Row of Choice"), sets: 1, reps: "6-9", restSeconds: 120, rpe: 9, note: "Heavy - Hard" },
+              { exerciseId: getEx("Incline Chest Press of Choice"), sets: 1, reps: "6-9", restSeconds: 120, rpe: 9, note: "Heavy - Hard" },
+              { exerciseId: getEx("Row of Choice"), sets: 1, reps: "5-8", restSeconds: 120, rpe: 10, note: "Same weight - Harder" },
+              { exerciseId: getEx("Incline Chest Press of Choice"), sets: 1, reps: "5-8", restSeconds: 120, rpe: 10, note: "Same weight - Harder" },
             ]
           },
           // PART 3: Accessories Circuit
@@ -163,23 +163,23 @@ Part 3 is your chance to catch any muscle groups that need extra attention. If y
             name: "accessory" as const,
             items: [
               // Round 1
-              { exerciseId: exMap.get("Shoulder Press of Choice")!, sets: 1, reps: "12", restSeconds: 45, rpe: 6, note: "Round 1 - Moderate" },
-              { exerciseId: exMap.get("Side Lateral Raises")!, sets: 1, reps: "12", restSeconds: 30, rpe: 6, note: "Round 1 - Moderate" },
-              { exerciseId: exMap.get("Seated Incline Dumbbell Curls")!, sets: 1, reps: "12", restSeconds: 45, rpe: 6, note: "Round 1 - Moderate" },
-              { exerciseId: exMap.get("Bodyweight / Machine Dips")!, sets: 1, reps: "12", restSeconds: 45, rpe: 6, note: "Round 1 - Moderate" },
-              { exerciseId: exMap.get("Standing / Seated Calf Raise")!, sets: 1, reps: "12", restSeconds: 30, rpe: 6, note: "Round 1 - Moderate" },
+              { exerciseId: getEx("Shoulder Press of Choice"), sets: 1, reps: "12", restSeconds: 45, rpe: 6, note: "Round 1 - Moderate" },
+              { exerciseId: getEx("Side Lateral Raises"), sets: 1, reps: "12", restSeconds: 30, rpe: 6, note: "Round 1 - Moderate" },
+              { exerciseId: getEx("Seated Incline Dumbbell Curls"), sets: 1, reps: "12", restSeconds: 45, rpe: 6, note: "Round 1 - Moderate" },
+              { exerciseId: getEx("Bodyweight / Machine Dips"), sets: 1, reps: "12", restSeconds: 45, rpe: 6, note: "Round 1 - Moderate" },
+              { exerciseId: getEx("Standing / Seated Calf Raise"), sets: 1, reps: "12", restSeconds: 30, rpe: 6, note: "Round 1 - Moderate" },
               // Round 2
-              { exerciseId: exMap.get("Shoulder Press of Choice")!, sets: 1, reps: "8-10", restSeconds: 60, rpe: 8, note: "Round 2 - Heavy/Hard" },
-              { exerciseId: exMap.get("Side Lateral Raises")!, sets: 1, reps: "8-10", restSeconds: 45, rpe: 8, note: "Round 2 - Heavy/Hard" },
-              { exerciseId: exMap.get("Seated Incline Dumbbell Curls")!, sets: 1, reps: "8-10", restSeconds: 60, rpe: 8, note: "Round 2 - Heavy/Hard" },
-              { exerciseId: exMap.get("Bodyweight / Machine Dips")!, sets: 1, reps: "8-10", restSeconds: 60, rpe: 8, note: "Round 2 - Heavy/Hard" },
-              { exerciseId: exMap.get("Standing / Seated Calf Raise")!, sets: 1, reps: "8-10", restSeconds: 45, rpe: 8, note: "Round 2 - Heavy/Hard" },
+              { exerciseId: getEx("Shoulder Press of Choice"), sets: 1, reps: "8-10", restSeconds: 60, rpe: 8, note: "Round 2 - Heavy/Hard" },
+              { exerciseId: getEx("Side Lateral Raises"), sets: 1, reps: "8-10", restSeconds: 45, rpe: 8, note: "Round 2 - Heavy/Hard" },
+              { exerciseId: getEx("Seated Incline Dumbbell Curls"), sets: 1, reps: "8-10", restSeconds: 60, rpe: 8, note: "Round 2 - Heavy/Hard" },
+              { exerciseId: getEx("Bodyweight / Machine Dips"), sets: 1, reps: "8-10", restSeconds: 60, rpe: 8, note: "Round 2 - Heavy/Hard" },
+              { exerciseId: getEx("Standing / Seated Calf Raise"), sets: 1, reps: "8-10", restSeconds: 45, rpe: 8, note: "Round 2 - Heavy/Hard" },
               // Round 3 (Optional)
-              { exerciseId: exMap.get("Shoulder Press of Choice")!, sets: 1, reps: "7-10", restSeconds: 90, rpe: 9, note: "Round 3 - Heavier/Harder" },
-              { exerciseId: exMap.get("Side Lateral Raises")!, sets: 1, reps: "7-10", restSeconds: 60, rpe: 9, note: "Round 3 - Heavier/Harder" },
-              { exerciseId: exMap.get("Seated Incline Dumbbell Curls")!, sets: 1, reps: "7-10", restSeconds: 90, rpe: 9, note: "Round 3 - Heavier/Harder" },
-              { exerciseId: exMap.get("Bodyweight / Machine Dips")!, sets: 1, reps: "7-10", restSeconds: 90, rpe: 9, note: "Round 3 - Heavier/Harder" },
-              { exerciseId: exMap.get("Standing / Seated Calf Raise")!, sets: 1, reps: "7-10", restSeconds: 60, rpe: 9, note: "Round 3 - Heavier/Harder" },
+              { exerciseId: getEx("Shoulder Press of Choice"), sets: 1, reps: "7-10", restSeconds: 90, rpe: 9, note: "Round 3 - Heavier/Harder" },
+              { exerciseId: getEx("Side Lateral Raises"), sets: 1, reps: "7-10", restSeconds: 60, rpe: 9, note: "Round 3 - Heavier/Harder" },
+              { exerciseId: getEx("Seated Incline Dumbbell Curls"), sets: 1, reps: "7-10", restSeconds: 90, rpe: 9, note: "Round 3 - Heavier/Harder" },
+              { exerciseId: getEx("Bodyweight / Machine Dips"), sets: 1, reps: "7-10", restSeconds: 90, rpe: 9, note: "Round 3 - Heavier/Harder" },
+              { exerciseId: getEx("Standing / Seated Calf Raise"), sets: 1, reps: "7-10", restSeconds: 60, rpe: 9, note: "Round 3 - Heavier/Harder" },
             ]
           }
         ]

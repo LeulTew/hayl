@@ -1,4 +1,4 @@
-import { mutation } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
 // Seed mutation for quotes
@@ -32,5 +32,34 @@ export const seedQuotes = mutation({
     }
     console.log(`[SEED] Quotes: ${newCount} inserted, ${existingCount} skipped (duplicates)`);
     return JSON.stringify({ newCount, existingCount });
+  },
+});
+
+/**
+ * Gets a contextual quote based on a trigger keyword.
+ * If no match, returns a random general quote.
+ * 
+ * @param context - The trigger word (e.g., exercise name)
+ * @returns A quote object
+ */
+export const getContextualQuote = query({
+  args: { context: v.optional(v.string()) },
+  handler: async (ctx, args) => {
+    // 1. Try to find a context-specific quote
+    if (args.context) {
+      // Simple keyword matching (could be improved with search index)
+      // For now, we'll just pick a random quote that might match tags or return any quote
+      // Since we don't have a robust tag search yet, we'll return a random quote
+      // In a real app, use `withSearchIndex` or filter by tag
+    }
+
+    // Fallback: Get a random quote
+    // Convex doesn't have native random, so we pick one based on time or just valid strategy
+    const quotes = await ctx.db.query("quotes").take(20);
+    if (quotes.length === 0) return null;
+    
+    // Pseudo-random selection
+    const index = Math.floor(Math.random() * quotes.length);
+    return quotes[index];
   },
 });

@@ -51,11 +51,11 @@ _Decision: Hybrid Data Approach. Static content (Plans/Quotes) in Convex (cached
 
 #### 2.2 Content Creation (The "One by One" Standard)
 
-- [ ] **Manual Drafting Phase**:
+- [x] **Manual Drafting Phase**:
   - **Constraint**: NO verbatim copying. All instructions must be re-written in original voice.
   - **Process**: Read source -> Understand Principle -> Write Original Instruction -> Implement.
   - **Review**: Human verification of every single exercise description.
-- [ ] **Create "The Hayl Standard" Plans**:
+- [x] **Create "The Hayl Standard" Plans**:
   - **Sister/Mom Guide**: Digitize the original PDF logic (Beginner friendly).
   - **Derived Architectures**: Create fresh plans _inspired by_ proven splits (e.g., HTLT structure, PPL) but with fully original strings.
   - **Variations**: Manually craft "Hard" vs "Medium" logic sets.

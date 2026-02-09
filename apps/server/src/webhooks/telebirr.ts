@@ -38,12 +38,25 @@ export const telebirrWebhook = new Elysia()
   });
 
 function verifyTelebirrSignature(payload: Record<string, unknown>, secret: string): boolean {
-    // REAL IMPLEMENTATION (Commented out until secret available)
-    // const sortedKeys = Object.keys(payload).sort().filter(k => k !== 'sign');
-    // const stringToSign = sortedKeys.map(k => `${k}=${payload[k]}`).join('&');
-    // const signature = createHmac('sha256', secret).update(stringToSign).digest('hex');
-    // return signature === payload.sign;
+    if (!secret || secret === "todo-secret") {
+        console.warn("Telebirr Signature Validation Failed: Missing Secret (Failing Closed)");
+        return false;
+    }
+
+    const { sign, ...rest } = payload;
     
-    console.warn("Telebirr Signature Stub - Always returning TRUE for dev/test without secret");
-    return true; 
+    if (typeof sign !== 'string') return false;
+
+    // Sort keys and filter out null/undefined/empty
+    const sortedKeys = Object.keys(rest).sort();
+    const stringToSign = sortedKeys
+        .filter(k => rest[k] !== null && rest[k] !== undefined && rest[k] !== '')
+        .map(k => `${k}=${rest[k]}`)
+        .join('&');
+
+    const computedSignature = createHmac('sha256', secret)
+        .update(stringToSign)
+        .digest('hex');
+
+    return computedSignature === sign;
 }

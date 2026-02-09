@@ -36,9 +36,10 @@ export const seedIngredients = mutation({
 
     for (const ing of args.ingredients) {
       // Check for existing by searching name
+      // Check for existing by exact name match
       const existing = await ctx.db
         .query("ingredients")
-        .withSearchIndex("search_name", (q) => q.search("name", ing.name))
+        .filter((q) => q.eq(q.field("name"), ing.name))
         .first();
 
       // Only skip if exact match

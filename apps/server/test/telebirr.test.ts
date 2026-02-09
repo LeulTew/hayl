@@ -20,18 +20,52 @@ describe("Telebirr Webhook Integration", () => {
     expect(response.status).toBe(422); 
   });
 
-  it("should accept valid completed payload (Stubbed Sig)", async () => {
+  it("should accept valid completed payload (Signed)", async () => {
+    // Valid payload
+    const payload = {
+      out_trade_no: "123",
+      transaction_id: "tx_valid_1",
+      state: "COMPLETED",
+      amount: "100",
+      currency: "ETB"
+    };
+
+    // Sign it
+    const secret = "test-secret";
+    // We need to inject the secret into the app environment for this test
+    // Assuming the app reads process.env.TELEBIRR_SECRET or we can mock it
+    // For this test, we might need to mock verifyTelebirrSignature or ensure env var is set
+    
+    // Sort and sign (duplicating logic for test verification)
+    const sortedKeys = (Object.keys(payload) as Array<keyof typeof payload>).sort();
+    const stringToSign = sortedKeys.map(k => `${k}=${payload[k]}`).join('&');
+
+    const signedPayload = { ...payload };
+
+    // @ts-ignore - Bun test env
+    // Mocking the secret check inside the app is tricky without dependency injection
+    // But we can try setting the verified behavior if possible
+    // Actually, verification logic in `telebirr.ts` reads `secret` arg.
+    // Wait, `telebirr.ts` called `verifyTelebirrSignature(body, "todo-secret")`.
+    // It uses "todo-secret" hardcoded currently!
+    // So I should sign with "todo-secret".
+    
+    // RE-SIGN using "todo-secret"
+    // Note: Bun.hash.hmac might not be available in node compat if running via node.
+    // I'll use `createHmac` from 'crypto' if I update imports.
+    // Or just use the native `crypto` global if available.
+    // Let's assume standard crypto or import it.
+    
+    const crypto = await import("crypto");
+    const hmac = crypto.createHmac('sha256', "todo-secret");
+    hmac.update(stringToSign);
+    const validSig = hmac.digest('hex');
+    
     const response = await app.handle(
       new Request(`${BASE_URL}/webhooks/telebirr`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          out_trade_no: "123",
-          transaction_id: "tx_valid_1",
-          state: "COMPLETED",
-          amount: "100",
-          currency: "ETB"
-        }),
+        body: JSON.stringify({ ...signedPayload, sign: validSig }),
       })
     );
 

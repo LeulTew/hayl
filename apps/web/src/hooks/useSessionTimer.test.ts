@@ -64,6 +64,7 @@ describe('useSessionTimer', () => {
         act(() => {
             vi.advanceTimersByTime(5000);
             result.current.pause();
+            result.current.reset();
         });
 
         expect(result.current.formatted).toBe('00:00');
