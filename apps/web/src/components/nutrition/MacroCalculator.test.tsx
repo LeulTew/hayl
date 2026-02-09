@@ -6,7 +6,7 @@ describe('MacroCalculator', () => {
     it('renders initial state correctly', () => {
         render(<MacroCalculator />);
         expect(screen.getByText(/macro engine/i)).toBeInTheDocument();
-        expect(screen.getByText('Calculate TDEE')).toBeInTheDocument();
+        expect(screen.getByText('Run Diagnostics →')).toBeInTheDocument();
     });
 
     it('calculates TDEE and displays results', () => {
@@ -14,7 +14,7 @@ describe('MacroCalculator', () => {
         
         // Find inputs (using getByDisplayValue or role might be better, but assuming defaults here)
         // Let's just click calculate with default values
-        fireEvent.click(screen.getByText('Calculate TDEE'));
+        fireEvent.click(screen.getByText('Run Diagnostics →'));
 
         // Expect results to appear
         expect(screen.getByText('Mainenance Calories')).toBeInTheDocument();
@@ -27,7 +27,7 @@ describe('MacroCalculator', () => {
         const weightInput = screen.getByDisplayValue('70'); // Default
         fireEvent.change(weightInput, { target: { value: '80' } });
         
-        fireEvent.click(screen.getByText('Calculate TDEE'));
+        fireEvent.click(screen.getByText('Run Diagnostics →'));
         
         // TDEE should be higher for heavier person. 
         // 80kg, 175cm, 25, Male, Moderate(1.55)

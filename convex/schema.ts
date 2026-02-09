@@ -14,6 +14,7 @@ export default defineSchema({
       v.literal("elite")
     ),
     splitType: v.union(
+      v.literal("1-day"),
       v.literal("2-day"),
       v.literal("3-day"),
       v.literal("4-day"),

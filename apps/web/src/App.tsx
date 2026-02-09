@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { LandingPage } from './components/home/LandingPage';
 import { Dashboard } from './components/dashboard/Dashboard';
 import { SplitSelector } from './components/workout/SplitSelector';
@@ -28,6 +28,28 @@ function App() {
     }
     return { type: 'landing' };
   });
+
+  useEffect(() => {
+    if (activeSession?.id && activeSession.state === 'active') {
+      setView((prev) => {
+        if (prev.type === 'workout' && prev.data.planId === activeSession.planId) return prev;
+        return { type: 'workout', data: { planId: activeSession.planId } };
+      });
+    }
+  }, [activeSession]);
+
+  // Sync view with active session changes
+  // If a session becomes active externally or after load, we must redirect to workout view
+  // unless we are already there.
+  if (activeSession?.id && activeSession.state === 'active' && view.type !== 'workout') {
+     // Render-time update (safe if guarded)
+     // Or use useEffect. The linter might complain about render-time updates.
+     // Let's use useEffect or just let the render logic handle it.
+     // Feedback suggested useEffect.
+  }
+  
+
+
 
   // Render-time redirection: If we are in workout view but have no active session, 
   // we effectively "fallback" to dashboard.

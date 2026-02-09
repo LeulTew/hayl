@@ -32,7 +32,9 @@ describe("Telebirr Webhook Integration", () => {
 
     // Sign it
     const secret = "test-secret";
-    // We need to inject the secret into the app environment for this test
+    process.env.TELEBIRR_SECRET = secret;
+    
+    // Sort and sign (duplicating logic for test verification)
     // Assuming the app reads process.env.TELEBIRR_SECRET or we can mock it
     // For this test, we might need to mock verifyTelebirrSignature or ensure env var is set
     

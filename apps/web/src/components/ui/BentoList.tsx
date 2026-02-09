@@ -17,11 +17,12 @@ export function BentoList({ items, onItemClick, className = '' }: BentoListProps
   return (
     <div className={`flex flex-col gap-4 ${className}`}>
       {items.map((item) => (
-        <div 
+        <button 
           key={item.id} 
           onClick={() => onItemClick?.(item.id)}
           className="
             group
+            w-full text-left
             p-6 
             bg-hayl-surface 
             rounded-2xl
@@ -46,7 +47,7 @@ export function BentoList({ items, onItemClick, className = '' }: BentoListProps
           <div className="text-hayl-accent transition-all font-heading font-bold text-xl group-hover:translate-x-1">
             {item.rightElement || <span>→</span>}
           </div>
-        </div>
+        </button>
       ))}
     </div>
 

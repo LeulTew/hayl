@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { query, mutation, type QueryCtx, type MutationCtx } from "./_generated/server";
+import type { Id } from "./_generated/dataModel";
 
 /**
  * Lists all published programs.
@@ -96,7 +97,16 @@ export const seedPrograms = mutation({
           v.literal("intermediate"),
           v.literal("elite")
         ),
+// Add Id import at top if possible, but replace_file_content can't do multiple unrelated chunks easily.
+// I will just fix the validator and return type logic here.
+// I need `Id` type. I'll assume it's imported or I need to import it.
+// Wait, `convex/programs.ts` imports from `./_generated/server`.
+// I need to add `import type { Id } from "./_generated/dataModel";` at top.
+// I will do that in a separate call.
+// Here I fix validation and typing.
+
         splitType: v.union(
+          v.literal("1-day"),
           v.literal("2-day"),
           v.literal("3-day"),
           v.literal("4-day"),
@@ -109,7 +119,7 @@ export const seedPrograms = mutation({
     ),
   },
   handler: async (ctx: MutationCtx, args) => {
-    const insertedIds: Record<string, string> = {};
+    const insertedIds: Record<string, Id<"programs">> = {};
 
     for (const program of args.programs) {
       const existing = await ctx.db

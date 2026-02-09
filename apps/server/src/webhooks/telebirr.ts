@@ -6,8 +6,8 @@ export const telebirrWebhook = new Elysia()
   .post('/webhooks/telebirr', async ({ body, headers, set }) => {
     // 1. Signature Verification
     // In production, this verifies strict H5/App/Miniprogram signatures.
-    // Given the lack of a real secret in this context, we use the placeholder but structure it correctly.
-    if (!verifyTelebirrSignature(body, "todo-secret")) {
+    const secret = process.env.TELEBIRR_SECRET;
+    if (!verifyTelebirrSignature(body, secret || "")) {
         set.status = 401;
         return { status: "error", message: "Invalid Signature" };
     }
