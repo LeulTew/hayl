@@ -229,7 +229,22 @@ export const seedDerivedPlan = mutation({
       .first();
 
     if (existing) {
-      console.log(`[SEED] Plan exists: ${args.version}`);
+      await ctx.db.patch(existing._id, {
+        programId: args.programId,
+        version: args.version,
+        author: args.author,
+        variant: args.variant,
+        description: args.description,
+        overview_markdown: args.overview_markdown,
+        schedule_markdown: args.schedule_markdown,
+        philosophy_markdown: args.philosophy_markdown,
+        source_refs: args.source_refs,
+        requires_human_review: args.requires_human_review,
+        reviewedBy: args.reviewedBy,
+        days: args.days,
+        changelog: args.changelog,
+      });
+      console.log(`[SEED] Plan updated: ${args.version}`);
       return existing._id;
     }
 

@@ -32,6 +32,7 @@ export const telebirrWebhook = new Elysia()
       state: t.String(),
       amount: t.String(),
       currency: t.String(),
+      sign: t.String(),
       // Add other Telebirr fields as optional
       msisdn: t.Optional(t.String()),
     })

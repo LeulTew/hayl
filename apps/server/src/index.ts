@@ -8,5 +8,7 @@ app.get('/', () => 'Hayl Backend Active 🇪🇹');
 app.use(telebirrWebhook);
 
 
-app.listen(3000);
-console.log('Hayl Elysia server running on port 3000');
+if (import.meta.main) {
+  app.listen(3000);
+  console.log('Hayl Elysia server running on port 3000');
+}
