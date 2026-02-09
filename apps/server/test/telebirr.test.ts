@@ -30,9 +30,7 @@ describe("Telebirr Webhook Integration", () => {
       currency: "ETB"
     };
 
-    // Sign it
-    const secret = "test-secret";
-    process.env.TELEBIRR_SECRET = secret;
+    // Sign it (logic moved down)
     
     // Sort and sign (duplicating logic for test verification)
     // Assuming the app reads process.env.TELEBIRR_SECRET or we can mock it
@@ -43,34 +41,25 @@ describe("Telebirr Webhook Integration", () => {
     const stringToSign = sortedKeys.map(k => `${k}=${payload[k]}`).join('&');
 
     const signedPayload = { ...payload };
-
     // @ts-ignore - Bun test env
     // Mocking the secret check inside the app is tricky without dependency injection
     // But we can try setting the verified behavior if possible
     // Actually, verification logic in `telebirr.ts` reads `secret` arg.
-    // Wait, `telebirr.ts` called `verifyTelebirrSignature(body, "todo-secret")`.
-    // It uses "todo-secret" hardcoded currently!
-    // So I should sign with "todo-secret".
-    
-    // RE-SIGN using "todo-secret"
-    // Note: Bun.hash.hmac might not be available in node compat if running via node.
-    // I'll use `createHmac` from 'crypto' if I update imports.
-    // Or just use the native `crypto` global if available.
-    // Let's assume standard crypto or import it.
-    
-    const crypto = await import("crypto");
-    const hmac = crypto.createHmac('sha256', "todo-secret");
-    hmac.update(stringToSign);
-    const validSig = hmac.digest('hex');
+    // Import the signer dynamically
+    // Note: In bun test environment, we might need relative path from test file
+    const { signTelebirrPayload } = await import("../src/webhooks/telebirr");
+
+    const secret = "test-secret"; // Moved declaration here
+    process.env.TELEBIRR_SECRET = secret; // Moved declaration here
+    const validSig = signTelebirrPayload(payload, secret);
     
     const response = await app.handle(
       new Request(`${BASE_URL}/webhooks/telebirr`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...signedPayload, sign: validSig }),
+        body: JSON.stringify({ ...payload, sign: validSig }),
       })
     );
-
     expect(response.status).toBe(200);
     const json = await response.json();
     expect(json).toEqual({ ok: true });

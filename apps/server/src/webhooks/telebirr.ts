@@ -37,16 +37,9 @@ export const telebirrWebhook = new Elysia()
     })
   });
 
-function verifyTelebirrSignature(payload: Record<string, unknown>, secret: string): boolean {
-    if (!secret || secret === "todo-secret") {
-        console.warn("Telebirr Signature Validation Failed: Missing Secret (Failing Closed)");
-        return false;
-    }
-
+export function signTelebirrPayload(payload: Record<string, unknown>, secret: string): string {
     const { sign, ...rest } = payload;
     
-    if (typeof sign !== 'string') return false;
-
     // Sort keys and filter out null/undefined/empty
     const sortedKeys = Object.keys(rest).sort();
     const stringToSign = sortedKeys
@@ -54,9 +47,20 @@ function verifyTelebirrSignature(payload: Record<string, unknown>, secret: strin
         .map(k => `${k}=${rest[k]}`)
         .join('&');
 
-    const computedSignature = createHmac('sha256', secret)
+    return createHmac('sha256', secret)
         .update(stringToSign)
         .digest('hex');
+}
 
-    return computedSignature === sign;
+function verifyTelebirrSignature(payload: Record<string, unknown>, secret: string): boolean {
+    if (!secret || secret === "todo-secret") {
+        console.warn("Telebirr Signature Validation Failed: Missing Secret (Failing Closed)");
+        return false;
+    }
+    
+    // If payload doesn't have signature, fail
+    if (typeof payload.sign !== 'string') return false;
+
+    const computed = signTelebirrPayload(payload, secret);
+    return computed === payload.sign;
 }
