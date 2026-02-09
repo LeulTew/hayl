@@ -102,7 +102,7 @@ async function main() {
     const foundationsId = programIds["hayl-foundations"];
     if (foundationsId) {
       await client.mutation(api.programs.seedDerivedPlan, {
-        programId: foundationsId as Id<"programs">,
+        programId: foundationsId as Id<"programs">, adminSecret: "hayl-seed-secret-2026", adminSecret: "hayl-seed-secret-2026", adminSecret: "hayl-seed-secret-2026",
         version: "1.0.0",
         author: "Hayl Team",
         variant: {

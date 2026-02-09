@@ -17,8 +17,9 @@ describe('MacroCalculator', () => {
         fireEvent.click(screen.getByText('Run Diagnostics →'));
 
         // Expect results to appear
-        expect(screen.getByText('Mainenance Calories')).toBeInTheDocument();
+        expect(screen.getByText('Maintenance Load')).toBeInTheDocument();
         expect(screen.getByText('Mifflin-St Jeor')).toBeInTheDocument();
+        expect(screen.getAllByText(/kcal/i).length).toBeGreaterThan(0);
     });
 
     it('updates inputs and recalculates', () => {

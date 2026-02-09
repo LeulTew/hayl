@@ -25,7 +25,10 @@ export const list = query({
 export const listAll = query({
   args: {},
   handler: async (ctx: QueryCtx) => {
-    return await ctx.db.query("programs").collect();
+    return await ctx.db
+      .query("programs")
+      .filter((q) => q.eq(q.field("published"), true))
+      .collect();
   },
 });
 
@@ -110,8 +113,12 @@ export const seedPrograms = mutation({
         published: v.boolean(),
       })
     ),
+    adminSecret: v.string(),
   },
   handler: async (ctx: MutationCtx, args) => {
+    if (args.adminSecret !== "hayl-seed-secret-2026") {
+      throw new Error("❌ Unauthorized: Invalid Admin Secret");
+    }
     const insertedIds: Record<string, Id<"programs">> = {};
 
     for (const program of args.programs) {
@@ -207,8 +214,12 @@ export const seedDerivedPlan = mutation({
       })
     ),
     changelog: v.string(),
+    adminSecret: v.string(),
   },
   handler: async (ctx: MutationCtx, args) => {
+    if (args.adminSecret !== "hayl-seed-secret-2026") {
+      throw new Error("❌ Unauthorized: Invalid Admin Secret");
+    }
     // Check for existing plan with same program + version
     const existing = await ctx.db
       .query("derivedPlans")
@@ -248,11 +259,10 @@ export const seedDerivedPlan = mutation({
  * Wipes all derived plans. (Admin use only in prod, but open for dev seeding)
  */
 export const wipeDerivedPlans = mutation({
-  args: {},
-  handler: async (ctx: MutationCtx) => {
-    // Safety check - blocked in production
-    if (process.env.NODE_ENV === "production") {
-      throw new Error("❌ WIPE OPERATION BLOCKED IN PRODUCTION");
+  args: { adminSecret: v.string() },
+  handler: async (ctx: MutationCtx, args) => {
+  if (args.adminSecret !== "hayl-seed-secret-2026") {
+      throw new Error("❌ Unauthorized: Invalid Admin Secret");
     }
 
     const plans = await ctx.db.query("derivedPlans").collect();

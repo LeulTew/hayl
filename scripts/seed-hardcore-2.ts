@@ -29,7 +29,7 @@ async function main() {
   console.log("🌱 Seeding Hardcore Template II (3-Day, 60min, Strength)...");
 
   // Seed new exercises
-  await client.mutation(api.exercises.seedExercises, { exercises: EXERCISES });
+  await client.mutation(api.exercises.seedExercises, { exercises: EXERCISES, adminSecret: "hayl-seed-secret-2026" });
 
   // Fetch Exercise IDs
   const exercises = (await client.query(api.exercises.listAll)) as Doc<"exercises">[];
@@ -49,13 +49,13 @@ async function main() {
   };
 
   // Seed Program
-  const programIds = (await client.mutation(api.programs.seedPrograms, { programs: [PROGRAM] })) as Record<string, Id<"programs">>;
+  const programIds = (await client.mutation(api.programs.seedPrograms, { programs: [PROGRAM], adminSecret: "hayl-seed-secret-2026" })) as Record<string, Id<"programs">>;
   const programId = programIds[PROGRAM.slug];
   console.log(`✅ Program Created: ${programId}`);
 
   // Seed Derived Plan
   const planId = await client.mutation(api.programs.seedDerivedPlan, {
-    programId,
+    programId, adminSecret: "hayl-seed-secret-2026",
     version: "v1.0.0",
     author: "Coach Greg / Hayl Adaptation",
     variant: {

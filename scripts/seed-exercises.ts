@@ -148,7 +148,7 @@ async function main() {
 
   try {
     await client.mutation(api.exercises.seedExercises, {
-      exercises: EXERCISES,
+      exercises: EXERCISES, adminSecret: "hayl-seed-secret-2026", adminSecret: "hayl-seed-secret-2026",
     });
     console.log(`✅ Successfully seeded ${EXERCISES.length} exercises!`);
   } catch (error) {
