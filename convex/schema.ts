@@ -42,6 +42,7 @@ export default defineSchema({
       
       // Future-proofing: Allow arbitrary tags for new categorization dimensions
       tags: v.optional(v.array(v.string())), 
+      equipment_needed: v.optional(v.array(v.string())),
     }),
 
     // --- RICH CONTENT (GUIDE VIEW) ---

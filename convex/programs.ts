@@ -157,6 +157,7 @@ export const seedDerivedPlan = mutation({
       splitFreq: v.string(),
       durationMinutes: v.number(),
       tags: v.optional(v.array(v.string())),
+      equipment_needed: v.optional(v.array(v.string())),
     }),
     description: v.string(),
     overview_markdown: v.optional(v.string()),
@@ -232,5 +233,20 @@ export const seedDerivedPlan = mutation({
 
     console.log(`[SEED] Plan inserted: ${args.version}`);
     return id;
+  },
+});
+
+/**
+ * Wipes all derived plans. (Admin use only in prod, but open for dev seeding)
+ */
+export const wipeDerivedPlans = mutation({
+  args: {},
+  handler: async (ctx: MutationCtx) => {
+    const plans = await ctx.db.query("derivedPlans").collect();
+    for (const plan of plans) {
+      await ctx.db.delete(plan._id);
+    }
+    console.log(`[WIPE] Deleted ${plans.length} derived plans.`);
+    return plans.length;
   },
 });
