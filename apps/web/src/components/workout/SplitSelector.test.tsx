@@ -19,8 +19,7 @@ vi.mock('../../../../../convex/_generated/api', () => ({
 
 describe('SplitSelector', () => {
   it('should show loading spinner when data is undefined', () => {
-    // @ts-expect-error - Mocking useQuery
-    useQuery.mockReturnValue(undefined);
+    vi.mocked(useQuery).mockReturnValue(undefined);
     render(<SplitSelector programId="p1" onSelect={vi.fn()} onCancel={vi.fn()} />);
     expect(document.querySelector('.animate-spin')).toBeInTheDocument();
   });
@@ -32,8 +31,7 @@ describe('SplitSelector', () => {
         variant: { difficulty: 'intermediate', splitFreq: '4', durationMinutes: 60, tags: ['Strength'] }
       }
     ];
-    // @ts-expect-error - Mocking useQuery
-    useQuery.mockReturnValue(mockPlans);
+    vi.mocked(useQuery).mockReturnValue(mockPlans);
 
     render(<SplitSelector programId="p1" onSelect={vi.fn()} onCancel={vi.fn()} />);
 
@@ -50,8 +48,7 @@ describe('SplitSelector', () => {
         variant: { difficulty: 'intermediate', splitFreq: '4', durationMinutes: 60 }
       }
     ];
-    // @ts-expect-error - Mocking useQuery
-    useQuery.mockReturnValue(mockPlans);
+    vi.mocked(useQuery).mockReturnValue(mockPlans);
 
     render(<SplitSelector programId="p1" onSelect={onSelect} onCancel={vi.fn()} />);
     

@@ -19,7 +19,7 @@ const PROGRAM = {
   title: "Casual Template IV",
   canonicalVersion: "v1.0",
   difficulty: "beginner" as const,
-  splitType: "2-day" as const, // Closest match for 1-day full body
+  splitType: "1-day" as const, // Closest match for 1-day full body
   isPremium: false,
   published: true,
 };

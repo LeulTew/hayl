@@ -3,7 +3,12 @@ import { api } from "../convex/_generated/api.js";
 
 import { Doc } from "../convex/_generated/dataModel.js";
 
-const client = new ConvexHttpClient(process.env.CONVEX_URL!);
+const convexUrl = process.env.VITE_CONVEX_URL || process.env.CONVEX_URL;
+if (!convexUrl) {
+  console.error("❌ Error: VITE_CONVEX_URL or CONVEX_URL is not set.");
+  process.exit(1);
+}
+const client = new ConvexHttpClient(convexUrl);
 
 async function main() {
   console.log("🔍 Verifying 'Hayl Foundations' plan...");

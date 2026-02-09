@@ -7,7 +7,7 @@
  */
 
 import { ConvexHttpClient } from "convex/browser";
-import { api } from "../convex/_generated/api";
+import { api } from "../convex/_generated/api.js";
 
 const convexUrl = process.env.VITE_CONVEX_URL || process.env.CONVEX_URL;
 

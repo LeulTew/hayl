@@ -40,11 +40,6 @@ describe("Telebirr Webhook Integration", () => {
     const sortedKeys = (Object.keys(payload) as Array<keyof typeof payload>).sort();
     const stringToSign = sortedKeys.map(k => `${k}=${payload[k]}`).join('&');
 
-    const signedPayload = { ...payload };
-    // @ts-ignore - Bun test env
-    // Mocking the secret check inside the app is tricky without dependency injection
-    // But we can try setting the verified behavior if possible
-    // Actually, verification logic in `telebirr.ts` reads `secret` arg.
     // Import the signer dynamically
     // Note: In bun test environment, we might need relative path from test file
     const { signTelebirrPayload } = await import("../src/webhooks/telebirr");

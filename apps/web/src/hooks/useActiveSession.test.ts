@@ -1,7 +1,7 @@
 import { renderHook, act } from '@testing-library/react';
 import { useActiveSession } from './useActiveSession';
 import { db } from '../lib/db';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi, type Mock } from 'vitest';
 
 // Mock Dexie
 vi.mock('../lib/db', () => ({
@@ -31,10 +31,14 @@ describe('useActiveSession', () => {
   });
 
   it('should start a new session when none exists', async () => {
-    // @ts-expect-error - Mocking Dexie's complex internal chain
-    (db.sessions.where('state').equals('active').first).mockResolvedValue(null);
-    // @ts-expect-error - Mocking Dexie
-    (db.sessions.add).mockResolvedValue(1);
+    const mockChainStr = {
+      equals: vi.fn().mockReturnValue({
+        first: vi.fn().mockResolvedValue(null)
+      })
+    };
+    (db.sessions.where as Mock).mockReturnValue(mockChainStr); 
+
+    (db.sessions.add as Mock).mockResolvedValue(1);
 
     const { result } = renderHook(() => useActiveSession());
     
@@ -52,8 +56,12 @@ describe('useActiveSession', () => {
   });
 
   it('should not start a second session if one is active', async () => {
-    // @ts-expect-error - Mocking Dexie chain
-    (db.sessions.where('state').equals('active').first).mockResolvedValue({ sessionId: 'existing_id' });
+    const mockChainExisting = {
+      equals: vi.fn().mockReturnValue({
+        first: vi.fn().mockResolvedValue({ sessionId: 'existing_id' })
+      })
+    };
+    (db.sessions.where as Mock).mockReturnValue(mockChainExisting);
 
     const { result } = renderHook(() => useActiveSession());
     
