@@ -12,8 +12,12 @@ export const seedQuotes = mutation({
         contextTrigger: v.optional(v.string()),
       })
     ),
+    adminSecret: v.string(),
   },
   handler: async (ctx, args) => {
+    if (args.adminSecret !== process.env.ADMIN_SECRET) {
+      throw new Error("❌ Unauthorized: Invalid Admin Secret");
+    }
     let newCount = 0;
     let existingCount = 0;
 

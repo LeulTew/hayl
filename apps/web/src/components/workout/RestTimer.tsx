@@ -8,7 +8,8 @@ interface RestTimerProps {
 
 export function RestTimer({ seconds, onComplete, onSkip }: RestTimerProps) {
     const [timeLeft, setTimeLeft] = useState(seconds);
-    const progress = (timeLeft / seconds) * 100;
+    const safeSeconds = seconds > 0 ? seconds : 1;
+    const progress = (timeLeft / safeSeconds) * 100;
     
     // Circular Progress Constants
     const radius = 90;

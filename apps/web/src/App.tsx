@@ -41,28 +41,21 @@ function App() {
   // Sync view with active session changes
   // If a session becomes active externally or after load, we must redirect to workout view
   // unless we are already there.
-  if (activeSession?.id && activeSession.state === 'active' && view.type !== 'workout') {
-     // Render-time update (safe if guarded)
-     // Or use useEffect. The linter might complain about render-time updates.
-     // Let's use useEffect or just let the render logic handle it.
-     // Feedback suggested useEffect.
-  }
+
   
 
 
 
   // Render-time redirection: If we are in workout view but have no active session, 
   // we effectively "fallback" to dashboard.
-  // We can update state lazily or just handle it in the render logic.
-  // For now, let's keep it simple: unique key to force remount if needed, 
-  // or just rely on the user manual navigation if session breaks.
-  
-  // Actually, better pattern:
+  useEffect(() => {
+    if (view.type === 'workout' && (!activeSession || activeSession.state !== 'active')) {
+      setView({ type: 'dashboard' });
+    }
+  }, [view.type, activeSession]);
+
   if (view.type === 'workout' && (!activeSession || activeSession.state !== 'active')) {
-     // This is a render-time state update pattern (allowed if conditional)
-     // But to be safer and avoid loop, we just render Dashboard and schedule update
-     setTimeout(() => setView({ type: 'dashboard' }), 0);
-     return <Dashboard onSelectProgram={(id) => setView({ type: 'split-selector', data: { programId: id } })} />;
+      return <Dashboard onSelectProgram={(id) => setView({ type: 'split-selector', data: { programId: id } })} />;
   }
 
   const isTopLevelView = (type: string): type is TopLevelView => {

@@ -23,7 +23,7 @@ const PROGRAM = {
   title: "Casual Template II",
   canonicalVersion: "v1.0",
   difficulty: "beginner" as const,
-  splitType: "2-day" as const,
+  splitType: "1-day" as const,
   isPremium: false,
   published: true,
 };
