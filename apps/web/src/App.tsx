@@ -64,8 +64,9 @@ function App() {
 
   const currentActiveTab = isTopLevelView(view.type) ? view.type : 'dashboard';
 
-  const handleStartWorkout = async (planId: string, dayIndex: number) => {
+  const handleStartWorkout = async (planId: string, dayIndex: number = 0) => {
     if (view.type === 'split-selector') {
+
       await startSession(view.data.programId, planId, dayIndex);
       // View will auto-sync via useEffect
     }

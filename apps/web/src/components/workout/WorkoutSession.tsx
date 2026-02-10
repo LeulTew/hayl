@@ -58,9 +58,9 @@ export function WorkoutSession({ planId }: WorkoutSessionProps) {
   
   // Local state
   const [restTimer, setRestTimer] = useState<{ active: boolean; seconds: number }>({ active: false, seconds: 0 });
-  // const [, setActivePhaseIndex] = useState(0); // Removed unused state
   
   // Input refs for weight/reps
+
   const weightInputRef = useRef<HTMLInputElement>(null);
   const repsInputRef = useRef<HTMLInputElement>(null);
 

@@ -15,10 +15,10 @@ interface ExerciseCardProps {
   /** Current set index (0-based) */
   currentSetIndex: number;
   /** Total exercises in workout */
-  /** Total exercises in workout */
   exerciseNumber: number;
   totalExercises: number;
 }
+
 
 
 /**
