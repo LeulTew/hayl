@@ -65,8 +65,8 @@ export function WorkoutSession({ planId }: WorkoutSessionProps) {
   const repsInputRef = useRef<HTMLInputElement>(null);
 
   // Acquire Wake Lock when session starts
-  // Acquire Wake Lock when session starts
   useEffect(() => {
+
     if (activeSession) {
       requestLock();
     }

@@ -25,7 +25,7 @@ const EXERCISES = [
   { name: "Mountain Climbers", muscleGroup: "Cardio", instructions: "High plank position. Drive knees to chest alternating quickly. Keep hips low." },
   
   // STABILITY (Day 3)
-  { name: "Single-Leg Deadlift (Bodyweight)", muscleGroup: "Hamstrings", instructions: "Stand on one leg. Hinge at hips, reaching conflicting hand to floor. Keep back flat. Feel the stretch in hamstring." },
+  { name: "Single-Leg Deadlift (Bodyweight)", muscleGroup: "Hamstrings", instructions: "Stand on one leg. Hinge at hips, reaching opposite hand to floor. Keep back flat. Feel the stretch in hamstring." },
   { name: "Side Plank", muscleGroup: "Core", instructions: "Lie on side, elbow under shoulder. Lift hips to create straight line from head to heels. Hold." },
   { name: "Bird Dog", muscleGroup: "Core", instructions: "Hands and knees. Extend opposite arm and leg. Hold for 2s. Keep hips square to the floor (don't tilt)." },
   { name: "Cat-Cow", muscleGroup: "Back", instructions: "Hands and knees. Arch back like a cat (exhale), then drop belly and look up (inhale). Move with breath." },

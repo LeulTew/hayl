@@ -16,8 +16,8 @@ async function ingestAsset(url: string, license: string) {
   console.log(`[AUDIT] License verified: ${license}`);
   
   // Return schema-compliant object
-  // Return schema-compliant object
   return {
+
       originalSource: url,
       robotsChecked: true,
       licenseType: license, // Cast as needed or validate

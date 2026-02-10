@@ -43,9 +43,6 @@ function App() {
   // unless we are already there.
 
   
-
-
-
   // Render-time redirection: If we are in workout view but have no active session, 
   // we effectively "fallback" to dashboard.
   useEffect(() => {
