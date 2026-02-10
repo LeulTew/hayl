@@ -53,21 +53,14 @@ export function signTelebirrPayload(payload: Record<string, unknown>, secret: st
         .digest('hex');
 }
 
-function verifyTelebirrSignature(payload: Record<string, unknown>, secret: string): boolean {
-    if (!secret || secret === "todo-secret") {
-        console.warn("Telebirr Signature Validation Failed: Missing Secret (Failing Closed)");
-        return false;
-    }
-    
-    // If payload doesn't have signature, fail
     // If payload doesn't have signature, fail
     if (typeof payload.sign !== 'string') return false;
 
     const computed = signTelebirrPayload(payload, secret);
     
     // Constant-time comparison to prevent timing attacks
-    // Constant-time comparison to prevent timing attacks
     const computedBuffer = Buffer.from(computed, 'hex');
+
     const payloadBuffer = Buffer.from(payload.sign, 'hex');
 
     if (computedBuffer.length !== payloadBuffer.length) return false;
