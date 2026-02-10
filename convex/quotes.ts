@@ -52,10 +52,9 @@ export const getContextualQuote = query({
     seed: v.optional(v.number()) 
   },
   handler: async (ctx, args) => {
-    // 1. Try to find a context-specific quote
-    if (args.context) {
-      // Future: Search index matching
-    }
+    // 1. Context matching (Future implementation)
+    // if (args.context) { ... }
+
 
     // Fallback: Get a random quote deterministically
     // Note: We use collect() here because the dataset is small (<100 quotes).

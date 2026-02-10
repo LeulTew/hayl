@@ -13,7 +13,7 @@
 
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "../convex/_generated/api";
-import type { Id } from "../convex/_generated/dataModel";
+
 
 const convexUrl = process.env.VITE_CONVEX_URL || process.env.CONVEX_URL;
 
@@ -72,45 +72,9 @@ async function main() {
     });
     console.log(`✅ Programs seeded:`, programIds);
 
-    // Step 2: Get exercise IDs for plan creation
-    // We need actual exercise IDs to create valid derived plans
-    const exercises = await client.query(api.exercises.listAll, {});
-    
-    if (exercises.length === 0) {
-      console.error("❌ No exercises found. Run seed-exercises.ts first!");
-      process.exit(1);
-    }
+    // Note: Exercise fetching was removed as this script now only seeds Programs.
+    // Derived Plans are seeded by their respective scripts (foundations, casual, etc.)
 
-    // Build a lookup map by exercise name
-    const exerciseMap = new Map<string, Id<"exercises">>();
-    for (const ex of exercises) {
-      exerciseMap.set(ex.name.toLowerCase(), ex._id);
-    }
-
-    // Helper to get exercise ID or throw
-    const getExerciseId = (name: string): Id<"exercises"> => {
-      const lowerName = name.toLowerCase();
-      // 1. Exact match
-      const exactId = exerciseMap.get(lowerName);
-      if (exactId) return exactId;
-
-      // 2. Partial match (Strict)
-      const matches: Id<"exercises">[] = [];
-      for (const [key, value] of exerciseMap) {
-        if (key.includes(lowerName)) {
-          matches.push(value);
-        }
-      }
-
-      if (matches.length === 0) {
-        throw new Error(`Exercise not found: ${name}`);
-      }
-      if (matches.length > 1) {
-        throw new Error(`Ambiguous exercise match for "${name}": found ${matches.length} candidates.`);
-      }
-
-      return matches[0];
-    };
 
     console.log(`\n🎉 All programs and plans seeded successfully!`);
   } catch (error) {

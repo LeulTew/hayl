@@ -69,7 +69,7 @@ function PhaseTabsComponent({ phases, activeIndex, onTabClick }: PhaseTabsProps)
 
         return (
           <button
-            key={phase.name}
+            key={`${phase.name}-${index}`}
             role="tab"
             aria-selected={isActive}
             aria-controls={`phase-panel-${phase.name}`}

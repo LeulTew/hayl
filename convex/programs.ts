@@ -140,6 +140,8 @@ export const seedPrograms = mutation({
         // Patch existing program to ensure idempotency update
         await ctx.db.patch(existing._id, {
           ...program,
+          // If createdAt is missing (legacy data), backfill it. otherwise keep existing.
+          createdAt: existing.createdAt ?? Date.now(),
           updatedAt: Date.now(),
         });
         insertedIds[program.slug] = existing._id;
@@ -243,6 +245,7 @@ export const seedDerivedPlan = mutation({
         reviewedBy: args.reviewedBy,
         days: args.days,
         changelog: args.changelog,
+        createdAt: existing.createdAt ?? Date.now(),
       });
       console.log(`[SEED] Plan updated: ${args.version}`);
       return existing._id;
