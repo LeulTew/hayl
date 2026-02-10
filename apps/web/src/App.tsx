@@ -20,6 +20,7 @@ import { ExerciseLibrary } from './components/exercises/ExerciseLibrary';
 import { NutritionHub } from './components/nutrition/NutritionHub';
 import { ProfileView } from './components/profile/ProfileView';
 import { GlobalNav } from './components/navigation/GlobalNav';
+import { ErrorBoundary } from './components/ui/ErrorBoundary';
 
 function App() {
   const { activeSession, startSession } = useActiveSession();
@@ -66,7 +67,8 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-hayl-bg text-hayl-text font-sans selection:bg-hayl-accent selection:text-hayl-bg">
+    <ErrorBoundary>
+      <div className="min-h-screen bg-hayl-bg text-hayl-text font-sans selection:bg-hayl-accent selection:text-hayl-bg">
       
       {/* 1. Landing View */}
       {effectiveView.type === 'landing' && (
@@ -118,7 +120,8 @@ function App() {
         onViewChange={(newView: TopLevelView) => setView({ type: newView })}
         isHidden={effectiveView.type === 'landing' || effectiveView.type === 'workout' || effectiveView.type === 'split-selector' || effectiveView.type === 'guide'}
       />
-    </div>
+      </div>
+    </ErrorBoundary>
   );
 }
 
