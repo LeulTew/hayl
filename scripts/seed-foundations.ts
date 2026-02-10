@@ -3,11 +3,16 @@ import { ConvexHttpClient } from "convex/browser";
 import { api } from "../convex/_generated/api.js";
 import { Doc, Id } from "../convex/_generated/dataModel.js";
 
-const client = new ConvexHttpClient(process.env.CONVEX_URL!);
+const convexUrl = process.env.VITE_CONVEX_URL || process.env.CONVEX_URL;
+if (!convexUrl) {
+  console.error("❌ CONVEX_URL is not set.");
+  process.exit(1);
+}
+const client = new ConvexHttpClient(convexUrl);
 
 // High-Quality Exercise Library (No generic stubs)
 const EXERCISES = [
-  // MECHIANICS (Day 1)
+  // MECHANICS (Day 1)
   { name: "Bodyweight Squat", muscleGroup: "Legs", instructions: "Stand with feet shoulder-width apart. Hips back first, then knees. Keep chest proud. Depth is key, but form is king." },
   { name: "Push-up (Knees or Standard)", muscleGroup: "Chest", instructions: "Hands under shoulders. Core braced like you're about to be punched. Lower chest to floor, elbows at 45 degrees. Use knees if form breaks." },
   { name: "Glute Bridge", muscleGroup: "Glutes", instructions: "Lie on back, feet flat. Drive through heels to lift hips. Squeeze glutes at the top like you're cracking a walnut. Don't hyperextend lower back." },

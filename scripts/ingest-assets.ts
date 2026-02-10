@@ -21,7 +21,13 @@ async function ingestAsset(url: string, license: string) {
       robotsChecked: true,
       licenseType: license,
       ingestDate: Date.now(),
-      cachedUrl: "processed_url_pending" // Placeholder
+      cachedUrl: "processed_url_pending", // Placeholder
+      // Schema compliance stubs
+      type: "image",
+      ingestedBy: "script",
+      checksum: "pending_checksum",
+      contentLength: 0,
+      url: "processed_url_pending"
   };
 }
 

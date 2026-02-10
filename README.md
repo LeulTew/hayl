@@ -33,7 +33,7 @@ hayl/
 │   ├── server/       # Backend (ElysiaJS)
 │   └── admin/        # Internal admin UI
 ├── packages/
-│   └── shared-types/ # Shared TypeScript definitions
+│   └── shared/       # Shared TypeScript definitions
 ├── convex/           # Convex functions & schema
 ├── scripts/          # Seeding & maintenance scripts
 └── assets/           # Static assets (Note: reference-docs are internal only)

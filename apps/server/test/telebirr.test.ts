@@ -38,7 +38,7 @@ describe("Telebirr Webhook Integration", () => {
     
     // Sort and sign (duplicating logic for test verification)
     const sortedKeys = (Object.keys(payload) as Array<keyof typeof payload>).sort();
-    const stringToSign = sortedKeys.map(k => `${k}=${payload[k]}`).join('&');
+    // const stringToSign = sortedKeys.map(k => `${k}=${payload[k]}`).join('&');
 
     // Import the signer dynamically
     // Note: In bun test environment, we might need relative path from test file
