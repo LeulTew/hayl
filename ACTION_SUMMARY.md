@@ -1,26 +1,28 @@
-# Action Summary
+# Hayl Bootstrap Action Summary
 
-## Completed Setup
+## Completed Actions
 
-- **Repo Structure**: Initialized Bun workspace with `apps/web`, `apps/server`, `convex`, and `packages/shared-types`.
-- **Backend**: Scaffolds ElysiaJS server with Telebirr webhook stub at `POST /webhooks/telebirr`.
-- **Frontend**: Vite + React + Tailwind CSS configured in `apps/web`.
-- **Database**: Convex schema defined in `convex/schema.ts`.
-- **Scripts**:
-  - `seed-plans.ts`: Seeding logic for Hayl Foundations.
-  - `ingest-assets.ts`: Stub for licensed asset ingestion.
-- **CI/CD**: GitHub Actions workflows `deploy.yml` and `pages-deploy.yml` created.
+- [x] **Repository**: Created `hayl` repo with Bun workspace structure.
+- [x] **Safety**:
+  - Added `verifyTelebirrSignature` stub in `server/index.ts` (fails safe).
+  - Added explicit audit logging to `scripts/ingest-assets.ts`.
+- [x] **CI/CD**:
+  - `deploy.yml` for Backend (Fly.io/Render ready).
+  - `pages-deploy.yml` for Frontend (Cloudflare Pages).
+- [x] **DX**: Created `scripts/setup-secrets.sh` to easily set up GitHub Secrets.
 
-## Required Human Actions
+## Immediate Next Steps (For You)
 
-1. **Secrets**: Configure the following in GitHub Settings -> Secrets:
-   - `CONVEX_URL`, `CONVEX_KEY`
-   - `CLOUDFLARE_API_TOKEN` (for Pages deploy)
-   - `TELEBIRR_SECRET`
-2. **Review**: Check the PR `init/hayl-bootstrap`.
-3. **Deployment**: Connect Cloudflare Pages to `apps/web` and your backend host to `apps/server`.
+1. **Set Secrets**: Run the helper script to configure your environment:
+   ```bash
+   ./scripts/setup-secrets.sh
+   ```
+2. **Review PR**: A Pull Request `feat: Bootstrap Hayl Repository` has been opened. Please review and merge it.
+3. **Connect Deployment**:
+   - Link **Cloudflare Pages** to this repo (for `apps/web`).
+   - Link **Fly.io/Render** to this repo (for `apps/server`).
 
 ## Notes
 
-- **PDFs**: Place PDFs in `assets/reference-docs/`. They are gitignored by default.
-- **Safety**: Do not publish derived plans without human review.
+- The `telebirr.test.ts` is intentionally failing/placeholder until you implement the real signature logic.
+- **Do not publish** any PDFs to the public web server.

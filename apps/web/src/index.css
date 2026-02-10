@@ -1,9 +1,100 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-hayl-bg: var(--hayl-bg);
+  --color-hayl-surface: var(--hayl-surface);
+  --color-hayl-text: var(--hayl-text);
+  --color-hayl-muted: var(--hayl-muted);
+  --color-hayl-accent: var(--hayl-accent);
+  --color-hayl-border: var(--hayl-border);
+
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-heading: "Barlow Condensed", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* Subtle Shadows for Depth (Premium Athletic) */
+  --shadow-subtle: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-premium:
+    0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+  --animate-fade-in: fadeIn 0.4s ease-out forwards;
+  --animate-slide-up: slideUp 0.3s ease-out forwards;
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      transform: translateY(16px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+}
+
+/* Custom Utilities */
+.font-heading {
+  font-family: "Barlow Condensed", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+}
+
+.athletic-border {
+  border: 1px solid var(--hayl-border);
+}
+
+.athletic-card {
+  background: var(--hayl-surface);
+  border: 1px solid var(--hayl-border);
+  border-radius: 1.5rem; /* 24px - Airy/Nike feel */
+  padding: 1.5rem;
+}
 
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  /* Light Mode (Modern Athletic - Premium White/Gray) */
+  --hayl-bg: #fdfdfd;
+  --hayl-surface: #ffffff;
+  --hayl-text: #09090b; /* Zinc 950 */
+  --hayl-muted: #71717a; /* Zinc 500 */
+  --hayl-accent: #ff4d00;
+  --hayl-border: #e4e4e7; /* Zinc 200 */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --hayl-bg: #09090b;
+    --hayl-surface: #09090b;
+    --hayl-text: #fafafa;
+    --hayl-muted: #a1a1aa;
+    --hayl-accent: #ff4d00;
+    --hayl-border: #27272a;
+  }
+}
+
+/* Manual Overrides */
+.dark {
+  --hayl-bg: #09090b;
+  --hayl-surface: #18181b;
+  --hayl-text: #fafafa;
+  --hayl-muted: #a1a1aa;
+  --hayl-accent: #ff4d00;
+  --hayl-border: #27272a;
+}
+
+.light {
+  --hayl-bg: #fdfdfd;
+  --hayl-surface: #ffffff;
+  --hayl-text: #09090b;
+  --hayl-muted: #71717a;
+  --hayl-accent: #ff4d00;
+  --hayl-border: #e4e4e7;
 }

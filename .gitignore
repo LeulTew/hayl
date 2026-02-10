@@ -15,3 +15,6 @@ convex/_generated/
 # Reference Docs (Strictly developer eyes only)
 assets/reference-docs/*
 !assets/reference-docs/.keep
+
+
+.env.local

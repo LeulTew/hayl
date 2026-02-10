@@ -1,41 +1,205 @@
-# ANTIGRAVITY AI DEVELOPMENT RULES
+# 🧲 ANTIGRAVITY AI DEVELOPMENT RULES (STRICT, NON-NEGOTIABLE)
 
-These rules are strict constraints for the AI agent (Antigravity) to ensure high-quality, secure, and maintainable code in the `hayl` repository.
+These rules are **hard constraints** for the AI agent operating in the `hayl` repository.  
+Violating these rules is considered a **failure**, not a suggestion.
 
-## 1. Type Safety & Validation
+---
 
-- **NO `any` ALLOWED**: The `any` type is strictly forbidden in production code. Use `unknown` with narrowing or strict schema definitions.
-- **Runtime Validation**: All external inputs (API bodies, headers, query params) MUST be validated at the boundary using runtime validators (e.g., Elysia uses `t` from TypeBox, Zod, etc.).
-- **Strict Integers**: When handling money or quantities, use integers (cents) or strict decimal types. Never use floating-point math for currency.
+## 0. PRIME DIRECTIVE (READ FIRST)
 
-## 2. Documentation & Research
+The AI must solve problems **directly, completely, and correctly**.
 
-- **Verify Before Implementing**: Do not hallucinate API signatures. If external documentation is missing, create a research task or ask the user.
-- **Docblocks**: All public functions and complex logic blocks must have TSDoc/JSDoc comments explaining:
-  - `@param` details
-  - `@returns` shape
-  - `@throws` potential errors
-- **ADRs**: Significant architectural decisions must be recorded in `docs/decisions/`.
+The AI is NOT allowed to:
 
-## 3. Testing Strategy (Target: 100% Critical Path Coverage)
+- bypass issues using `any`, unsafe casts, or placeholders
+- defer correctness “for later”
+- ship partial implementations in critical paths
 
-- **Test-First / TDD**: Write the test case before implementing complex logic.
-- **Unit Tests**: Test individual functions/classes in isolation. Mock external dependencies (DB, Payment APIs).
-- **Integration Tests**: Test API endpoints with a test database/runtime. Verify schema validation and error handling.
-- **E2E Tests**: Use Playwright/etc. for critical user flows (e.g., "User subscribes via Telebirr").
-- **Safety Gates**: Security-critical functions (signatures, auth) must have negative tests (verify they fail on invalid input).
+### 0.1 CONTENT QUALITY IS PARAMOUNT
 
-## 4. Security & Best Practices
+- **No TODOs in Seed Scripts**: Content must be complete. 50 quotes means 50 quotes, not 5 and a TODO.
+- **Verification**: Every plan must be verified for logic and tone.
+- **Quantity**: We do not rush. We build comprehensive libraries.
 
-- **Secrets**: Never commit secrets. Use environment variables.
-- **Least Privilege**: Functions should only ask for the data they need.
-- **Audit Logs**: All financial or sensitive data mutations must be logged with a context ID.
-- **Clean Code**:
-  - Functions < 50 lines.
-  - One purpose per function.
-  - Descriptive variable names (no `x`, `data`, `item`).
+If something is difficult:
 
-## 5. Review Protocol
+- slow down
+- reason step by step
+- research or ask
+- then implement correctly
 
-- **Self-Correction**: Before showing code to the user, the AI must run lints and tests.
-- **One Change per PR**: Do not bundle refactors with features.
+Speed is secondary to correctness.
+
+---
+
+## 1. TYPE SAFETY IS LAW
+
+### 1.1 Absolute Prohibitions
+
+- `any` is forbidden in **all code** (production, tests, examples).
+- `as any`, double-casting (`as unknown as X`), or unsafe assertions are forbidden.
+- Suppressing or silencing TypeScript errors is forbidden.
+
+If the type system fails, **the design is wrong**. Fix the design.
+
+---
+
+### 1.2 Required Type Practices
+
+- TypeScript must run with `strict: true`.
+- Every external boundary MUST define a runtime schema:
+  - HTTP bodies
+  - headers
+  - query parameters
+  - webhooks
+- Validation must occur at the boundary using Elysia validators or equivalent.
+- After validation, rely on **inferred types only**. No manual casting.
+
+---
+
+### 1.3 No Unresolved `unknown`
+
+- `unknown` is allowed only when:
+  1. Immediately narrowed
+  2. Exhaustively handled via type guards
+- Leaving values as `unknown` beyond a boundary is forbidden.
+
+---
+
+## 2. NO TODOs IN CRITICAL PATHS
+
+### 2.1 Forbidden TODO Zones
+
+The following areas must be **fully implemented**:
+
+- payment verification
+- signature validation
+- authentication and authorization
+- money and quantity calculations
+- data mutations affecting subscriptions, workouts, or access control
+
+Placeholder comments or TODOs in these areas are forbidden.
+
+---
+
+### 2.2 Explicit Blocking Is Required
+
+If the AI cannot safely complete an implementation:
+
+- it must STOP
+- explain exactly what information is missing
+- request that information explicitly
+
+Guessing is forbidden.
+
+---
+
+## 3. RUNTIME VALIDATION IS MANDATORY
+
+- All external input is untrusted until validated.
+- Validation happens at the edge, not inside business logic.
+- After validation, internal code must assume correctness.
+
+Required layers:
+
+1. runtime schema validation
+2. domain/business rule validation
+3. persistence and schema validation
+
+---
+
+## 4. TESTING IS NOT OPTIONAL
+
+### 4.1 Test Requirements
+
+- Critical paths require tests before implementation.
+- Payment flows must include:
+  - valid success case
+  - invalid signature case
+  - replay or duplication case
+- No tests means no merge.
+
+---
+
+### 4.2 Failure Tests Are Mandatory
+
+Security-critical code must prove that it **fails correctly**.
+
+Examples:
+
+- invalid webhook signature → rejected
+- expired subscription → denied
+- malformed payload → 400 error
+
+---
+
+## 5. RESEARCH BEFORE CODE
+
+- The AI must never invent APIs, payloads, or undocumented behavior.
+- If documentation is unclear or missing:
+  - stop
+  - ask the user
+  - or document the gap explicitly
+
+Guessing is not allowed.
+
+---
+
+## 6. CLEAN CODE ENFORCEMENT
+
+- One function = one responsibility
+- Functions should stay under ~50 lines (soft limit)
+- Names must be explicit and meaningful
+
+Every exported or public function must include documentation explaining:
+
+- purpose
+- inputs
+- outputs
+- failure modes
+
+---
+
+## 7. DATA INTEGRITY & STATE RULES
+
+- The database schema is the source of truth.
+- Broad or untyped fields require:
+  - versioning
+  - migration strategy
+- All sensitive or financial mutations must be logged with a correlation ID.
+
+---
+
+## 8. AI SELF-REVIEW CHECKLIST (MANDATORY)
+
+Before presenting code, the AI must internally confirm:
+
+- no `any` exists
+- no TODOs exist in critical paths
+- all external inputs are validated
+- types are inferred, not cast
+- success and failure tests exist
+- code compiles under strict mode
+
+If any check fails, the code must not be shown.
+
+---
+
+## 9. PR DISCIPLINE
+
+- One logical change per PR
+- No refactors mixed with features
+- PRs must explain:
+  - what changed
+  - why it changed
+  - risks involved
+
+---
+
+## 10. ENGINEERING PHILOSOPHY
+
+Type errors are design feedback.  
+Difficulty is a signal to think, not to bypass.  
+Correctness beats speed. Always.
+
+The AI must behave like a senior engineer protecting a production system.
