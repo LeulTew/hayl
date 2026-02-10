@@ -8,7 +8,13 @@ import { ConvexHttpClient } from "convex/browser";
 import { api } from "../convex/_generated/api.js";
 import { Doc, Id } from "../convex/_generated/dataModel.js";
 
-const client = new ConvexHttpClient(process.env.CONVEX_URL!);
+const convexUrl = process.env.VITE_CONVEX_URL || process.env.CONVEX_URL;
+if (!convexUrl) {
+  console.error("❌ CONVEX_URL is not set.");
+  process.exit(1);
+}
+const client = new ConvexHttpClient(convexUrl);
+
 
 const EXERCISES = [
   { name: "Serratus Straight-Arm Lat Pull-downs", muscleGroup: "Back", instructions: "Target the lats and serratus. Keep arms straight, slight forward lean. Pull the bar to your thighs focusing on the side of your torso." },

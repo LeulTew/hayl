@@ -8,7 +8,13 @@ import { ConvexHttpClient } from "convex/browser";
 import { api } from "../convex/_generated/api.js";
 import { Doc, Id } from "../convex/_generated/dataModel.js";
 
-const client = new ConvexHttpClient(process.env.CONVEX_URL!);
+const convexUrl = process.env.VITE_CONVEX_URL || process.env.CONVEX_URL;
+if (!convexUrl) {
+  console.error("❌ CONVEX_URL is not set.");
+  process.exit(1);
+}
+const client = new ConvexHttpClient(convexUrl);
+
 
 const EXERCISES = [
   { name: "Flat Bench Press", muscleGroup: "Chest", instructions: "Medium to wide grip for chest focus. Pause on all sets except the ALL OUT set. Control the weight." },

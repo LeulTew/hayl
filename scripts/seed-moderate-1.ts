@@ -9,7 +9,13 @@ import { ConvexHttpClient } from "convex/browser";
 import { api } from "../convex/_generated/api.js";
 import { Doc, Id } from "../convex/_generated/dataModel.js";
 
-const client = new ConvexHttpClient(process.env.CONVEX_URL!);
+const convexUrl = process.env.VITE_CONVEX_URL || process.env.CONVEX_URL;
+if (!convexUrl) {
+  console.error("❌ CONVEX_URL is not set.");
+  process.exit(1);
+}
+const client = new ConvexHttpClient(convexUrl);
+
 
 const EXERCISES = [
   { name: "Barbell Squat of Choice", muscleGroup: "Legs", instructions: "PAUSE ALL OF YOUR REPS at the bottom. Control the weight (30-45s sets). Options: Back Squat, Front Squat." },
