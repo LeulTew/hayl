@@ -31,8 +31,9 @@ const PROGRAMS = [
   {
     slug: "hayl-foundations",
     title: "Hayl Foundations",
-    canonicalVersion: "1.0.0",
+    canonicalVersion: "v1.0.0",
     difficulty: "beginner" as const,
+
     splitType: "3-day" as const,
     isPremium: false,
     published: true,
@@ -40,7 +41,7 @@ const PROGRAMS = [
   {
     slug: "hayl-intermediate",
     title: "Hayl Intermediate",
-    canonicalVersion: "1.0.0",
+    canonicalVersion: "v1.0.0",
     difficulty: "intermediate" as const,
     splitType: "4-day" as const,
     isPremium: false,
@@ -49,7 +50,8 @@ const PROGRAMS = [
   {
     slug: "greg-derived-hard",
     title: "The Greg Protocol (Hard)",
-    canonicalVersion: "1.0.0",
+    canonicalVersion: "v1.0.0",
+
     difficulty: "elite" as const,
     splitType: "ppl" as const,
     isPremium: true,
@@ -92,17 +94,27 @@ async function main() {
 
     // Helper to get exercise ID or throw
     const getExerciseId = (name: string): Id<"exercises"> => {
-      const id = exerciseMap.get(name.toLowerCase());
-      if (!id) {
-        // Try partial match
-        for (const [key, value] of exerciseMap) {
-          if (key.includes(name.toLowerCase())) {
-            return value;
-          }
+      const lowerName = name.toLowerCase();
+      // 1. Exact match
+      const exactId = exerciseMap.get(lowerName);
+      if (exactId) return exactId;
+
+      // 2. Partial match (Strict)
+      const matches: Id<"exercises">[] = [];
+      for (const [key, value] of exerciseMap) {
+        if (key.includes(lowerName)) {
+          matches.push(value);
         }
+      }
+
+      if (matches.length === 0) {
         throw new Error(`Exercise not found: ${name}`);
       }
-      return id;
+      if (matches.length > 1) {
+        throw new Error(`Ambiguous exercise match for "${name}": found ${matches.length} candidates.`);
+      }
+
+      return matches[0];
     };
 
     // Step 3: Seed a derived plan for Hayl Foundations
@@ -110,10 +122,11 @@ async function main() {
     if (foundationsId) {
       await client.mutation(api.programs.seedDerivedPlan, {
         programId: foundationsId as Id<"programs">, adminSecret: adminSecret,
-        version: "1.0.0",
+        version: "v1.0.0",
         author: "Hayl Team",
         variant: {
           difficulty: "amateur",
+
           splitFreq: "3-day",
           durationMinutes: 60,
           tags: ["beginner-friendly", "full-body"],

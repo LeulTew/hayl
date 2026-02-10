@@ -15,11 +15,11 @@ interface ExerciseCardProps {
   /** Current set index (0-based) */
   currentSetIndex: number;
   /** Total exercises in workout */
+  /** Total exercises in workout */
   exerciseNumber: number;
   totalExercises: number;
-  /** Callback when a set is completed */
-  onSetComplete?: (weight: number, reps: number) => void;
 }
+
 
 /**
  * ExerciseCard
@@ -39,6 +39,7 @@ function ExerciseCardComponent({
   exerciseNumber,
   totalExercises,
 }: ExerciseCardProps) {
+
   // Fetch exercise details
   const exercise = useQuery(api.exercises.getExercise, { id: exerciseId });
   

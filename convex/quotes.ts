@@ -58,7 +58,10 @@ export const getContextualQuote = query({
     }
 
     // Fallback: Get a random quote deterministically
+    // Note: We use collect() here because the dataset is small (<100 quotes).
+    // For larger datasets, we should use a random index or precomputed count to avoid full table scans.
     const quotes = await ctx.db.query("quotes").collect();
+
 
     if (quotes.length === 0) return null;
     
