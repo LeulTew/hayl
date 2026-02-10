@@ -175,9 +175,17 @@ export function WorkoutSession({ planId }: WorkoutSessionProps) {
   }
 
   const handleLogSet = () => {
-    const weight = parseFloat(weightInputRef.current?.value || '0');
-    const reps = parseInt(repsInputRef.current?.value || '0', 10);
-    
+    const weightRaw = weightInputRef.current?.value;
+    const repsRaw = repsInputRef.current?.value;
+
+    // Guard against empty input to prevent storing 0s or NaNs
+    if (!weightRaw || !repsRaw) return;
+
+    const weight = parseFloat(weightRaw);
+    const reps = parseInt(repsRaw, 10);
+
+    if (isNaN(weight) || isNaN(reps)) return;
+
     logSet(currentExercise.exerciseId, weight, reps);
 
     // Clear inputs for next set

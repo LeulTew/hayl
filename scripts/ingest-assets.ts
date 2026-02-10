@@ -16,19 +16,21 @@ async function ingestAsset(url: string, license: string) {
   console.log(`[AUDIT] License verified: ${license}`);
   
   // Return schema-compliant object
+  // Return schema-compliant object
   return {
       originalSource: url,
       robotsChecked: true,
-      licenseType: license,
-      ingestDate: Date.now(),
-      cachedUrl: "processed_url_pending", // Placeholder
-      // Schema compliance stubs
-      type: "image",
+      licenseType: license, // Cast as needed or validate
+      // cachedUrl: "processed_url_pending", // REMOVED: Not in schema
+      // ingestDate: Date.now(), // REMOVED: Not in schema
+      
+      type: "gif", // Valid union member (mp4 | gif | webm)
       ingestedBy: "script",
       checksum: "pending_checksum",
       contentLength: 0,
       url: "processed_url_pending"
   };
+
 }
 
 console.log("Asset ingest pipeline ready (stub)");

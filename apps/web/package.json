@@ -12,7 +12,8 @@
   },
   "dependencies": {
     "@hayl/shared": "workspace:*",
-    "convex": "^1.17.0",
+    "convex": "1.31.6",
+
     "clsx": "2.1.1",
 
     "dexie": "4.2.1",
