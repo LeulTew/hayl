@@ -44,7 +44,7 @@ jobs:
 
       - name: Deploy to Fly.io
         if: env.FLY_API_TOKEN != ''
-        run: flyctl deploy --remote-only
+        run: flyctl deploy --remote-only --config apps/server/fly.toml
 
       - name: Skip Deploy (No Token)
         if: env.FLY_API_TOKEN == ''

@@ -65,15 +65,17 @@ export function WorkoutSession({ planId }: WorkoutSessionProps) {
   const repsInputRef = useRef<HTMLInputElement>(null);
 
   // Acquire Wake Lock when session starts
+  // Acquire Wake Lock when session starts
   useEffect(() => {
-    if (activeSession && !isLocked) {
+    if (activeSession) {
       requestLock();
     }
     
     return () => {
       releaseLock();
     };
-  }, [activeSession, isLocked, requestLock, releaseLock]);
+  }, [activeSession, requestLock, releaseLock]);
+
 
   // Loading state
   if (!plan || !activeSession) {

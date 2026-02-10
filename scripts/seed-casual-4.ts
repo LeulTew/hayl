@@ -8,7 +8,13 @@ import { ConvexHttpClient } from "convex/browser";
 import { api } from "../convex/_generated/api.js";
 import { Doc, Id } from "../convex/_generated/dataModel.js";
 
-const client = new ConvexHttpClient(process.env.CONVEX_URL!);
+const convexUrl = process.env.VITE_CONVEX_URL || process.env.CONVEX_URL;
+if (!convexUrl) {
+  console.error("❌ CONVEX_URL is not set.");
+  process.exit(1);
+}
+const client = new ConvexHttpClient(convexUrl);
+
 
 const EXERCISES = [
   { name: "Incline Chest Press of Choice", muscleGroup: "Chest", instructions: "Incline Dumbbell Press, Incline Barbell Press, or Incline Chest Machine. Focus on upper chest. Control the negative." },
@@ -38,6 +44,8 @@ async function main() {
 
   // Fetch Exercise IDs
   const exercises = (await client.query(api.exercises.listAll)) as Doc<"exercises">[];
+  // Note: This script assumes exercises from Casual I, II, & III have already been seeded.
+  // In a production environment, we would add a pre-flight check here to verify all dependencies exist.
   const exMap = new Map<string, Id<"exercises">>(
     exercises.map((e) => [e.name, e._id])
   );
