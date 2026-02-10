@@ -42,7 +42,7 @@ export function Dashboard({ onSelectProgram }: DashboardProps) {
       <header className="mb-8 px-2 flex justify-between items-end">
         <div>
            <p className="text-[10px] font-sans font-bold text-hayl-muted uppercase tracking-[0.3em] mb-1 opacity-60">Status: Online</p>
-           <h1 className="text-4xl font-heading font-black italic tracking-tighter uppercase leading-none lowercase">Command Center.</h1>
+           <h1 className="text-4xl font-heading font-black italic tracking-tighter uppercase leading-none">Command Center.</h1>
         </div>
         <div className="w-8 h-8 rounded-full bg-green-500/20 text-green-500 flex items-center justify-center animate-pulse">
            <div className="w-2 h-2 bg-green-500 rounded-full" />
@@ -72,7 +72,7 @@ export function Dashboard({ onSelectProgram }: DashboardProps) {
       {/* Recent History Stub */}
       <div className="mb-8">
         <h2 className="text-[12px] font-heading font-black uppercase tracking-[0.2em] text-hayl-muted mb-6 px-2">Recent Sorties</h2>
-        <div className="p-6 bg-hayl-surface/50 border border-hayl-border rounded-[2rem] text-center opacity-50">
+        <div className="p-6 bg-hayl-surface/50 border border-hayl-border rounded-4xl text-center opacity-50">
            <p className="text-[10px] font-bold uppercase tracking-widest text-hayl-muted">Log Empty</p>
         </div>
       </div>

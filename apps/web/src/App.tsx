@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { LandingPage } from './components/home/LandingPage';
 import { Dashboard } from './components/dashboard/Dashboard';
 import { SplitSelector } from './components/workout/SplitSelector';
@@ -32,24 +32,23 @@ function App() {
     return { type: 'landing' };
   });
 
-  // Sync active session changes
-  useEffect(() => {
+  const effectiveView: ViewState = (() => {
     if (activeSession?.id && activeSession.state === 'active') {
-      setView((prev) => {
-        if (prev.type === 'workout' && prev.data.planId === activeSession.planId) return prev;
-        return { type: 'workout', data: { planId: activeSession.planId } };
-      });
-    } else if (view.type === 'workout' && (!activeSession || activeSession.state !== 'active')) {
-      setView({ type: 'dashboard' });
+      return { type: 'workout', data: { planId: activeSession.planId } };
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeSession?.id, activeSession?.state, activeSession?.planId, view.type, (view as any).data?.planId]);
+
+    if (view.type === 'workout') {
+      return { type: 'dashboard' };
+    }
+
+    return view;
+  })();
 
   const isTopLevelView = (type: string): type is TopLevelView => {
     return ['dashboard', 'exercises', 'nutrition', 'profile'].includes(type);
   };
 
-  const currentActiveTab = isTopLevelView(view.type) ? view.type : 'dashboard';
+  const currentActiveTab = isTopLevelView(effectiveView.type) ? effectiveView.type : 'dashboard';
 
   // Core Navigation Handlers
   const handlePlanSelection = (planId: string) => {
@@ -62,7 +61,7 @@ function App() {
   const handleStartWorkout = async (dayIndex: number) => {
     if (view.type === 'guide') {
       await startSession(view.data.programId, view.data.planId, dayIndex);
-      // View auto-syncs via useEffect
+      setView({ type: 'workout', data: { planId: view.data.planId } });
     }
   };
 
@@ -70,25 +69,25 @@ function App() {
     <div className="min-h-screen bg-hayl-bg text-hayl-text font-sans selection:bg-hayl-accent selection:text-hayl-bg">
       
       {/* 1. Landing View */}
-      {view.type === 'landing' && (
+      {effectiveView.type === 'landing' && (
         <LandingPage onEnter={() => setView({ type: 'dashboard' })} />
       )}
 
       {/* 2. Top Level Views */}
-      <div className={`${(view.type === 'landing' || view.type === 'workout' || view.type === 'split-selector' || view.type === 'guide') ? 'hidden' : 'block'} p-6 pb-32`}>
-        {view.type === 'dashboard' && (
+      <div className={`${(effectiveView.type === 'landing' || effectiveView.type === 'workout' || effectiveView.type === 'split-selector' || effectiveView.type === 'guide') ? 'hidden' : 'block'} p-6 pb-32`}>
+        {effectiveView.type === 'dashboard' && (
           <Dashboard onSelectProgram={(id) => setView({ type: 'split-selector', data: { programId: id } })} />
         )}
-        {view.type === 'exercises' && <ExerciseLibrary />}
-        {view.type === 'nutrition' && <NutritionHub />}
-        {view.type === 'profile' && <ProfileView />}
+        {effectiveView.type === 'exercises' && <ExerciseLibrary />}
+        {effectiveView.type === 'nutrition' && <NutritionHub />}
+        {effectiveView.type === 'profile' && <ProfileView />}
       </div>
 
       {/* 3. Split Selector Overlay */}
-      {view.type === 'split-selector' && (
+      {effectiveView.type === 'split-selector' && (
         <div className="fixed inset-0 z-50 bg-hayl-bg p-6 pt-10 overflow-y-auto animate-in slide-in-from-bottom duration-500">
           <SplitSelector 
-            programId={view.data.programId} 
+            programId={effectiveView.data.programId} 
             onSelect={handlePlanSelection}
             onCancel={() => setView({ type: 'dashboard' })}
           />
@@ -96,10 +95,10 @@ function App() {
       )}
 
       {/* 4. Plan Guide View (NEW) */}
-      {view.type === 'guide' && (
+      {effectiveView.type === 'guide' && (
         <div className="fixed inset-0 z-50 bg-hayl-bg overflow-y-auto animate-in fade-in duration-300">
           <PlanGuide 
-            planId={view.data.planId} 
+            planId={effectiveView.data.planId} 
             onStartSession={handleStartWorkout}
             onBack={() => setView({ type: 'dashboard' })}
           />
@@ -107,9 +106,9 @@ function App() {
       )}
 
       {/* 5. Active Workout View */}
-      {view.type === 'workout' && (
+      {effectiveView.type === 'workout' && (
         <div className="fixed inset-0 z-50 bg-hayl-bg p-6 pt-10 overflow-y-auto">
-          <WorkoutSession planId={view.data.planId} />
+          <WorkoutSession planId={effectiveView.data.planId} />
         </div>
       )}
 
@@ -117,7 +116,7 @@ function App() {
       <GlobalNav 
         currentView={currentActiveTab} 
         onViewChange={(newView: TopLevelView) => setView({ type: newView })}
-        isHidden={view.type === 'landing' || view.type === 'workout' || view.type === 'split-selector' || view.type === 'guide'}
+        isHidden={effectiveView.type === 'landing' || effectiveView.type === 'workout' || effectiveView.type === 'split-selector' || effectiveView.type === 'guide'}
       />
     </div>
   );
