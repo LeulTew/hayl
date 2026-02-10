@@ -58,7 +58,8 @@ export const getContextualQuote = query({
     }
 
     // Fallback: Get a random quote deterministically
-    const quotes = await ctx.db.query("quotes").take(20);
+    const quotes = await ctx.db.query("quotes").collect();
+
     if (quotes.length === 0) return null;
     
     // Deterministic selection based on seed (default to 0 if missing)

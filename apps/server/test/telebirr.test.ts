@@ -37,7 +37,8 @@ describe("Telebirr Webhook Integration", () => {
     // For this test, we might need to mock verifyTelebirrSignature or ensure env var is set
     
     // Sort and sign (duplicating logic for test verification)
-    const sortedKeys = (Object.keys(payload) as Array<keyof typeof payload>).sort();
+    // const sortedKeys = (Object.keys(payload) as Array<keyof typeof payload>).sort();
+
     // const stringToSign = sortedKeys.map(k => `${k}=${payload[k]}`).join('&');
 
     // Import the signer dynamically

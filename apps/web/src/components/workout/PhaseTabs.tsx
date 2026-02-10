@@ -1,4 +1,5 @@
-import { memo } from 'react';
+import React, { memo } from 'react';
+
 
 interface Phase {
   name: 'warmup' | 'main' | 'accessory' | 'stretch';
