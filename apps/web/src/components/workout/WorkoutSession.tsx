@@ -232,9 +232,10 @@ export function WorkoutSession({ planId }: WorkoutSessionProps) {
           restSeconds={currentExercise.restSeconds}
           currentSetIndex={activeSession.currentSetIndex}
           exerciseNumber={activeSession.currentExerciseIndex + 1}
+
           totalExercises={allExercises.length}
-          onSetComplete={handleLogSet}
         />
+
       </div>
 
       {/* Set Tracking */}
