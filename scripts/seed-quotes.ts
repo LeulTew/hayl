@@ -86,9 +86,7 @@ async function main() {
 
   console.log(`🌱 Seeding ${QUOTES.length} quotes...`);
   try {
-    const resultString = await client.mutation(api.quotes.seedQuotes, { quotes: QUOTES, adminSecret: adminSecret });
-    console.log("Raw Result:", resultString);
-    const result = JSON.parse(resultString);
+    const result = await client.mutation(api.quotes.seedQuotes, { quotes: QUOTES, adminSecret: adminSecret });
     console.log(`✅ Quotes synced: ${result.newCount} new, ${result.existingCount} existing.`);
   } catch (error) {
     console.error("❌ Failed to seed quotes:", error);

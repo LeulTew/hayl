@@ -6,13 +6,12 @@
 ## Overview
 
 We need to implement a secure, idempotent webhook handler for Telebirr payments.
-This document serves as the single source of truth for the signing specification and test vectors.
+This document serves as the research notes and draft specification for Telebirr integration.
 
 ## Action Required
 
 > [!IMPORTANT]
-> Please paste a valid **Sample Payload** and **Signature** from a test transaction below.
-> Do NOT commit real production secrets here.
+> Awaiting production credentials to verify exact signing format.
 
 ## 1. Signing Specification
 

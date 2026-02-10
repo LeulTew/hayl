@@ -66,8 +66,9 @@ function verifyTelebirrSignature(payload: Record<string, unknown>, secret: strin
     const computed = signTelebirrPayload(payload, secret);
     
     // Constant-time comparison to prevent timing attacks
-    const computedBuffer = Buffer.from(computed);
-    const payloadBuffer = Buffer.from(payload.sign);
+    // Constant-time comparison to prevent timing attacks
+    const computedBuffer = Buffer.from(computed, 'hex');
+    const payloadBuffer = Buffer.from(payload.sign, 'hex');
 
     if (computedBuffer.length !== payloadBuffer.length) return false;
     

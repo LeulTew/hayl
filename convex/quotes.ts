@@ -35,7 +35,7 @@ export const seedQuotes = mutation({
       }
     }
     console.log(`[SEED] Quotes: ${newCount} inserted, ${existingCount} skipped (duplicates)`);
-    return JSON.stringify({ newCount, existingCount });
+    return { newCount, existingCount };
   },
 });
 
