@@ -178,13 +178,18 @@ export function WorkoutSession({ planId }: WorkoutSessionProps) {
     const weightRaw = weightInputRef.current?.value;
     const repsRaw = repsInputRef.current?.value;
 
-    // Guard against empty input to prevent storing 0s or NaNs
-    if (!weightRaw || !repsRaw) return;
+    // Guard: Reps are mandatory, Weight is optional (bodyweight)
+    if (!repsRaw) return;
 
-    const weight = parseFloat(weightRaw);
     const reps = parseInt(repsRaw, 10);
+    if (isNaN(reps)) return;
 
-    if (isNaN(weight) || isNaN(reps)) return;
+    let weight: number | undefined = undefined;
+    if (weightRaw) {
+      const parsedWeight = parseFloat(weightRaw);
+      if (isNaN(parsedWeight)) return; // Invalid weight string
+      weight = parsedWeight;
+    }
 
     logSet(currentExercise.exerciseId, weight, reps);
 
