@@ -1,12 +1,9 @@
-import { useState, useCallback } from "react";
 import { useQuery } from "convex/react";
-import { useActiveSession } from "../../hooks/useActiveSession";
 import { api } from "../../../../../convex/_generated/api";
 
-import { WorkoutSession } from "../workout/WorkoutSession";
-import { SplitSelector } from "../workout/SplitSelector";
-import { PlanGuide } from "../guide/PlanGuide";
+
 import { BentoList } from "../ui/BentoList";
+
 
 /**
  * Dashboard View
@@ -23,67 +20,20 @@ interface DashboardProps {
 }
 
 export function Dashboard({ onSelectProgram }: DashboardProps) {
-  const { activeSession, startSession } = useActiveSession();
-  const [showSplitSelector, setShowSplitSelector] = useState<string | null>(null);
-  const [viewingPlanId, setViewingPlanId] = useState<string | null>(null);
-  const [viewingProgramId, setViewingProgramId] = useState<string | null>(null);
+
 
   const programs = useQuery(api.programs.list) || [];
 
   // Flow Handlers
   const handleProgramClick = (programSlug: string) => {
-    // Find the program ID from the slug
-    // Note: BentoList returns ID, but we mapped slug to ID in BentoList props
-    // Actually BentoList clicks return the item ID.
-    // Let's find the program that matches the ID.
     const program = programs.find(p => p._id === programSlug || p.slug === programSlug);
     if (program) {
-      setShowSplitSelector(program._id);
-      // Optional: notify parent if needed, but local state handles overlay
       onSelectProgram?.(program._id); 
     }
   };
 
-  const handlePlanSelected = (planId: string) => {
-    if (showSplitSelector) {
-        setViewingProgramId(showSplitSelector);
-    }
-    setShowSplitSelector(null);
-    setViewingPlanId(planId); // Go to Guide View instead of immediate start
-  };
-
-  const handleStartFromGuide = useCallback((dayIndex: number) => {
-    if (viewingPlanId && viewingProgramId) {
-       startSession(viewingProgramId, viewingPlanId, dayIndex);
-    }
-  }, [viewingPlanId, viewingProgramId, startSession]);
-
   // 1. ACTIVE SESSION MODE
-  if (activeSession) {
-    return <WorkoutSession planId={activeSession.planId} />;
-  }
-
-  // 2. VIEW GUIDE MODE
-  if (viewingPlanId) {
-    return (
-      <PlanGuide 
-        planId={viewingPlanId} 
-        onStartSession={handleStartFromGuide}
-        onBack={() => setViewingPlanId(null)}
-      />
-    );
-  }
-
-  // 3. SPLIT SELECTOR OVERLAY
-  if (showSplitSelector) {
-    return (
-      <SplitSelector 
-        programId={showSplitSelector} 
-        onSelect={(planId) => handlePlanSelected(planId)} 
-        onCancel={() => setShowSplitSelector(null)} 
-      />
-    );
-  }
+  // Delegated to App.tsx
 
   // 4. DEFAULT DASHBOARD VIEW
   return (
