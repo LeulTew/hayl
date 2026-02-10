@@ -1,4 +1,4 @@
-import { useState, useEffect, memo } from 'react';
+import { useState, useEffect, memo, useRef } from 'react';
 
 interface GlobalTimerProps {
   /** Session start time in milliseconds (Date.now()) */
@@ -17,20 +17,23 @@ interface GlobalTimerProps {
  * <GlobalTimer startTime={session.startTime} isActive={true} />
  */
 function GlobalTimerComponent({ startTime, isActive = true }: GlobalTimerProps) {
-  const [elapsed, setElapsed] = useState(0);
+  const [elapsed, setElapsed] = useState(() => Date.now() - startTime);
+  const startTimeRef = useRef(startTime);
+
+  // Update startTime ref when prop changes
+  useEffect(() => {
+    startTimeRef.current = startTime;
+  }, [startTime]);
 
   useEffect(() => {
     if (!isActive) return;
 
-    // Initial update
-    setElapsed(Date.now() - startTime);
-
     const timer = setInterval(() => {
-      setElapsed(Date.now() - startTime);
+      setElapsed(Date.now() - startTimeRef.current);
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [startTime, isActive]);
+  }, [isActive]);
 
   // Format elapsed time
   const hours = Math.floor(elapsed / 3600000);

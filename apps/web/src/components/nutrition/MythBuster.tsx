@@ -23,7 +23,7 @@ export function MythBuster() {
   return (
     <div className="bg-hayl-surface p-10 rounded-[2.5rem] border border-hayl-border">
       <div className="mb-10">
-        <h2 className="text-5xl font-heading font-black uppercase italic tracking-tighter leading-none mb-2 lowercase">Truth engine.</h2>
+        <h2 className="text-5xl font-heading font-black uppercase italic tracking-tighter leading-none mb-2">Truth engine.</h2>
         <p className="text-[10px] font-sans font-bold text-hayl-muted uppercase tracking-[0.4em] opacity-60 pl-1">Science-based nutrition clarity</p>
       </div>
       <div className="space-y-6">
@@ -41,7 +41,7 @@ function MythCard({ question, answer }: { question: string, answer: string }) {
     return (
         <div 
             onClick={() => setIsOpen(!isOpen)}
-            className="bg-hayl-bg rounded-[2rem] border border-hayl-border overflow-hidden cursor-pointer group transition-all"
+            className="bg-hayl-bg rounded-4xl border border-hayl-border overflow-hidden cursor-pointer group transition-all"
         >
             <div className={`p-6 flex justify-between items-center bg-hayl-bg group-hover:bg-hayl-surface transition-colors ${isOpen ? 'bg-hayl-surface' : ''}`}>
                 <h3 className="font-heading font-bold uppercase text-lg italic tracking-tight leading-tight pr-6">{question}</h3>

@@ -32,22 +32,18 @@ function App() {
     return { type: 'landing' };
   });
 
-  // Sync active session
+  // Sync active session changes
   useEffect(() => {
     if (activeSession?.id && activeSession.state === 'active') {
       setView((prev) => {
         if (prev.type === 'workout' && prev.data.planId === activeSession.planId) return prev;
         return { type: 'workout', data: { planId: activeSession.planId } };
       });
-    }
-  }, [activeSession]);
-
-  // Fallback to dashboard if session ends while in workout view
-  useEffect(() => {
-    if (view.type === 'workout' && (!activeSession || activeSession.state !== 'active')) {
+    } else if (view.type === 'workout' && (!activeSession || activeSession.state !== 'active')) {
       setView({ type: 'dashboard' });
     }
-  }, [view.type, activeSession]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeSession?.id, activeSession?.state, activeSession?.planId, view.type, (view as any).data?.planId]);
 
   const isTopLevelView = (type: string): type is TopLevelView => {
     return ['dashboard', 'exercises', 'nutrition', 'profile'].includes(type);

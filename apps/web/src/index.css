@@ -65,7 +65,7 @@
   --hayl-surface: #ffffff;
   --hayl-text: #09090b; /* Zinc 950 */
   --hayl-muted: #71717a; /* Zinc 500 */
-  --hayl-accent: #09090b;
+  --hayl-accent: #ff4d00;
   --hayl-border: #e4e4e7; /* Zinc 200 */
 }
 
@@ -75,7 +75,7 @@
     --hayl-surface: #09090b;
     --hayl-text: #fafafa;
     --hayl-muted: #a1a1aa;
-    --hayl-accent: #fafafa;
+    --hayl-accent: #ff4d00;
     --hayl-border: #27272a;
   }
 }
@@ -83,10 +83,10 @@
 /* Manual Overrides */
 .dark {
   --hayl-bg: #09090b;
-  --hayl-surface: #09090b;
+  --hayl-surface: #18181b;
   --hayl-text: #fafafa;
   --hayl-muted: #a1a1aa;
-  --hayl-accent: #fafafa;
+  --hayl-accent: #ff4d00;
   --hayl-border: #27272a;
 }
 
@@ -95,6 +95,6 @@
   --hayl-surface: #ffffff;
   --hayl-text: #09090b;
   --hayl-muted: #71717a;
-  --hayl-accent: #09090b;
+  --hayl-accent: #ff4d00;
   --hayl-border: #e4e4e7;
 }

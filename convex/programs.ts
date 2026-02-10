@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { v } from "convex/values";
 import { query, mutation, type QueryCtx, type MutationCtx } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
@@ -27,7 +28,8 @@ export const listAll = query({
   handler: async (ctx: QueryCtx) => {
     return await ctx.db
       .query("programs")
-      .filter((q) => q.eq(q.field("published"), true))
+      // .filter((q) => q.eq(q.field("published"), true)) // REMOVED: listAll should list ALL
+
       .collect();
   },
 });
