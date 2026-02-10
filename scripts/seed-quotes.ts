@@ -78,6 +78,12 @@ const QUOTES = [
 ];
 
 async function main() {
+  const adminSecret = process.env.ADMIN_SECRET;
+  if (!adminSecret) {
+    console.error("❌ ADMIN_SECRET is not set in environment.");
+    process.exit(1);
+  }
+
   console.log(`🌱 Seeding ${QUOTES.length} quotes...`);
   try {
     const resultString = await client.mutation(api.quotes.seedQuotes, { quotes: QUOTES });

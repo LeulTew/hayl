@@ -143,12 +143,18 @@ const EXERCISES = [
 ];
 
 async function main() {
+  const adminSecret = process.env.ADMIN_SECRET;
+  if (!adminSecret) {
+    console.error("❌ ADMIN_SECRET is not set in environment.");
+    process.exit(1);
+  }
+
   console.log(`🏋️ Seeding exercises to Convex...`);
   console.log(`   URL: ${convexUrl}`);
 
   try {
     await client.mutation(api.exercises.seedExercises, {
-      exercises: EXERCISES, adminSecret: "hayl-seed-secret-2026", adminSecret: "hayl-seed-secret-2026",
+      exercises: EXERCISES, adminSecret: adminSecret, adminSecret: adminSecret,
     });
     console.log(`✅ Successfully seeded ${EXERCISES.length} exercises!`);
   } catch (error) {

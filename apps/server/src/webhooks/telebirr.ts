@@ -1,5 +1,5 @@
 import { Elysia, t } from 'elysia';
-import { createHmac } from 'crypto';
+import crypto from 'crypto';
 
 // Setup Elysia router strictly for this webhook
 export const telebirrWebhook = new Elysia()
@@ -48,7 +48,7 @@ export function signTelebirrPayload(payload: Record<string, unknown>, secret: st
         .map(k => `${k}=${rest[k]}`)
         .join('&');
 
-    return createHmac('sha256', secret)
+    return crypto.createHmac('sha256', secret)
         .update(stringToSign)
         .digest('hex');
 }
@@ -60,8 +60,16 @@ function verifyTelebirrSignature(payload: Record<string, unknown>, secret: strin
     }
     
     // If payload doesn't have signature, fail
+    // If payload doesn't have signature, fail
     if (typeof payload.sign !== 'string') return false;
 
     const computed = signTelebirrPayload(payload, secret);
-    return computed === payload.sign;
+    
+    // Constant-time comparison to prevent timing attacks
+    const computedBuffer = Buffer.from(computed);
+    const payloadBuffer = Buffer.from(payload.sign);
+
+    if (computedBuffer.length !== payloadBuffer.length) return false;
+    
+    return crypto.timingSafeEqual(computedBuffer, payloadBuffer);
 }

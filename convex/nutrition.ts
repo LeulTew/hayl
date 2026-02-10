@@ -29,8 +29,12 @@ export const seedIngredients = mutation({
         isLocal: v.boolean(),
       })
     ),
+    adminSecret: v.string(),
   },
   handler: async (ctx: MutationCtx, args) => {
+    if (args.adminSecret !== process.env.ADMIN_SECRET) {
+      throw new Error("❌ Unauthorized: Invalid Admin Secret");
+    }
     let inserted = 0;
     let skipped = 0;
 

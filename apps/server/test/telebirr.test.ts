@@ -59,4 +59,23 @@ describe("Telebirr Webhook Integration", () => {
     const json = await response.json();
     expect(json).toEqual({ ok: true });
   });
+  it("should reject invalid signature with 401", async () => {
+    const payload = {
+        out_trade_no: "bad",
+        transaction_id: "tx_bad",
+        state: "COMPLETED",
+        amount: "100",
+        currency: "ETB",
+        sign: "invalid_signature_string"
+    };
+
+    const response = await app.handle(
+        new Request(`${BASE_URL}/webhooks/telebirr`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        })
+    );
+    expect(response.status).toBe(401);
+  });
 });

@@ -116,7 +116,7 @@ export const seedPrograms = mutation({
     adminSecret: v.string(),
   },
   handler: async (ctx: MutationCtx, args) => {
-    if (args.adminSecret !== "hayl-seed-secret-2026") {
+    if (args.adminSecret !== process.env.ADMIN_SECRET) {
       throw new Error("❌ Unauthorized: Invalid Admin Secret");
     }
     const insertedIds: Record<string, Id<"programs">> = {};
@@ -217,7 +217,7 @@ export const seedDerivedPlan = mutation({
     adminSecret: v.string(),
   },
   handler: async (ctx: MutationCtx, args) => {
-    if (args.adminSecret !== "hayl-seed-secret-2026") {
+    if (args.adminSecret !== process.env.ADMIN_SECRET) {
       throw new Error("❌ Unauthorized: Invalid Admin Secret");
     }
     // Check for existing plan with same program + version

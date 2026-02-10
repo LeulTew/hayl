@@ -20,7 +20,7 @@ export const seedExercises = mutation({
     adminSecret: v.string(),
   },
   handler: async (ctx: MutationCtx, args) => {
-    if (args.adminSecret !== "hayl-seed-secret-2026") {
+    if (args.adminSecret !== process.env.ADMIN_SECRET) {
       throw new Error("❌ Unauthorized: Invalid Admin Secret");
     }
     let inserted = 0;

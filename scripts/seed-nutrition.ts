@@ -100,9 +100,15 @@ const INGREDIENTS = [
 ] as const;
 
 async function main() {
+  const adminSecret = process.env.ADMIN_SECRET;
+  if (!adminSecret) {
+    console.error("❌ ADMIN_SECRET is not set in environment.");
+    process.exit(1);
+  }
+
   console.log(`Checking Convex URL: ${convexUrl}`);
   try {
-      await client.mutation(api.nutrition.seedIngredients, { ingredients: [...INGREDIENTS] });
+      await client.mutation(api.nutrition.seedIngredients, { ingredients: [...INGREDIENTS], adminSecret });
       console.log("✅ Successfully seeded nutrition data!");
   } catch(e) {
       console.error("❌ Failed to seed:", e);

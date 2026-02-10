@@ -29,10 +29,16 @@ const PROGRAM = {
 };
 
 async function main() {
+  const adminSecret = process.env.ADMIN_SECRET;
+  if (!adminSecret) {
+    console.error("❌ ADMIN_SECRET is not set in environment.");
+    process.exit(1);
+  }
+
   console.log("🌱 Seeding Hardcore Template I (3-Day, 60min, Hypertrophy)...");
 
   // Seed new exercises
-  await client.mutation(api.exercises.seedExercises, { exercises: EXERCISES, adminSecret: "hayl-seed-secret-2026" });
+  await client.mutation(api.exercises.seedExercises, { exercises: EXERCISES, adminSecret: adminSecret });
 
   // Fetch Exercise IDs
   const exercises = (await client.query(api.exercises.listAll)) as Doc<"exercises">[];
@@ -52,13 +58,13 @@ async function main() {
   };
 
   // Seed Program
-  const programIds = (await client.mutation(api.programs.seedPrograms, { programs: [PROGRAM], adminSecret: "hayl-seed-secret-2026" })) as Record<string, Id<"programs">>;
+  const programIds = (await client.mutation(api.programs.seedPrograms, { programs: [PROGRAM], adminSecret: adminSecret })) as Record<string, Id<"programs">>;
   const programId = programIds[PROGRAM.slug];
   console.log(`✅ Program Created: ${programId}`);
 
   // Seed Derived Plan
   const planId = await client.mutation(api.programs.seedDerivedPlan, {
-    programId, adminSecret: "hayl-seed-secret-2026",
+    programId, adminSecret: adminSecret,
     version: "v1.0.0",
     author: "Coach Greg / Hayl Adaptation",
     variant: {

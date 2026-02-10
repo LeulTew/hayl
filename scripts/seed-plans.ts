@@ -58,6 +58,12 @@ const PROGRAMS = [
 ];
 
 async function main() {
+  const adminSecret = process.env.ADMIN_SECRET;
+  if (!adminSecret) {
+    console.error("❌ ADMIN_SECRET is not set in environment.");
+    process.exit(1);
+  }
+
   console.log(`📋 Seeding programs to Convex...`);
   console.log(`   URL: ${convexUrl}`);
 
@@ -102,7 +108,7 @@ async function main() {
     const foundationsId = programIds["hayl-foundations"];
     if (foundationsId) {
       await client.mutation(api.programs.seedDerivedPlan, {
-        programId: foundationsId as Id<"programs">, adminSecret: "hayl-seed-secret-2026", adminSecret: "hayl-seed-secret-2026", adminSecret: "hayl-seed-secret-2026",
+        programId: foundationsId as Id<"programs">, adminSecret: adminSecret, adminSecret: adminSecret, adminSecret: adminSecret,
         version: "1.0.0",
         author: "Hayl Team",
         variant: {
