@@ -124,35 +124,35 @@ The accessory circuit is where the real work happens. If you still have energy a
           {
             name: "warmup" as const,
             items: [
-              { exerciseId: exMap.get("Squat of Choice")!, sets: 1, reps: "15", restSeconds: 60, note: "Light - Easy. Slow eccentric/TUT focus." },
+              { exerciseId: getEx("Squat of Choice"), sets: 1, reps: "15", restSeconds: 60, note: "Light - Easy. Slow eccentric/TUT focus." },
             ]
           },
           {
             name: "main" as const,
             items: [
-              { exerciseId: exMap.get("Squat of Choice")!, sets: 1, reps: "15", restSeconds: 90, rpe: 5, note: "Light - Easy" },
-              { exerciseId: exMap.get("Pull-up / Lat Pull-down")!, sets: 1, reps: "15", restSeconds: 90, rpe: 5, note: "Light - Easy" },
-              { exerciseId: exMap.get("Squat of Choice")!, sets: 1, reps: "12-15", restSeconds: 120, rpe: 7, note: "Moderate - Moderate" },
-              { exerciseId: exMap.get("Pull-up / Lat Pull-down")!, sets: 1, reps: "12-15", restSeconds: 120, rpe: 7, note: "Moderate - Moderate" },
-              { exerciseId: exMap.get("Squat of Choice")!, sets: 1, reps: "11-15", restSeconds: 150, rpe: 8, note: "Heavy - Hard" },
-              { exerciseId: exMap.get("Chin-up / Supinated Lat Pull-down")!, sets: 1, reps: "11-15", restSeconds: 150, rpe: 8, note: "Heavy - Hard" },
-              { exerciseId: exMap.get("Squat of Choice")!, sets: 1, reps: "10-15", restSeconds: 150, rpe: 9, note: "Same weight - Hard. Push the limit." },
-              { exerciseId: exMap.get("Chin-up / Supinated Lat Pull-down")!, sets: 1, reps: "10-15", restSeconds: 150, rpe: 9, note: "Same weight - Hard" },
+              { exerciseId: getEx("Squat of Choice"), sets: 1, reps: "15", restSeconds: 90, rpe: 5, note: "Light - Easy" },
+              { exerciseId: getEx("Pull-up / Lat Pull-down"), sets: 1, reps: "15", restSeconds: 90, rpe: 5, note: "Light - Easy" },
+              { exerciseId: getEx("Squat of Choice"), sets: 1, reps: "12-15", restSeconds: 120, rpe: 7, note: "Moderate - Moderate" },
+              { exerciseId: getEx("Pull-up / Lat Pull-down"), sets: 1, reps: "12-15", restSeconds: 120, rpe: 7, note: "Moderate - Moderate" },
+              { exerciseId: getEx("Squat of Choice"), sets: 1, reps: "11-15", restSeconds: 150, rpe: 8, note: "Heavy - Hard" },
+              { exerciseId: getEx("Chin-up / Supinated Lat Pull-down"), sets: 1, reps: "11-15", restSeconds: 150, rpe: 8, note: "Heavy - Hard" },
+              { exerciseId: getEx("Squat of Choice"), sets: 1, reps: "10-15", restSeconds: 150, rpe: 9, note: "Same weight - Hard. Push the limit." },
+              { exerciseId: getEx("Chin-up / Supinated Lat Pull-down"), sets: 1, reps: "10-15", restSeconds: 150, rpe: 9, note: "Same weight - Hard" },
 
               // PART 2: Deadlift/Row & Bench/Chest
-              { exerciseId: exMap.get("Deadlift of Choice")!, sets: 1, reps: "15", restSeconds: 90, rpe: 5, note: "Light - Easy. No belt." },
-              { exerciseId: exMap.get("Paused Bench Press")!, sets: 1, reps: "15", restSeconds: 90, rpe: 5, note: "Light - Easy. PAUSE on all sets." },
-              { exerciseId: exMap.get("Deadlift of Choice")!, sets: 1, reps: "15", restSeconds: 120, rpe: 7, note: "Moderate - Moderate" },
-              { exerciseId: exMap.get("Paused Bench Press")!, sets: 1, reps: "15", restSeconds: 120, rpe: 7, note: "Moderate - Moderate" },
-              { exerciseId: exMap.get("Deadlift of Choice")!, sets: 1, reps: "12-15", restSeconds: 120, rpe: 8, note: "Heavy - Hard. Belt optional." },
-              { exerciseId: exMap.get("Paused Bench Press")!, sets: 1, reps: "12-15", restSeconds: 120, rpe: 8, note: "Heavy - Hard" },
+              { exerciseId: getEx("Deadlift of Choice"), sets: 1, reps: "15", restSeconds: 90, rpe: 5, note: "Light - Easy. No belt." },
+              { exerciseId: getEx("Paused Bench Press"), sets: 1, reps: "15", restSeconds: 90, rpe: 5, note: "Light - Easy. PAUSE on all sets." },
+              { exerciseId: getEx("Deadlift of Choice"), sets: 1, reps: "15", restSeconds: 120, rpe: 7, note: "Moderate - Moderate" },
+              { exerciseId: getEx("Paused Bench Press"), sets: 1, reps: "15", restSeconds: 120, rpe: 7, note: "Moderate - Moderate" },
+              { exerciseId: getEx("Deadlift of Choice"), sets: 1, reps: "12-15", restSeconds: 120, rpe: 8, note: "Heavy - Hard. Belt optional." },
+              { exerciseId: getEx("Paused Bench Press"), sets: 1, reps: "12-15", restSeconds: 120, rpe: 8, note: "Heavy - Hard" },
               
-              { exerciseId: exMap.get("Row of Choice")!, sets: 1, reps: "15", restSeconds: 90, rpe: 7, note: "Moderate - Moderate" },
-              { exerciseId: exMap.get("Chest Machine of Choice")!, sets: 1, reps: "15", restSeconds: 90, rpe: 7, note: "Moderate - Moderate" },
-              { exerciseId: exMap.get("Row of Choice")!, sets: 1, reps: "12", restSeconds: 90, rpe: 8, note: "Heavy - Hard" },
-              { exerciseId: exMap.get("Chest Machine of Choice")!, sets: 1, reps: "12", restSeconds: 90, rpe: 8, note: "Heavy - Hard" },
-              { exerciseId: exMap.get("Row of Choice")!, sets: 1, reps: "10-12", restSeconds: 120, rpe: 9, note: "Same weight - Harder" },
-              { exerciseId: exMap.get("Chest Machine of Choice")!, sets: 1, reps: "10-12", restSeconds: 120, rpe: 9, note: "Same weight - Harder" },
+              { exerciseId: getEx("Row of Choice"), sets: 1, reps: "15", restSeconds: 90, rpe: 7, note: "Moderate - Moderate" },
+              { exerciseId: getEx("Chest Machine of Choice"), sets: 1, reps: "15", restSeconds: 90, rpe: 7, note: "Moderate - Moderate" },
+              { exerciseId: getEx("Row of Choice"), sets: 1, reps: "12", restSeconds: 90, rpe: 8, note: "Heavy - Hard" },
+              { exerciseId: getEx("Chest Machine of Choice"), sets: 1, reps: "12", restSeconds: 90, rpe: 8, note: "Heavy - Hard" },
+              { exerciseId: getEx("Row of Choice"), sets: 1, reps: "10-12", restSeconds: 120, rpe: 9, note: "Same weight - Harder" },
+              { exerciseId: getEx("Chest Machine of Choice"), sets: 1, reps: "10-12", restSeconds: 120, rpe: 9, note: "Same weight - Harder" },
             ]
           },
           // PART 3: Accessories Circuit (3 Rounds)
