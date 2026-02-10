@@ -53,8 +53,9 @@ export function signTelebirrPayload(payload: Record<string, unknown>, secret: st
         .digest('hex');
 }
 
+export function verifyTelebirrSignature(payload: any, secret: string): boolean {
     // If payload doesn't have signature, fail
-    if (typeof payload.sign !== 'string') return false;
+    if (!payload || typeof payload.sign !== 'string') return false;
 
     const computed = signTelebirrPayload(payload, secret);
     
