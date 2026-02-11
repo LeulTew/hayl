@@ -4,14 +4,14 @@
 
 ## 📊 Project Status Overview
 
-| Phase                        | Focus                                                | Status             |
-| :--------------------------- | :--------------------------------------------------- | :----------------- |
-| **I. Foundation**            | Repo, Stack, CI/CD, Safety                           | ✅ **COMPLETED**   |
-| **II. The Engine**           | Data Schema, Content Seeding, Quote Bank             | 🚧 **IN PROGRESS** |
-| **III. Workout UI**          | Evaluation, Active Timer, Asset Lazy-loading         | ✅ **COMPLETED**   |
-| **IV. Nutrition (ET)**       | Addis-specific Foods, CICO Calc, Myth Busting        | ✅ **COMPLETED**   |
-| **V. UX Interface Overhaul** | Complete UI Redesign, Desktop Support, Component Lib | 🔴 **NEW**         |
-| **VI. Monetization**         | Telebirr Integration, Premium Locking                | 🚧 **PAUSED**      |
+| Phase                        | Focus                                                     | Status           |
+| :--------------------------- | :-------------------------------------------------------- | :--------------- |
+| **I. Foundation**            | Repo, Stack, CI/CD, Safety                                | ✅ **COMPLETED** |
+| **II. The Engine**           | Data Schema, Content Seeding, Quote Bank, Standard Splits | ✅ **COMPLETED** |
+| **III. Workout UI**          | Evaluation, Active Timer, Asset Lazy-loading              | ✅ **COMPLETED** |
+| **IV. Nutrition (ET)**       | Addis-specific Foods, CICO Calc, Myth Busting             | ✅ **COMPLETED** |
+| **V. UX Interface Overhaul** | Complete UI Redesign, Desktop Support, Component Lib      | 🔴 **NEW**       |
+| **VI. Monetization**         | Telebirr Integration, Premium Locking                     | 🚧 **PAUSED**    |
 
 ---
 
@@ -121,6 +121,14 @@ Example from Coach Greg: _"Cheat on your curls, but don't cheat on your girlfrie
 #### 2.3 Payment Infrastructure (Moved to Phase VI)
 
 - _Refactored to Phase VI for better separation of concerns._
+
+#### 2.4 Phase IV Standard Splits (PR #9, Issue #8) ✅
+
+- [x] **HAYL Efficiency I**: 1-day, 30min density training. Antagonist supersets, compound-only, dumbbell-focused.
+- [x] **HAYL Minimalist I**: 4-day Upper/Lower, dumbbell-only. Tempo-driven progression for home gyms.
+- [x] **HAYL Power-Builder I**: 4-day Upper/Lower blending heavy strength (3-6 reps) with hypertrophy volume (8-15 reps).
+- [x] **Database Performance**: Added 5 indexes (`exercises.by_name`, `quotes.by_text`, `programs.by_published`, `ingredients.by_name`, `ingredients.by_isLocal`). All `.filter()` → `.withIndex()` for O(1) lookups.
+- [x] **Type Safety Audit**: Removed all `as` casts, unused imports, dead code. Strict mode — 0 errors.
 
 ---
 
@@ -345,4 +353,4 @@ We will use **shadcn/ui** as a base for accessible, unstyled primitives and sour
 
 ---
 
-_Last Updated: 2026-02-08_
+_Last Updated: 2026-02-12_
