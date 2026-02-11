@@ -20,7 +20,7 @@
 
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "../convex/_generated/api.js";
-import { Doc, Id } from "../convex/_generated/dataModel.js";
+import { Id } from "../convex/_generated/dataModel.js";
 
 const convexUrl = process.env.VITE_CONVEX_URL || process.env.CONVEX_URL;
 if (!convexUrl) {
@@ -78,9 +78,9 @@ async function main() {
   console.log("✅ Exercises seeded.");
 
   // 2. Fetch Exercise IDs
-  const exercises = (await client.query(api.exercises.listAll)) as Doc<"exercises">[];
-  const exMap = new Map<string, Id<"exercises">>(
-    exercises.map((e) => [e.name, e._id])
+  const exercises = await client.query(api.exercises.listAll);
+  const exMap = new Map(
+    exercises.map((e) => [e.name, e._id] as const)
   );
 
   /**
@@ -99,7 +99,7 @@ async function main() {
   };
 
   // 3. Seed Program
-  const programIds = (await client.mutation(api.programs.seedPrograms, { programs: [PROGRAM], adminSecret })) as Record<string, Id<"programs">>;
+  const programIds = await client.mutation(api.programs.seedPrograms, { programs: [PROGRAM], adminSecret });
   const programId = programIds[PROGRAM.slug];
   console.log(`✅ Program Created: ${programId}`);
 
@@ -313,4 +313,7 @@ Strength days prioritize heavy barbell compounds when neuromuscular fatigue is l
   console.log(`✅ Plan Seeded: ${planId}`);
 }
 
-main().catch(console.error);
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
