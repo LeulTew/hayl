@@ -1,9 +1,9 @@
 /**
- * Seed Script: Casual Template I
- * Source: HTLT_Greg.pdf (Pages 68-70)
- * Naming: casual-1day-60min-hypertrophy
+ * Seed Script: HAYL Essentials I
+ * Author: Leul Tewodros Agonafer
+ * Slug: casual-1day-60min-hypertrophy
  * 
- * Structure from book:
+ * Structure:
  * - 1-Day Split | 60 Minutes | Hypertrophy
  * - PART 1: Squat & Lat Alternating Sets
  * - PART 2: Deadlift/Row & Bench/Chest Alternating Sets
@@ -38,8 +38,8 @@ const EXERCISES = [
 
 const PROGRAM = {
   slug: "casual-1day-60min-hypertrophy",
-  title: "Casual Template I",
-  canonicalVersion: "v1.0",
+  title: "HAYL Essentials I",
+  canonicalVersion: "v2.0",
   difficulty: "beginner" as const,
   splitType: "1-day" as const,
   isPremium: false,
@@ -53,7 +53,7 @@ async function main() {
     process.exit(1);
   }
 
-  console.log("🌱 Seeding Casual Template I (1-Day, 60min, Hypertrophy)...");
+  console.log("🌱 Seeding HAYL Essentials I (1-Day, 60min, Hypertrophy)...");
 
   // 1. Seed Exercises
   await client.mutation(api.exercises.seedExercises, { exercises: EXERCISES, adminSecret: adminSecret });
@@ -73,40 +73,35 @@ async function main() {
   // 4. Seed Derived Plan
   const planId = await client.mutation(api.programs.seedDerivedPlan, {
     programId, adminSecret: adminSecret,
-    version: "v1.0.0",
-    author: "Coach Greg / Hayl Adaptation",
+    version: "v2.0.0",
+    author: "HAYL Performance Team",
     variant: {
       difficulty: "amateur",
       splitFreq: "1-day",
       durationMinutes: 60,
-      tags: ["full-body", "hypertrophy", "casual"],
+      tags: ["full-body", "hypertrophy", "essentials"],
       equipment_needed: ["barbell", "dumbbells", "cables", "machines"],
     },
-    description: "A 60-minute full-body hypertrophy session. Perfect for busy schedules or those who can only train 1-2 times per week. Focus on controlled reps and time under tension.",
+    description: "A 60-minute full-body hypertrophy session designed for busy schedules. Train 1-2x per week with controlled reps, time under tension, and progressive overload.",
     overview_markdown: `
-# Casual Template I - Full Body Hypertrophy
+# HAYL Essentials I — Full Body Hypertrophy
 
-**Duration**: 60 Minutes  
-**Split**: 1-Day (Full Body)  
-**Focus**: Hypertrophy (Muscle Building)  
-**Level**: Casual / Beginner-Friendly
+**Duration**: 60 min | **Split**: Full Body | **Focus**: Hypertrophy | **Level**: Essentials
 
-## The Philosophy
-This template is designed for those who want to train once or twice per week and still make progress. 
-Every session is a full-body workout hitting all major muscle groups with alternating sets to maximize efficiency.
+## Why This Program
+Maximum results from minimum frequency. One session covers every muscle group through intelligent alternating supersets — resting one muscle while training another.
 
-## Key Principles
-1. **Control the weight** - Focus on slow eccentrics (3-4 seconds down)
-2. **Time Under Tension (TUT)** - Each set should take 30-40 seconds
-3. **Pause on Bench** - Always pause at the bottom to avoid injury
-4. **Progressive Overload** - If you hit the top of the rep range, increase weight next session
+## Core Principles
+- **Controlled Eccentrics** — 3-4 seconds on the way down, every rep
+- **Time Under Tension** — 30-40s per set for optimal hypertrophy stimulus
+- **Paused Bench** — mandatory pause at chest to protect shoulders
+- **Progressive Overload** — hit top of rep range → add weight next session
 
-## Equipment Needed
-- Barbell + Plates
-- Dumbbells
-- Cable Machine
-- Lat Pull-down / Pull-up Station
-- Leg Press or Squat Rack
+## Coach's Notes
+> Perfect for athletes training 1-2x/week. Don't let the "Essentials" label fool you — this session is dense, efficient, and highly effective when executed with discipline.
+
+## Equipment
+Barbell, Dumbbells, Cable Machine, Lat Pull-down, Leg Press / Squat Rack
     `,
     schedule_markdown: `
 ## Daily Structure
@@ -124,19 +119,19 @@ Every session is a full-body workout hitting all major muscle groups with altern
 - Shoulders → Biceps → Triceps → Quads → Hamstrings → Calves
     `,
     philosophy_markdown: `
-## Why This Works
+## The Science Behind HAYL Essentials I
 
-**Frequency over Volume for Beginners**  
-Training muscles 1-2x per week with full-body sessions is optimal for those new to lifting or with limited time.
+**Frequency Matching**
+Full-body sessions 1-2x/week are optimal for building a strength foundation. Research shows beginners respond well to full-body frequency when volume per session is managed.
 
-**Alternating Sets = Efficiency**  
-By alternating between muscle groups (squat/lats, bench/rows), you can rest one while training the other, cutting workout time in half.
+**Alternating Supersets**
+Pairing opposing muscle groups (squat/lats, bench/rows) doubles training density without compromising recovery between sets.
 
-**Intensity Ramping**  
-Each exercise starts "Easy/Light" and progresses to "Hard/Heavy". This warms you up properly and saves the hardest sets for when you're primed.
+**Ascending Intensity**
+Every exercise ramps from light to heavy. This is deliberate — it primes the nervous system and protects joints while reserving peak effort for the final sets.
     `,
     source_refs: [
-      { docId: "HTLT_Greg.pdf", page: 68, note: "Casual Template I - 1-Day Split, 60 min, Hypertrophy" }
+      { docId: "hayl-internal", note: "HAYL Essentials I — 1-Day, 60 min, Hypertrophy. Author: Leul Tewodros Agonafer" }
     ],
     requires_human_review: false,
     days: [
@@ -204,7 +199,7 @@ Each exercise starts "Easy/Light" and progresses to "Hard/Heavy". This warms you
         ]
       }
     ],
-    changelog: "v1.0.0: Initial digitization from HTLT_Greg.pdf pages 68-70",
+    changelog: "v1.0.0: Initial digitization. v2.0.0: HAYL Essentials rebrand.",
   });
 
   console.log(`✅ Plan Seeded: ${planId}`);

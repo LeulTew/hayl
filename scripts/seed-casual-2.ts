@@ -1,9 +1,9 @@
 /**
- * Seed Script: Casual Template II
- * Source: HTLT_Greg.pdf (Pages 71-73)
- * Naming: casual-1day-60min-strength
+ * Seed Script: HAYL Essentials II
+ * Author: Leul Tewodros Agonafer
+ * Slug: casual-1day-60min-strength
  * 
- * Structure from book:
+ * Structure:
  * - 1-Day Split | 60 Minutes | Strength
  * - PART 1: Squat & Lat Alternating Sets (lower reps, heavier weights)
  * - PART 2: Deadlift/Row & Bench/Chest Alternating Sets
@@ -26,8 +26,8 @@ const client = new ConvexHttpClient(convexUrl);
 
 const PROGRAM = {
   slug: "casual-1day-60min-strength",
-  title: "Casual Template II",
-  canonicalVersion: "v1.0",
+  title: "HAYL Essentials II",
+  canonicalVersion: "v2.0",
   difficulty: "beginner" as const,
   splitType: "1-day" as const,
   isPremium: false,
@@ -41,7 +41,7 @@ async function main() {
     process.exit(1);
   }
 
-  console.log("🌱 Seeding Casual Template II (1-Day, 60min, Strength)...");
+  console.log("🌱 Seeding HAYL Essentials II (1-Day, 60min, Strength)...");
 
   // Fetch Exercise IDs (already seeded from Casual I)
   const exercises = (await client.query(api.exercises.listAll)) as Doc<"exercises">[];
@@ -63,39 +63,35 @@ async function main() {
   // Seed Derived Plan
   const planId = await client.mutation(api.programs.seedDerivedPlan, {
     programId, adminSecret: adminSecret,
-    version: "v1.0.0",
-    author: "Coach Greg / Hayl Adaptation",
+    version: "v2.0.0",
+    author: "HAYL Performance Team",
     variant: {
       difficulty: "amateur",
       splitFreq: "1-day",
       durationMinutes: 60,
-      tags: ["full-body", "strength", "casual", "powerbuilding"],
+      tags: ["full-body", "strength", "essentials", "powerbuilding"],
       equipment_needed: ["barbell", "dumbbells", "cables", "machines"],
     },
-    description: "A 60-minute full-body strength session. Lower reps, heavier weights, focused on building raw power. For those who want to get STRONG while training just 1-2 times per week.",
+    description: "A 60-minute full-body strength session. Lower reps, heavier loads, focused on building raw power for athletes training 1-2x per week.",
     overview_markdown: `
-# Casual Template II - Full Body Strength
+# HAYL Essentials II — Full Body Strength
 
-**Duration**: 60 Minutes  
-**Split**: 1-Day (Full Body)  
-**Focus**: Strength (Power Building)  
-**Level**: Casual / Beginner-Friendly
+**Duration**: 60 min | **Split**: Full Body | **Focus**: Strength | **Level**: Essentials
 
-## The Philosophy
-This template is the STRENGTH version of the casual 1-day split. Same efficient alternating set structure, but with lower rep ranges and heavier weights to build raw power.
+## Why This Program
+The strength-focused counterpart to Essentials I. Same alternating superset efficiency, but optimized for building raw power with lower rep ranges and heavier loads.
 
-## Key Differences from Hypertrophy Template
-1. **Lower Rep Ranges** - 5-8 reps for main lifts instead of 10-15
-2. **Longer Rest** - 2-3 minutes between heavy sets
-3. **Fewer Accessories** - Focus on compound movements
-4. **Progressive Overload Priority** - Add weight when you hit top of rep range
+## How It Differs from Essentials I
+- **Lower Rep Ranges** — 5-8 reps on main lifts vs 10-15
+- **Longer Rest** — 2-3 min between heavy sets for full neural recovery
+- **Compound Priority** — fewer accessories, more focus on the big lifts
+- **Progressive Overload** — add weight when you hit top of rep range
 
-## Equipment Needed
-- Barbell + Plates
-- Dumbbells
-- Cable Machine
-- Lat Pull-down / Pull-up Station
-- Leg Press or Squat Rack
+## Coach's Notes
+> If you're deciding between Essentials I and II: choose I for physique, choose II for performance. Both are valid starting points.
+
+## Equipment
+Barbell, Dumbbells, Cable Machine, Lat Pull-down, Leg Press / Squat Rack
     `,
     schedule_markdown: `
 ## Daily Structure
@@ -115,7 +111,7 @@ This template is the STRENGTH version of the casual 1-day split. Same efficient 
 - Lower reps, heavier weights
     `,
     philosophy_markdown: `
-## Why Strength Training Works
+## The Science Behind HAYL Essentials II
 
 **Neural Adaptations**  
 Heavy lifting trains your nervous system to recruit more muscle fibers. This is why beginners can get stronger without adding much muscle mass initially.
@@ -127,7 +123,7 @@ Research shows 5-8 reps with heavy weight is optimal for building strength while
 Squats, Deadlifts, Bench, Rows - these multi-joint movements give you the most bang for your buck when time is limited.
     `,
     source_refs: [
-      { docId: "HTLT_Greg.pdf", page: 71, note: "Casual Template II - 1-Day Split, 60 min, Strength" }
+      { docId: "hayl-internal", note: "HAYL Essentials II — 1-Day, 60 min, Strength. Author: Leul Tewodros Agonafer" }
     ],
     requires_human_review: false,
     days: [
@@ -191,7 +187,7 @@ Squats, Deadlifts, Bench, Rows - these multi-joint movements give you the most b
         ]
       }
     ],
-    changelog: "v1.0.0: Initial digitization from HTLT_Greg.pdf pages 71-73",
+    changelog: "v1.0.0: Initial release. v2.0.0: HAYL Essentials rebrand.",
   });
 
   console.log(`✅ Plan Seeded: ${planId}`);

@@ -1,7 +1,7 @@
 /**
- * Seed Script: Moderate Template II
- * Source: HTLT_Greg.pdf (Pages 88-91)
- * Naming: moderate-2day-60min-strength
+ * Seed Script: HAYL Hybrid II
+ * Author: Leul Tewodros Agonafer
+ * Slug: moderate-2day-60min-strength
  */
 
 import { ConvexHttpClient } from "convex/browser";
@@ -18,8 +18,8 @@ const client = new ConvexHttpClient(convexUrl);
 
 const PROGRAM = {
   slug: "moderate-2day-60min-strength",
-  title: "Moderate Template II",
-  canonicalVersion: "v1.0",
+  title: "HAYL Hybrid II",
+  canonicalVersion: "v2.0",
   difficulty: "intermediate" as const,
   splitType: "2-day" as const,
   isPremium: false,
@@ -33,7 +33,7 @@ async function main() {
     process.exit(1);
   }
 
-  console.log("🌱 Seeding Moderate Template II (2-Day, 60min, Strength)...");
+  console.log("🌱 Seeding HAYL Hybrid II (2-Day, 60min, Strength)...");
 
   // Fetch Exercise IDs (already seeded from Moderate I and Casuals)
   const exercises = (await client.query(api.exercises.listAll)) as Doc<"exercises">[];
@@ -62,8 +62,8 @@ async function main() {
   // Seed Derived Plan
   const planId = await client.mutation(api.programs.seedDerivedPlan, {
     programId, adminSecret: adminSecret,
-    version: "v1.0.0",
-    author: "Coach Greg / Hayl Adaptation",
+    version: "v2.0.0",
+    author: "HAYL Performance Team",
     variant: {
       difficulty: "intermediate",
       splitFreq: "2-day",
@@ -71,31 +71,26 @@ async function main() {
       tags: ["strength", "powerbuilding", "intermediate"],
       equipment_needed: ["barbell", "dumbbells", "cables", "machines"],
     },
-    description: "A 60-minute intermediate strength program. Lower reps, higher intensity, and longer rest periods compared to the hypertrophy version. Focuses on building raw power and compound strength.",
+    description: "A 60-minute intermediate strength program. Lower reps, higher intensity, longer rest. Builds raw power and compound strength on a 2-day repeated split.",
     overview_markdown: `
-# Moderate Template II - 2-Day Split Strength
+# HAYL Hybrid II — 2-Day Split Strength
 
-**Duration**: 60 Minutes  
-**Split**: 2-Day (Legs/Biceps + Upper/Back)  
-**Focus**: Strength (Power Building)  
-**Level**: Intermediate / Trained
+**Duration**: 60 min | **Split**: 2-Day (Legs/Biceps + Upper/Back) | **Focus**: Strength | **Level**: Hybrid
 
-## The Philosophy
-This is the strength-focused version of the moderate split. While it still builds muscle, the primary goal is neurological adaptation to heavy loads. The rep ranges are lower (5-8 for main lifts) to allow for heavier weights.
+## Why This Program
+The strength-focused counterpart to Hybrid I. While it still builds muscle, the primary goal is neurological adaptation to heavy loads with lower rep ranges (5-8 on main lifts).
 
-## Key Principles
-1. **Raw Power** - Focus on the weight moved, not just the "burn."
-2. **Explosive Concentric** - Pull/Push the weight aggressively but with control.
-3. **Pauses for Safety** - Bench press pauses are mandatory to protect your shoulders.
-4. **Full Recovery** - Rest 2-3 minutes on main lifts to ensure you can lift heavy every set.
+## Core Principles
+- **Raw Power** — focus on weight moved, not just the "burn"
+- **Explosive Concentric** — fire hard on the way up, control the way down
+- **Paused Bench** — mandatory pause at chest to protect shoulders
+- **Full Recovery Rest** — 2-3 min on main lifts to ensure quality reps every set
 
-## Equipment Needed
-- Barbell + Plates
-- Dumbbells
-- Cable Machine
-- Lat Pull-down / Pull-up Station
-- Squat Machine or Rack
-- Adductor/Abductor Machines
+## Coach's Notes
+> Choose Hybrid I for physique goals, Hybrid II for performance and strength gains. Both use the same efficient 2-day structure.
+
+## Equipment
+Barbell, Dumbbells, Cable Machine, Lat Pull-down, Squat Rack, Adductor/Abductor Machines
     `,
     schedule_markdown: `
 ## Weekly Schedule (Recommended)
@@ -131,8 +126,8 @@ By resetting the weight on the floor for the first 3 sets, you ensure perfect fo
 In this plan, intensity means the percentage of your 1-rep max. We are pushing closer to the limit of your absolute strength.
     `,
     source_refs: [
-      { docId: "HTLT_Greg.pdf", page: 88, note: "Day 1 - Legs & Biceps" },
-      { docId: "HTLT_Greg.pdf", page: 90, note: "Day 2 - Upper Body & Back" }
+      { docId: "hayl-internal", note: "HAYL Hybrid II — Day 1: Legs & Biceps. Author: Leul Tewodros Agonafer" },
+      { docId: "hayl-internal", note: "HAYL Hybrid II — Day 2: Upper Body & Back. Author: Leul Tewodros Agonafer" }
     ],
     requires_human_review: false,
     days: [
@@ -231,7 +226,7 @@ In this plan, intensity means the percentage of your 1-rep max. We are pushing c
         ]
       }
     ],
-    changelog: "v1.0.0: Initial digitization from HTLT_Greg.pdf pages 88-91",
+    changelog: "v1.0.0: Initial release. v2.0.0: HAYL Hybrid rebrand.",
   });
 
   console.log(`✅ Plan Seeded: ${planId}`);

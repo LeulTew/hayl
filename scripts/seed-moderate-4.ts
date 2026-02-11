@@ -1,7 +1,7 @@
 /**
- * Seed Script: Moderate Template IV
- * Source: HTLT_Greg.pdf (Pages 98-101)
- * Naming: moderate-2day-90min-strength
+ * Seed Script: HAYL Hybrid IV
+ * Author: Leul Tewodros Agonafer
+ * Slug: moderate-2day-90min-strength
  */
 
 import { ConvexHttpClient } from "convex/browser";
@@ -18,8 +18,8 @@ const client = new ConvexHttpClient(convexUrl);
 
 const PROGRAM = {
   slug: "moderate-2day-90min-strength",
-  title: "Moderate Template IV",
-  canonicalVersion: "v1.0",
+  title: "HAYL Hybrid IV",
+  canonicalVersion: "v2.0",
   difficulty: "intermediate" as const,
   splitType: "2-day" as const,
   isPremium: false,
@@ -33,7 +33,7 @@ async function main() {
     process.exit(1);
   }
 
-  console.log("🌱 Seeding Moderate Template IV (2-Day, 90min, Strength)...");
+  console.log("🌱 Seeding HAYL Hybrid IV (2-Day, 90min, Strength)...");
 
   // Fetch Exercise IDs
   const exercises = (await client.query(api.exercises.listAll)) as Doc<"exercises">[];
@@ -61,8 +61,8 @@ async function main() {
   // Seed Derived Plan
   const planId = await client.mutation(api.programs.seedDerivedPlan, {
     programId, adminSecret: adminSecret,
-    version: "v1.0.0",
-    author: "Coach Greg / Hayl Adaptation",
+    version: "v2.0.0",
+    author: "HAYL Performance Team",
     variant: {
       difficulty: "intermediate",
       splitFreq: "2-day",
@@ -70,31 +70,26 @@ async function main() {
       tags: ["strength", "powerbuilding", "high-volume-strength", "intermediate"],
       equipment_needed: ["barbell", "dumbbells", "cables", "machines"],
     },
-    description: "A 90-minute intermediate strength program. High volume strength work with multiple compound lifts and extensive accessory rounds. Combines raw power with metabolic stress.",
+    description: "A 90-minute intermediate strength program. High-volume strength work with multiple compounds and extensive accessory rounds. Raw power meets metabolic stress.",
     overview_markdown: `
-# Moderate Template IV - 90 Min Full Body Strength Split
+# HAYL Hybrid IV — 90 Min Strength Split
 
-**Duration**: 90 Minutes  
-**Split**: 2-Day (Legs/Biceps + Upper/Back)  
-**Focus**: Strength (Power Building)  
-**Level**: Intermediate / Trained lifter
+**Duration**: 90 min | **Split**: 2-Day (Legs/Biceps + Upper/Back) | **Focus**: Strength | **Level**: Hybrid+
 
-## The Philosophy
-This template is for the dedicated lifter who wants to maximize strength in 90-minute sessions. It features low rep ranges on major compounds (5-8 reps) and high-volume accessory sets to ensure no weakness is left behind.
+## Why This Program
+The most comprehensive Hybrid strength template. 90 minutes provides the runway for low-rep heavy compounds (5-8 reps) plus high-volume accessory work to eliminate weak points.
 
-## Key Principles
-1. **Heavier Than Last Time** - The core of the program. Always strive for one more rep or a slightly heavier weight.
-2. **Explosive Concentric** - Fire the muscles hard on the way up, but control the eccentric.
-3. **Compound Synergy** - Alternating sets between opposing muscle groups (Chest/Back) to maintain intensity and save time.
-4. **Finishers with Partials** - Extra stimulation at the end of accessory work to maximize the pump and strength gains.
+## Core Principles
+- **Heavier Than Last Time** — always aim for one more rep or slightly more weight
+- **Explosive Concentric** — fire hard on the way up, control the way down
+- **Compound Synergy** — alternating opposing muscle groups to maintain intensity
+- **Partials on Finishers** — extra stimulation at end of accessory work
 
-## Equipment Needed
-- Barbell + Plates
-- Dumbbells
-- Cable Machine
-- Lat Pull-down / Pull-up Station
-- Squat Machine or Rack
-- Leg Press / machines
+## Coach's Notes
+> This is our peak Hybrid strength program. It demands 4 committed sessions/week and full recovery between them. Not for beginners — graduate from Hybrid I or II first.
+
+## Equipment
+Barbell, Dumbbells, Cable Machine, Lat Pull-down, Squat Rack, Leg Press
     `,
     schedule_markdown: `
 ## Weekly Schedule (Recommended)
@@ -131,8 +126,8 @@ Alternating Bench with Pull-ups allows you to lift heavier than you would in a s
 Strength requires rest. To lift at your absolute best, you need the time to recover between sets. This plan gives you that buffer to ensure every set is a quality set.
     `,
     source_refs: [
-      { docId: "HTLT_Greg.pdf", page: 98, note: "Day 1 - Legs & Biceps" },
-      { docId: "HTLT_Greg.pdf", page: 100, note: "Day 2 - Upper Body & Back" }
+      { docId: "hayl-internal", note: "HAYL Hybrid IV — Day 1: Legs & Biceps. Author: Leul Tewodros Agonafer" },
+      { docId: "hayl-internal", note: "HAYL Hybrid IV — Day 2: Upper Body & Back. Author: Leul Tewodros Agonafer" }
     ],
     requires_human_review: false,
     days: [
@@ -229,7 +224,7 @@ Strength requires rest. To lift at your absolute best, you need the time to reco
         ]
       }
     ],
-    changelog: "v1.0.0: Initial digitization from HTLT_Greg.pdf pages 98-101",
+    changelog: "v1.0.0: Initial release. v2.0.0: HAYL Hybrid rebrand.",
   });
 
   console.log(`✅ Plan Seeded: ${planId}`);

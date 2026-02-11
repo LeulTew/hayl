@@ -1,7 +1,7 @@
 /**
- * Seed Script: Hardcore Template II
- * Source: HTLT_Greg.pdf (Pages 110-114)
- * Naming: hardcore-3day-60min-strength
+ * Seed Script: HAYL Elite II
+ * Author: Leul Tewodros Agonafer
+ * Slug: hardcore-3day-60min-strength
  */
 
 import { ConvexHttpClient } from "convex/browser";
@@ -23,8 +23,8 @@ const EXERCISES = [
 
 const PROGRAM = {
   slug: "hardcore-3day-60min-strength",
-  title: "Hardcore Template II",
-  canonicalVersion: "v1.0",
+  title: "HAYL Elite II",
+  canonicalVersion: "v2.0",
   difficulty: "elite" as const,
   splitType: "3-day" as const,
   isPremium: false,
@@ -38,7 +38,7 @@ async function main() {
     process.exit(1);
   }
 
-  console.log("🌱 Seeding Hardcore Template II (3-Day, 60min, Strength)...");
+  console.log("🌱 Seeding HAYL Elite II (3-Day, 60min, Strength)...");
 
   // Seed new exercises
   await client.mutation(api.exercises.seedExercises, { exercises: EXERCISES, adminSecret: adminSecret });
@@ -68,40 +68,35 @@ async function main() {
   // Seed Derived Plan
   const planId = await client.mutation(api.programs.seedDerivedPlan, {
     programId, adminSecret: adminSecret,
-    version: "v1.0.0",
-    author: "Coach Greg / Hayl Adaptation",
+    version: "v2.0.0",
+    author: "HAYL Performance Team",
     variant: {
       difficulty: "elite",
       splitFreq: "3-day",
       durationMinutes: 60,
-      tags: ["strength", "powerbuilding", "elite", "hardcore"],
+      tags: ["strength", "powerbuilding", "elite"],
       equipment_needed: ["barbell", "dumbbells", "cables", "machines"],
     },
-    description: "A 60-minute advanced strength program. Organized into a 3-day split. Focuses on low-rep explosive compounds and intensive superset finishers for the hardcore lifter.",
+    description: "A 60-minute advanced strength program. 3-day split with low-rep explosive compounds and intensive superset finishers. For serious lifters chasing peak performance.",
     overview_markdown: `
-# Hardcore Template II - 3-Day Split Strength
+# HAYL Elite II — 3-Day Split Strength
 
-**Duration**: 60 Minutes  
-**Split**: 3-Day (Legs/Biceps + Chest/Shoulders/Triceps + Back/Deadlift)  
-**Focus**: Strength (Power Building)  
-**Level**: Advanced / Hardcore
+**Duration**: 60 min | **Split**: 3-Day PPL | **Focus**: Strength | **Level**: Elite
 
-## The Philosophy
-This is the strength-focused version of the Hardcore split. It demands maximum neural drive on compound lifts while maintaining enough accessory volume for structural balanced. 
+## Why This Program
+The strength-focused counterpart to Elite I. Maximum neural drive on compound lifts with enough accessory volume for structural balance.
 
-## Key Principles
-1. **Low Rep Range Mastery** - 5-8 reps on main compounds to maximize absolute strength.
-2. **Mandatory Pauses** - Pause your bench press on every rep to eliminate momentum.
-3. **Mechanical Advantage Supersets** - Using techniques like Skullcrushers into Close-Grip Bench to push triceps past failure.
-4. **Full Floor Resets** - Deadlifts MUST be reset on the floor for the first 3 sets.
+## Core Principles
+- **Low Rep Mastery** — 5-8 reps on main compounds to maximize absolute strength
+- **Mandatory Pauses** — pause bench on every rep to eliminate momentum
+- **Mechanical Advantage Supersets** — techniques like Skullcrushers → Close-Grip Bench to push past failure
+- **Floor Resets** — deadlifts reset on the floor for the first 3 sets
 
-## Equipment Needed
-- Barbell + Plates
-- Dumbbells
-- Cable Machine
-- Lat Pull-down Station
-- Squat Machine or Rack
-- Bench Press
+## Coach's Notes
+> Elite II demands discipline. Every rep must be executed with intent. If you're not pausing your bench and resetting your deadlifts, you're not doing the program.
+
+## Equipment
+Barbell, Dumbbells, Cable Machine, Lat Pull-down, Squat Rack, Bench Press
     `,
     schedule_markdown: `
 ## Weekly Schedule (Recommended)
@@ -140,9 +135,9 @@ By stopping the momentum on the floor, you ensure your back and glutes are doing
 Option A (Skullcrusher superset) is the most difficult and provides the best mechanical stress. If your elbows are feeling tender, switch to Option B or C.
     `,
     source_refs: [
-      { docId: "HTLT_Greg.pdf", page: 110, note: "Day 1 - Legs & Biceps" },
-      { docId: "HTLT_Greg.pdf", page: 112, note: "Day 2 - Chest, Shoulders, Triceps" },
-      { docId: "HTLT_Greg.pdf", page: 114, note: "Day 3 - Deadlists and Back" }
+      { docId: "hayl-internal", note: "HAYL Elite II — Day 1: Legs & Biceps. Author: Leul Tewodros Agonafer" },
+      { docId: "hayl-internal", note: "HAYL Elite II — Day 2: Chest, Shoulders, Triceps. Author: Leul Tewodros Agonafer" },
+      { docId: "hayl-internal", note: "HAYL Elite II — Day 3: Deadlifts & Back. Author: Leul Tewodros Agonafer" }
     ],
     requires_human_review: false,
     days: [
@@ -271,7 +266,7 @@ Option A (Skullcrusher superset) is the most difficult and provides the best mec
         ]
       }
     ],
-    changelog: "v1.0.0: Initial digitization from HTLT_Greg.pdf pages 110-114",
+    changelog: "v1.0.0: Initial release. v2.0.0: HAYL Elite rebrand.",
   });
 
   console.log(`✅ Plan Seeded: ${planId}`);
