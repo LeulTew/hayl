@@ -23,7 +23,7 @@ const EXERCISES = [
 const PROGRAM = {
   slug: "casual-1day-90min-strength",
   title: "HAYL Essentials IV",
-  canonicalVersion: "v1.0",
+  canonicalVersion: "v2.0",
   difficulty: "beginner" as const,
   splitType: "1-day" as const, // Closest match for 1-day full body
   isPremium: false,
@@ -64,7 +64,7 @@ async function main() {
   // Seed Derived Plan
   const planId = await client.mutation(api.programs.seedDerivedPlan, {
     programId, adminSecret: adminSecret,
-    version: "v1.0.0",
+    version: "v2.0.0",
     author: "HAYL Performance Team",
     variant: {
       difficulty: "amateur",

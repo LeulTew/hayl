@@ -27,7 +27,7 @@ const client = new ConvexHttpClient(convexUrl);
 const PROGRAM = {
   slug: "casual-1day-60min-strength",
   title: "HAYL Essentials II",
-  canonicalVersion: "v1.0",
+  canonicalVersion: "v2.0",
   difficulty: "beginner" as const,
   splitType: "1-day" as const,
   isPremium: false,
@@ -63,7 +63,7 @@ async function main() {
   // Seed Derived Plan
   const planId = await client.mutation(api.programs.seedDerivedPlan, {
     programId, adminSecret: adminSecret,
-    version: "v1.0.0",
+    version: "v2.0.0",
     author: "HAYL Performance Team",
     variant: {
       difficulty: "amateur",

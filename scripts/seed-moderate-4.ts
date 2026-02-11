@@ -19,7 +19,7 @@ const client = new ConvexHttpClient(convexUrl);
 const PROGRAM = {
   slug: "moderate-2day-90min-strength",
   title: "HAYL Hybrid IV",
-  canonicalVersion: "v1.0",
+  canonicalVersion: "v2.0",
   difficulty: "intermediate" as const,
   splitType: "2-day" as const,
   isPremium: false,
@@ -61,7 +61,7 @@ async function main() {
   // Seed Derived Plan
   const planId = await client.mutation(api.programs.seedDerivedPlan, {
     programId, adminSecret: adminSecret,
-    version: "v1.0.0",
+    version: "v2.0.0",
     author: "HAYL Performance Team",
     variant: {
       difficulty: "intermediate",

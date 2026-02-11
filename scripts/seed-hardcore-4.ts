@@ -23,7 +23,7 @@ const EXERCISES = [
 const PROGRAM = {
   slug: "hardcore-3day-90min-strength",
   title: "HAYL Elite IV",
-  canonicalVersion: "v1.0",
+  canonicalVersion: "v2.0",
   difficulty: "elite" as const,
   splitType: "3-day" as const,
   isPremium: false,
@@ -67,7 +67,7 @@ async function main() {
   // Seed Derived Plan
   const planId = await client.mutation(api.programs.seedDerivedPlan, {
     programId, adminSecret: adminSecret,
-    version: "v1.0.0",
+    version: "v2.0.0",
     author: "HAYL Performance Team",
     variant: {
       difficulty: "elite",
