@@ -1,7 +1,7 @@
 /**
- * Seed Script: Hardcore Template I
- * Source: HTLT_Greg.pdf (Pages 103-108)
- * Naming: hardcore-3day-60min-hypertrophy
+ * Seed Script: HAYL Elite I
+ * Origin: Source 2 (Pages 103-108)
+ * Slug: hardcore-3day-60min-hypertrophy
  */
 
 import { ConvexHttpClient } from "convex/browser";
@@ -26,7 +26,7 @@ const EXERCISES = [
 
 const PROGRAM = {
   slug: "hardcore-3day-60min-hypertrophy",
-  title: "Hardcore Template I",
+  title: "HAYL Elite I",
   canonicalVersion: "v1.0",
   difficulty: "elite" as const,
   splitType: "3-day" as const,
@@ -41,7 +41,7 @@ async function main() {
     process.exit(1);
   }
 
-  console.log("🌱 Seeding Hardcore Template I (3-Day, 60min, Hypertrophy)...");
+  console.log("🌱 Seeding HAYL Elite I (3-Day, 60min, Hypertrophy)...");
 
   // Seed new exercises
   await client.mutation(api.exercises.seedExercises, { exercises: EXERCISES, adminSecret: adminSecret });
@@ -72,39 +72,34 @@ async function main() {
   const planId = await client.mutation(api.programs.seedDerivedPlan, {
     programId, adminSecret: adminSecret,
     version: "v1.0.0",
-    author: "Coach Greg / Hayl Adaptation",
+    author: "HAYL Performance Team",
     variant: {
       difficulty: "elite",
       splitFreq: "3-day",
       durationMinutes: 60,
-      tags: ["hypertrophy", "ppl", "elite", "hardcore"],
+      tags: ["hypertrophy", "ppl", "elite"],
       equipment_needed: ["barbell", "dumbbells", "cables", "machines"],
     },
-    description: "A 60-minute advanced high-frequency hypertrophy program. Organized into a 3-day split (repeated for 6 days/week). Designed for experienced lifters ready for maximum intensity.",
+    description: "A 60-minute advanced high-frequency hypertrophy program. 3-day split designed for 5-6 sessions/week. Maximum volume and intensity for experienced lifters.",
     overview_markdown: `
-# Hardcore Template I - 3-Day Split Hypertrophy
+# HAYL Elite I — 3-Day Split Hypertrophy
 
-**Duration**: 60 Minutes  
-**Split**: 3-Day (Legs/Biceps + Chest/Shoulders/Triceps + Back/Deadlift)  
-**Focus**: Hypertrophy (Muscle Building)  
-**Level**: Advanced / Hardcore
+**Duration**: 60 min | **Split**: 3-Day PPL (Legs/Biceps + Chest/Shoulders/Triceps + Back/Deadlift) | **Focus**: Hypertrophy | **Level**: Elite
 
-## The Philosophy
-The Hardcore templates are for those training 5-6 days per week. By splitting the body into three days, you can maximize the volume and intensity for each specific muscle group while still hitting everything twice per week.
+## Why This Program
+The Elite tier is for athletes training 5-6 days/week. A 3-day split repeated twice hits every muscle group with maximum volume and intensity — the highest frequency in the HAYL system.
 
-## Key Principles
-1. **PPL Reimagined** - A unique Coach Greg take on the Push/Pull/Legs split.
-2. **Intense Accessory Circuits** - Accessories are performed in fast-paced circuits to keep the heart rate up and maximize efficiency.
-3. **Strict Form on Compounds** - Even at "Hardcore" levels, safety is paramount. Pause your bench and reset your deadlifts.
-4. **Push the Limit** - "Doing more than last time" is the only way forward.
+## Core Principles
+- **PPL Architecture** — a battle-tested split optimized for high-frequency training
+- **Circuit Accessories** — fast-paced circuits keep heart rate elevated and maximize efficiency
+- **Strict Compound Form** — pause your bench, reset your deadlifts — even at Elite level
+- **Progressive Overload** — "doing more than last time" is the only rule
 
-## Equipment Needed
-- Barbell + Plates
-- Dumbbells
-- Cable Machine
-- Lat Pull-down Station
-- Squat Machine or Rack
-- Pec Deck / Fly Machine
+## Coach's Notes
+> Elite programs are not for beginners. If you haven't been consistent on Hybrid for 12+ weeks, you're not ready. This is earned.
+
+## Equipment
+Barbell, Dumbbells, Cable Machine, Lat Pull-down, Squat Rack, Pec Deck
     `,
     schedule_markdown: `
 ## Weekly Schedule (Recommended)

@@ -1,7 +1,7 @@
 /**
- * Seed Script: Hardcore Template III
- * Source: HTLT_Greg.pdf (Pages 116-121)
- * Naming: hardcore-3day-90min-hypertrophy
+ * Seed Script: HAYL Elite III
+ * Origin: Source 2 (Pages 116-121)
+ * Slug: hardcore-3day-90min-hypertrophy
  */
 
 import { ConvexHttpClient } from "convex/browser";
@@ -22,7 +22,7 @@ const EXERCISES = [
 
 const PROGRAM = {
   slug: "hardcore-3day-90min-hypertrophy",
-  title: "Hardcore Template III",
+  title: "HAYL Elite III",
   canonicalVersion: "v1.0",
   difficulty: "elite" as const,
   splitType: "3-day" as const,
@@ -37,7 +37,7 @@ async function main() {
     process.exit(1);
   }
 
-  console.log("🌱 Seeding Hardcore Template III (3-Day, 90min, Hypertrophy)...");
+  console.log("🌱 Seeding HAYL Elite III (3-Day, 90min, Hypertrophy)...");
 
   // Seed new exercises
   await client.mutation(api.exercises.seedExercises, { exercises: EXERCISES, adminSecret: adminSecret });
@@ -68,40 +68,34 @@ async function main() {
   const planId = await client.mutation(api.programs.seedDerivedPlan, {
     programId, adminSecret: adminSecret,
     version: "v1.0.0",
-    author: "Coach Greg / Hayl Adaptation",
+    author: "HAYL Performance Team",
     variant: {
       difficulty: "elite",
       splitFreq: "3-day",
       durationMinutes: 90,
-      tags: ["hypertrophy", "high-volume", "elite", "hardcore"],
+      tags: ["hypertrophy", "high-volume", "elite"],
       equipment_needed: ["barbell", "dumbbells", "cables", "machines"],
     },
-    description: "A 90-minute advanced hypertrophy program. Extreme volume 3-day split (repeated for 6 days/week). Incorporates drop sets, partials, and high-frequency training for the elite physique.",
+    description: "A 90-minute advanced hypertrophy program. Extreme volume 3-day split with drop sets, partials, and high-frequency training for elite-level physique development.",
     overview_markdown: `
-# Hardcore Template III - 90 Min Full Body PPL Hypertrophy
+# HAYL Elite III — 90 Min PPL Hypertrophy
 
-**Duration**: 90 Minutes  
-**Split**: 3-Day (Legs/Biceps + Chest/Shoulders/Triceps + Back/Deadlift)  
-**Focus**: Hypertrophy (Muscle Building)  
-**Level**: Advanced / Elite
+**Duration**: 90 min | **Split**: 3-Day PPL | **Focus**: Hypertrophy | **Level**: Elite+
 
-## The Philosophy
-This is one of the highest volume programs in the HTLT system. 90 minutes allows for extensive straight sets followed by heavy accessory circuits and finishing with high-intensity techniques. This is for the lifter who eats, sleeps, and breathes the gym.
+## Why This Program
+One of the highest-volume programs in the HAYL system. 90 minutes of heavy compounds, extensive accessory circuits, and high-intensity finishing techniques. For the athlete who lives in the gym.
 
-## Key Principles
-1. **Max Volume** - Multiple compound movements per day before even getting to accessories.
-2. **Technique under Fatigue** - Maintaining perfect form even during the 60th minute of the workout.
-3. **Metabolic Stress** - Drop sets and partials are used to create incredible levels of blood flow and muscle damage.
-4. **Frequency** - Designed to be run 6 days a week to maximize weekly protein synthesis.
+## Core Principles
+- **Maximum Volume** — multiple compound movements per day before accessories even begin
+- **Technique Under Fatigue** — maintaining perfect form even in the 60th minute
+- **Metabolic Stress** — drop sets and partials create extreme muscle damage and blood flow
+- **6-Day Frequency** — designed to maximize weekly protein synthesis
 
-## Equipment Needed
-- Barbell + Plates
-- Dumbbells
-- Cable Machine
-- Lat Pull-down Station (V-bar + wide bar)
-- Squat Machine or Rack
-- Chest Machine
-- Preacher Curl Bench
+## Coach's Notes
+> This program separates athletes from gym-goers. If your nutrition, sleep, and recovery aren't dialed in, you will burn out. Respect the volume.
+
+## Equipment
+Barbell, Dumbbells, Cable Machine, Lat Pull-down (V-bar + wide bar), Squat Rack, Chest Machine, Preacher Curl
     `,
     schedule_markdown: `
 ## Weekly Schedule (Recommended)

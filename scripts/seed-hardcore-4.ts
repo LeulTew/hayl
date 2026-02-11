@@ -1,7 +1,7 @@
 /**
- * Seed Script: Hardcore Template IV
- * Source: HTLT_Greg.pdf (Pages 122-127)
- * Naming: hardcore-3day-90min-strength
+ * Seed Script: HAYL Elite IV
+ * Origin: Source 2 (Pages 122-127)
+ * Slug: hardcore-3day-90min-strength
  */
 
 import { ConvexHttpClient } from "convex/browser";
@@ -22,7 +22,7 @@ const EXERCISES = [
 
 const PROGRAM = {
   slug: "hardcore-3day-90min-strength",
-  title: "Hardcore Template IV",
+  title: "HAYL Elite IV",
   canonicalVersion: "v1.0",
   difficulty: "elite" as const,
   splitType: "3-day" as const,
@@ -37,7 +37,7 @@ async function main() {
     process.exit(1);
   }
 
-  console.log("🌱 Seeding Hardcore Template IV (3-Day, 90min, Strength)...");
+  console.log("🌱 Seeding HAYL Elite IV (3-Day, 90min, Strength)...");
 
   // Seed new exercises
   await client.mutation(api.exercises.seedExercises, { exercises: EXERCISES, adminSecret: adminSecret });
@@ -68,39 +68,34 @@ async function main() {
   const planId = await client.mutation(api.programs.seedDerivedPlan, {
     programId, adminSecret: adminSecret,
     version: "v1.0.0",
-    author: "Coach Greg / Hayl Adaptation",
+    author: "HAYL Performance Team",
     variant: {
       difficulty: "elite",
       splitFreq: "3-day",
       durationMinutes: 90,
-      tags: ["strength", "powerbuilding", "elite", "hardcore"],
+      tags: ["strength", "powerbuilding", "elite"],
       equipment_needed: ["barbell", "dumbbells", "cables", "machines"],
     },
-    description: "A 90-minute advanced strength program. The ultimate strength tier. High volume, heavy compounds, and long rest periods (3–5 min) to build rock-solid foundation of power.",
+    description: "A 90-minute advanced strength program. The ultimate strength tier. Heavy compounds, high volume, and extended rest periods (3-5 min) for peak power development.",
     overview_markdown: `
-# Hardcore Template IV - 90 Min Full Body PPL Strength
+# HAYL Elite IV — 90 Min PPL Strength
 
-**Duration**: 90 Minutes  
-**Split**: 3-Day (Legs/Biceps + Chest/Shoulders/Triceps + Back/Deadlift)  
-**Focus**: Strength (Power Building)  
-**Level**: Advanced / Elite
+**Duration**: 90 min | **Split**: 3-Day PPL | **Focus**: Strength | **Level**: Elite+
 
-## The Philosophy
-This is the pinnacle of the HTLT strength system. It takes the Hardcore 3-day split and expands it to 90 minutes to allow for maximum rest and recovery between massive sets. If you want to move the most weight possible, this is your plan.
+## Why This Program
+The pinnacle of the HAYL strength system. 90 minutes allows for maximum rest between massive sets. If your goal is to move the heaviest weight possible, this is your program.
 
-## Key Principles
-1. **Neurological Overload** - Heavy triples and fives (5-8 rep range) across many sets.
-2. **Ego Control** - Paused benching is mandatory. No bouncing weights off your chest.
-3. **Compound Density** - Multiple horizontal and vertical pulls in the same session to build a thick, wide back.
-4. **Mechanical Advantage Supersets** - Pushing the stimulus on triceps while maintaining heavy tricep work.
+## Core Principles
+- **Neurological Overload** — heavy triples and fives (5-8 rep range) across many sets
+- **Ego Control** — paused bench is mandatory; no bouncing weights
+- **Compound Density** — multiple horizontal and vertical pulls in the same session
+- **Mechanical Advantage Supersets** — pushing tricep stimulus while maintaining heavy work
 
-## Equipment Needed
-- Barbell + Plates
-- Dumbbells
-- Cable Machine
-- Lat Pull-down Station
-- Squat Machine or Rack
-- Bench Press station
+## Coach's Notes
+> This is the final Boss. You need 6 committed sessions/week, elite nutrition, and 7+ hours of sleep. If any of those are missing, drop to Elite I or II until they're locked in.
+
+## Equipment
+Barbell, Dumbbells, Cable Machine, Lat Pull-down, Squat Rack, Bench Press
     `,
     schedule_markdown: `
 ## Weekly Schedule (Recommended)
