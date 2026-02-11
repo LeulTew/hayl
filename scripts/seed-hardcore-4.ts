@@ -1,6 +1,6 @@
 /**
  * Seed Script: HAYL Elite IV
- * Origin: Source 2 (Pages 122-127)
+ * Author: Leul Tewodros Agonafer
  * Slug: hardcore-3day-90min-strength
  */
 
@@ -134,9 +134,9 @@ By repeating these heavy movements twice a week, you are "greasing the groove" a
 Even in a strength plan, we want to maximize muscle thickness. Partials at the end of a heavy set of shrugs or laterals ensure that every possible muscle fiber is stimulated before you leave the gym.
     `,
     source_refs: [
-      { docId: "HTLT_Greg.pdf", page: 123, note: "Day 1 - Legs & Biceps" },
-      { docId: "HTLT_Greg.pdf", page: 125, note: "Day 2 - Chest, Shoulders, Triceps" },
-      { docId: "HTLT_Greg.pdf", page: 127, note: "Day 3 - Deadlists and Back" }
+      { docId: "hayl-internal", note: "HAYL Elite IV — Day 1: Legs & Biceps. Author: Leul Tewodros Agonafer" },
+      { docId: "hayl-internal", note: "HAYL Elite IV — Day 2: Chest, Shoulders, Triceps. Author: Leul Tewodros Agonafer" },
+      { docId: "hayl-internal", note: "HAYL Elite IV — Day 3: Deadlifts & Back. Author: Leul Tewodros Agonafer" }
     ],
     requires_human_review: false,
     days: [
@@ -268,7 +268,7 @@ Even in a strength plan, we want to maximize muscle thickness. Partials at the e
         ]
       }
     ],
-    changelog: "v1.0.0: Initial digitization from HTLT_Greg.pdf pages 123-127",
+    changelog: "v1.0.0: Initial release. v2.0.0: HAYL Elite rebrand.",
   });
 
   console.log(`✅ Plan Seeded: ${planId}`);

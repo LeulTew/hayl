@@ -1,6 +1,6 @@
 /**
  * Seed Script: HAYL Essentials II
- * Origin: Source 2 (Pages 71-73)
+ * Author: Leul Tewodros Agonafer
  * Slug: casual-1day-60min-strength
  * 
  * Structure:
@@ -123,7 +123,7 @@ Research shows 5-8 reps with heavy weight is optimal for building strength while
 Squats, Deadlifts, Bench, Rows - these multi-joint movements give you the most bang for your buck when time is limited.
     `,
     source_refs: [
-      { docId: "HTLT_Greg.pdf", page: 71, note: "HAYL Essentials II — 1-Day, 60 min, Strength" }
+      { docId: "hayl-internal", note: "HAYL Essentials II — 1-Day, 60 min, Strength. Author: Leul Tewodros Agonafer" }
     ],
     requires_human_review: false,
     days: [
@@ -187,7 +187,7 @@ Squats, Deadlifts, Bench, Rows - these multi-joint movements give you the most b
         ]
       }
     ],
-    changelog: "v1.0.0: Initial digitization from HTLT_Greg.pdf pages 71-73",
+    changelog: "v1.0.0: Initial release. v2.0.0: HAYL Essentials rebrand.",
   });
 
   console.log(`✅ Plan Seeded: ${planId}`);

@@ -1,6 +1,6 @@
 /**
  * Seed Script: HAYL Hybrid II
- * Origin: Source 2 (Pages 88-91)
+ * Author: Leul Tewodros Agonafer
  * Slug: moderate-2day-60min-strength
  */
 
@@ -126,8 +126,8 @@ By resetting the weight on the floor for the first 3 sets, you ensure perfect fo
 In this plan, intensity means the percentage of your 1-rep max. We are pushing closer to the limit of your absolute strength.
     `,
     source_refs: [
-      { docId: "HTLT_Greg.pdf", page: 88, note: "Day 1 - Legs & Biceps" },
-      { docId: "HTLT_Greg.pdf", page: 90, note: "Day 2 - Upper Body & Back" }
+      { docId: "hayl-internal", note: "HAYL Hybrid II — Day 1: Legs & Biceps. Author: Leul Tewodros Agonafer" },
+      { docId: "hayl-internal", note: "HAYL Hybrid II — Day 2: Upper Body & Back. Author: Leul Tewodros Agonafer" }
     ],
     requires_human_review: false,
     days: [
@@ -226,7 +226,7 @@ In this plan, intensity means the percentage of your 1-rep max. We are pushing c
         ]
       }
     ],
-    changelog: "v1.0.0: Initial digitization from HTLT_Greg.pdf pages 88-91",
+    changelog: "v1.0.0: Initial release. v2.0.0: HAYL Hybrid rebrand.",
   });
 
   console.log(`✅ Plan Seeded: ${planId}`);

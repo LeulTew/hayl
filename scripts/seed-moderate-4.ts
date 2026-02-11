@@ -1,6 +1,6 @@
 /**
  * Seed Script: HAYL Hybrid IV
- * Origin: Source 2 (Pages 98-101)
+ * Author: Leul Tewodros Agonafer
  * Slug: moderate-2day-90min-strength
  */
 
@@ -126,8 +126,8 @@ Alternating Bench with Pull-ups allows you to lift heavier than you would in a s
 Strength requires rest. To lift at your absolute best, you need the time to recover between sets. This plan gives you that buffer to ensure every set is a quality set.
     `,
     source_refs: [
-      { docId: "HTLT_Greg.pdf", page: 98, note: "Day 1 - Legs & Biceps" },
-      { docId: "HTLT_Greg.pdf", page: 100, note: "Day 2 - Upper Body & Back" }
+      { docId: "hayl-internal", note: "HAYL Hybrid IV — Day 1: Legs & Biceps. Author: Leul Tewodros Agonafer" },
+      { docId: "hayl-internal", note: "HAYL Hybrid IV — Day 2: Upper Body & Back. Author: Leul Tewodros Agonafer" }
     ],
     requires_human_review: false,
     days: [
@@ -224,7 +224,7 @@ Strength requires rest. To lift at your absolute best, you need the time to reco
         ]
       }
     ],
-    changelog: "v1.0.0: Initial digitization from HTLT_Greg.pdf pages 98-101",
+    changelog: "v1.0.0: Initial release. v2.0.0: HAYL Hybrid rebrand.",
   });
 
   console.log(`✅ Plan Seeded: ${planId}`);

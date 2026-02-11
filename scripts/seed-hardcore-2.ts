@@ -1,6 +1,6 @@
 /**
  * Seed Script: HAYL Elite II
- * Origin: Source 2 (Pages 110-114)
+ * Author: Leul Tewodros Agonafer
  * Slug: hardcore-3day-60min-strength
  */
 
@@ -135,9 +135,9 @@ By stopping the momentum on the floor, you ensure your back and glutes are doing
 Option A (Skullcrusher superset) is the most difficult and provides the best mechanical stress. If your elbows are feeling tender, switch to Option B or C.
     `,
     source_refs: [
-      { docId: "HTLT_Greg.pdf", page: 110, note: "Day 1 - Legs & Biceps" },
-      { docId: "HTLT_Greg.pdf", page: 112, note: "Day 2 - Chest, Shoulders, Triceps" },
-      { docId: "HTLT_Greg.pdf", page: 114, note: "Day 3 - Deadlists and Back" }
+      { docId: "hayl-internal", note: "HAYL Elite II — Day 1: Legs & Biceps. Author: Leul Tewodros Agonafer" },
+      { docId: "hayl-internal", note: "HAYL Elite II — Day 2: Chest, Shoulders, Triceps. Author: Leul Tewodros Agonafer" },
+      { docId: "hayl-internal", note: "HAYL Elite II — Day 3: Deadlifts & Back. Author: Leul Tewodros Agonafer" }
     ],
     requires_human_review: false,
     days: [
@@ -266,7 +266,7 @@ Option A (Skullcrusher superset) is the most difficult and provides the best mec
         ]
       }
     ],
-    changelog: "v1.0.0: Initial digitization from HTLT_Greg.pdf pages 110-114",
+    changelog: "v1.0.0: Initial release. v2.0.0: HAYL Elite rebrand.",
   });
 
   console.log(`✅ Plan Seeded: ${planId}`);

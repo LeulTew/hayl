@@ -1,6 +1,6 @@
 /**
  * Seed Script: HAYL Essentials III
- * Origin: Source 2 (Pages 75-77)
+ * Author: Leul Tewodros Agonafer
  * Slug: casual-1day-90min-hypertrophy
  */
 
@@ -113,7 +113,7 @@ Slow eccentrics achieve high muscle stimulation without requiring extreme loads 
 If you still have energy after Round 2 of the accessory circuit, Round 3 is where real adaptation begins. Push to the limit here.
     `,
     source_refs: [
-      { docId: "HTLT_Greg.pdf", page: 76, note: "HAYL Essentials III — 1-Day, 90 min, Hypertrophy" }
+      { docId: "hayl-internal", note: "HAYL Essentials III — 1-Day, 90 min, Hypertrophy. Author: Leul Tewodros Agonafer" }
     ],
     requires_human_review: false,
     days: [
@@ -185,7 +185,7 @@ If you still have energy after Round 2 of the accessory circuit, Round 3 is wher
         ]
       }
     ],
-    changelog: "v1.0.0: Initial digitization from HTLT_Greg.pdf pages 75-77",
+    changelog: "v1.0.0: Initial release. v2.0.0: HAYL Essentials rebrand.",
   });
 
   console.log(`✅ Plan Seeded: ${planId}`);

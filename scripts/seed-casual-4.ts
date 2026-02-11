@@ -1,6 +1,6 @@
 /**
  * Seed Script: HAYL Essentials IV
- * Origin: Source 2 (Pages 78-80)
+ * Author: Leul Tewodros Agonafer
  * Slug: casual-1day-90min-strength
  */
 
@@ -124,7 +124,7 @@ Pausing on the bench press removes the "stretch reflex" or bounce, making your m
 Part 3 is your chance to catch any muscle groups that need extra attention. If you feel like a beast, hit 3 rounds; otherwise, 2 is plenty after the heavy work in Parts 1 and 2.
     `,
     source_refs: [
-      { docId: "HTLT_Greg.pdf", page: 79, note: "HAYL Essentials IV — 1-Day, 90 min, Strength" }
+      { docId: "hayl-internal", note: "HAYL Essentials IV — 1-Day, 90 min, Strength. Author: Leul Tewodros Agonafer" }
     ],
     requires_human_review: false,
     days: [
@@ -194,7 +194,7 @@ Part 3 is your chance to catch any muscle groups that need extra attention. If y
         ]
       }
     ],
-    changelog: "v1.0.0: Initial digitization from HTLT_Greg.pdf pages 78-80",
+    changelog: "v1.0.0: Initial release. v2.0.0: HAYL Essentials rebrand.",
   });
 
   console.log(`✅ Plan Seeded: ${planId}`);

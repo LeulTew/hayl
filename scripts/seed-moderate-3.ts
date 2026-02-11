@@ -1,6 +1,6 @@
 /**
  * Seed Script: HAYL Hybrid III
- * Origin: Source 2 (Pages 92-96)
+ * Author: Leul Tewodros Agonafer
  * Slug: moderate-2day-90min-hypertrophy
  */
 
@@ -126,8 +126,8 @@ By dropping the weight 30% and going to absolute failure, you recruit every avai
 The extensive circuit in Part 2 is designed to create a massive pump and reinforce the connection with every minor muscle group, from traps to adductors.
     `,
     source_refs: [
-      { docId: "HTLT_Greg.pdf", page: 93, note: "Day 1 - Legs & Biceps" },
-      { docId: "HTLT_Greg.pdf", page: 95, note: "Day 2 - Upper Body & Back" }
+      { docId: "hayl-internal", note: "HAYL Hybrid III — Day 1: Legs & Biceps. Author: Leul Tewodros Agonafer" },
+      { docId: "hayl-internal", note: "HAYL Hybrid III — Day 2: Upper Body & Back. Author: Leul Tewodros Agonafer" }
     ],
     requires_human_review: false,
     days: [
@@ -224,7 +224,7 @@ The extensive circuit in Part 2 is designed to create a massive pump and reinfor
         ]
       }
     ],
-    changelog: "v1.0.0: Initial digitization from HTLT_Greg.pdf pages 92-96",
+    changelog: "v1.0.0: Initial release. v2.0.0: HAYL Hybrid rebrand.",
   });
 
   console.log(`✅ Plan Seeded: ${planId}`);

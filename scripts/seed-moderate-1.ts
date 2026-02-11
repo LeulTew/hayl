@@ -1,6 +1,6 @@
 /**
  * Seed Script: HAYL Hybrid I
- * Origin: Source 2 (Pages 82-86)
+ * Author: Leul Tewodros Agonafer
  * Slug: moderate-2day-60min-hypertrophy
  * Split: 2 Days (Day 1: Legs & Biceps, Day 2: Upper Body & Back)
  */
@@ -142,8 +142,8 @@ Because you are training the same muscles again in a few days, you don't need to
 The Moderate Tier is where you focus on truly "doing more than last time." Track every weight and every rep!
     `,
     source_refs: [
-      { docId: "HTLT_Greg.pdf", page: 83, note: "Day 1 - Legs & Biceps" },
-      { docId: "HTLT_Greg.pdf", page: 85, note: "Day 2 - Upper Body & Back" }
+      { docId: "hayl-internal", note: "HAYL Hybrid I — Day 1: Legs & Biceps. Author: Leul Tewodros Agonafer" },
+      { docId: "hayl-internal", note: "HAYL Hybrid I — Day 2: Upper Body & Back. Author: Leul Tewodros Agonafer" }
     ],
     requires_human_review: false,
     days: [
@@ -240,7 +240,7 @@ The Moderate Tier is where you focus on truly "doing more than last time." Track
         ]
       }
     ],
-    changelog: "v1.0.0: Initial digitization from HTLT_Greg.pdf pages 82-86",
+    changelog: "v1.0.0: Initial release. v2.0.0: HAYL Hybrid rebrand.",
   });
 
   console.log(`✅ Plan Seeded: ${planId}`);

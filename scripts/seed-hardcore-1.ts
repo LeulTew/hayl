@@ -1,6 +1,6 @@
 /**
  * Seed Script: HAYL Elite I
- * Origin: Source 2 (Pages 103-108)
+ * Author: Leul Tewodros Agonafer
  * Slug: hardcore-3day-60min-hypertrophy
  */
 
@@ -138,9 +138,9 @@ On Day 1 and Day 3, we use straight sets for the heaviest compounds. This ensure
 The finishers on Day 2 are meant to completely exhaust your pushing muscles. If you can't lift your arms to wash your hair after the workout, you did it right.
     `,
     source_refs: [
-      { docId: "HTLT_Greg.pdf", page: 104, note: "Day 1 - Legs & Biceps" },
-      { docId: "HTLT_Greg.pdf", page: 106, note: "Day 2 - Chest, Shoulders, Triceps" },
-      { docId: "HTLT_Greg.pdf", page: 108, note: "Day 3 - Deadlists and Back" }
+      { docId: "hayl-internal", note: "HAYL Elite I — Day 1: Legs & Biceps. Author: Leul Tewodros Agonafer" },
+      { docId: "hayl-internal", note: "HAYL Elite I — Day 2: Chest, Shoulders, Triceps. Author: Leul Tewodros Agonafer" },
+      { docId: "hayl-internal", note: "HAYL Elite I — Day 3: Deadlifts & Back. Author: Leul Tewodros Agonafer" }
     ],
     requires_human_review: false,
     days: [
@@ -260,7 +260,7 @@ The finishers on Day 2 are meant to completely exhaust your pushing muscles. If 
         ]
       }
     ],
-    changelog: "v1.0.0: Initial digitization from HTLT_Greg.pdf pages 103-108",
+    changelog: "v1.0.0: Initial release. v2.0.0: HAYL Elite rebrand.",
   });
 
   console.log(`✅ Plan Seeded: ${planId}`);

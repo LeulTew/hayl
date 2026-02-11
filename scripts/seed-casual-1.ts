@@ -1,6 +1,6 @@
 /**
  * Seed Script: HAYL Essentials I
- * Origin: Source 2 (Pages 68-70)
+ * Author: Leul Tewodros Agonafer
  * Slug: casual-1day-60min-hypertrophy
  * 
  * Structure:
@@ -131,7 +131,7 @@ Pairing opposing muscle groups (squat/lats, bench/rows) doubles training density
 Every exercise ramps from light to heavy. This is deliberate — it primes the nervous system and protects joints while reserving peak effort for the final sets.
     `,
     source_refs: [
-      { docId: "HTLT_Greg.pdf", page: 68, note: "HAYL Essentials I — 1-Day, 60 min, Hypertrophy" }
+      { docId: "hayl-internal", note: "HAYL Essentials I — 1-Day, 60 min, Hypertrophy. Author: Leul Tewodros Agonafer" }
     ],
     requires_human_review: false,
     days: [
