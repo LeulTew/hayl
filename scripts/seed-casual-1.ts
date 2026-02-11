@@ -119,7 +119,7 @@ Barbell, Dumbbells, Cable Machine, Lat Pull-down, Leg Press / Squat Rack
 - Shoulders → Biceps → Triceps → Quads → Hamstrings → Calves
     `,
     philosophy_markdown: `
-## The Science Behind HAYL Essentials
+## The Science Behind HAYL Essentials I
 
 **Frequency Matching**
 Full-body sessions 1-2x/week are optimal for building a strength foundation. Research shows beginners respond well to full-body frequency when volume per session is managed.
