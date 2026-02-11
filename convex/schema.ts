@@ -25,7 +25,9 @@ export default defineSchema({
     published: v.boolean(),
     createdAt: v.number(),
     updatedAt: v.number(),
-  }).index("by_slug", ["slug"]),
+  })
+    .index("by_slug", ["slug"])
+    .index("by_published", ["published"]),
 
   // --- 2. DERIVED WORKOUT STRUCTURE ---
 
@@ -114,14 +116,16 @@ export default defineSchema({
     })),
 
     instructions: v.string(),
-  }).searchIndex("search_name", { searchField: "name" }),
+  })
+    .index("by_name", ["name"])
+    .searchIndex("search_name", { searchField: "name" }),
 
   quotes: defineTable({
     text: v.string(),
     author: v.string(),
     tags: v.array(v.string()),
     contextTrigger: v.optional(v.string()),
-  }),
+  }).index("by_text", ["text"]),
 
   // --- 4. USERS & PAYMENTS ---
 
@@ -173,7 +177,10 @@ export default defineSchema({
       v.literal("other")
     ),
     isLocal: v.boolean(),
-  }).searchIndex("search_name", { searchField: "name" }),
+  })
+    .index("by_name", ["name"])
+    .index("by_isLocal", ["isLocal"])
+    .searchIndex("search_name", { searchField: "name" }),
 
   mealPlans: defineTable({
     title: v.string(),

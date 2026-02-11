@@ -13,7 +13,7 @@ export const list = query({
   handler: async (ctx: QueryCtx) => {
     return await ctx.db
       .query("programs")
-      .filter((q) => q.eq(q.field("published"), true))
+      .withIndex("by_published", (q) => q.eq("published", true))
       .collect();
   },
 });
