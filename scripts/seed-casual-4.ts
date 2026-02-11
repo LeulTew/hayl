@@ -1,7 +1,7 @@
 /**
- * Seed Script: Casual Template IV
- * Source: HTLT_Greg.pdf (Pages 78-80)
- * Naming: casual-1day-90min-strength
+ * Seed Script: HAYL Essentials IV
+ * Origin: Source 2 (Pages 78-80)
+ * Slug: casual-1day-90min-strength
  */
 
 import { ConvexHttpClient } from "convex/browser";
@@ -22,7 +22,7 @@ const EXERCISES = [
 
 const PROGRAM = {
   slug: "casual-1day-90min-strength",
-  title: "Casual Template IV",
+  title: "HAYL Essentials IV",
   canonicalVersion: "v1.0",
   difficulty: "beginner" as const,
   splitType: "1-day" as const, // Closest match for 1-day full body
@@ -37,7 +37,7 @@ async function main() {
     process.exit(1);
   }
 
-  console.log("🌱 Seeding Casual Template IV (1-Day, 90min, Strength)...");
+  console.log("🌱 Seeding HAYL Essentials IV (1-Day, 90min, Strength)...");
 
   // Seed new exercises
   await client.mutation(api.exercises.seedExercises, { exercises: EXERCISES, adminSecret: adminSecret });
@@ -65,40 +65,35 @@ async function main() {
   const planId = await client.mutation(api.programs.seedDerivedPlan, {
     programId, adminSecret: adminSecret,
     version: "v1.0.0",
-    author: "Coach Greg / Hayl Adaptation",
+    author: "HAYL Performance Team",
     variant: {
       difficulty: "amateur",
       splitFreq: "1-day",
       durationMinutes: 90,
-      tags: ["full-body", "strength", "powerbuilding", "casual"],
+      tags: ["full-body", "strength", "powerbuilding", "essentials"],
       equipment_needed: ["barbell", "dumbbells", "cables", "machines"],
     },
-    description: "A 90-minute full-body strength session. Combines heavy main lifts with a robust accessory circuit. Ideal for building raw strength and dense muscle on a low-frequency schedule.",
+    description: "A 90-minute full-body strength session. Heavy compound lifts paired with a comprehensive accessory circuit. Build raw power and dense muscle on a low-frequency schedule.",
     overview_markdown: `
-# Casual Template IV - High Volume Full Body Strength
+# HAYL Essentials IV — High Volume Strength
 
-**Duration**: 90 Minutes  
-**Split**: 1-Day (Full Body)  
-**Focus**: Strength (Power Building)  
-**Level**: Casual / Amateur
+**Duration**: 90 min | **Split**: Full Body | **Focus**: Strength | **Level**: Essentials+
 
-## The Philosophy
-This is the ultimate strength template for the casual lifter. 90 minutes provides ample time for long rest periods (2-3+ minutes) necessary for heavy, high-intensity sets while still including a comprehensive accessory circuit for overall physique development.
+## Why This Program
+The most comprehensive Essentials strength template. 90 minutes provides the time for extended rest periods (2-3+ min) needed for heavy, high-intensity sets without sacrificing accessory work.
 
-## Key Principles
-1. **Prioritize Performance** - Focus on moving the weight with perfect form
-2. **Longer Rest** - Rest as long as needed to fully recover for the next heavy set
-3. **Control the Negative** - Even on strength sets, don't drop the weight
-4. **Pause on Bench** - Safety first, ego last
-5. **RPE 10** - Push the final sets of compound lifts to the limit
+## Core Principles
+- **Performance First** — move the weight with perfect form, every rep
+- **Full Recovery Rest** — rest as long as needed between heavy sets
+- **Controlled Negatives** — even on strength sets, never drop the weight
+- **Paused Bench** — safety first, ego last
+- **RPE 10 Finishers** — push the final compound sets to absolute failure
 
-## Equipment Needed
-- Barbell + Plates
-- Dumbbells
-- Cable Machine
-- Lat Pull-down / Pull-up Station
-- Leg Press / Squat Rack
-- Incline Bench / Machine
+## Coach's Notes
+> This is our most demanding Essentials template. If you're new, start with Essentials I or II and graduate here after 8-12 weeks of consistent training.
+
+## Equipment
+Barbell, Dumbbells, Cable Machine, Lat Pull-down, Leg Press, Incline Bench
     `,
     schedule_markdown: `
 ## Daily Structure
@@ -117,7 +112,7 @@ This is the ultimate strength template for the casual lifter. 90 minutes provide
 - Shoulders → Biceps → Triceps → Calves
     `,
     philosophy_markdown: `
-## The Strength Advantage
+## The Science Behind HAYL Essentials IV
 
 **Neural Efficiency**  
 Lifting in the 5-8 rep range with 90 minutes of total time allows you to accumulate high-quality, high-intensity volume. This is the most efficient way to build strength for those who don't prioritize pure muscle size.

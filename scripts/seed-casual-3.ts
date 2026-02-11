@@ -1,7 +1,7 @@
 /**
- * Seed Script: Casual Template III
- * Source: HTLT_Greg.pdf (Pages 75-77)
- * Naming: casual-1day-90min-hypertrophy
+ * Seed Script: HAYL Essentials III
+ * Origin: Source 2 (Pages 75-77)
+ * Slug: casual-1day-90min-hypertrophy
  */
 
 import { ConvexHttpClient } from "convex/browser";
@@ -18,7 +18,7 @@ const client = new ConvexHttpClient(convexUrl);
 
 const PROGRAM = {
   slug: "casual-1day-90min-hypertrophy",
-  title: "Casual Template III",
+  title: "HAYL Essentials III",
   canonicalVersion: "v1.0",
   difficulty: "beginner" as const,
   splitType: "1-day" as const,
@@ -33,7 +33,7 @@ async function main() {
     process.exit(1);
   }
 
-  console.log("🌱 Seeding Casual Template III (1-Day, 90min, Hypertrophy)...");
+  console.log("🌱 Seeding HAYL Essentials III (1-Day, 90min, Hypertrophy)...");
 
   // Fetch Exercise IDs
   const exercises = (await client.query(api.exercises.listAll)) as Doc<"exercises">[];
@@ -56,39 +56,34 @@ async function main() {
   const planId = await client.mutation(api.programs.seedDerivedPlan, {
     programId, adminSecret: adminSecret,
     version: "v1.0.0",
-    author: "Coach Greg / Hayl Adaptation",
+    author: "HAYL Performance Team",
     variant: {
       difficulty: "amateur",
       splitFreq: "1-day",
       durationMinutes: 90,
-      tags: ["full-body", "hypertrophy", "high-volume", "casual"],
+      tags: ["full-body", "hypertrophy", "high-volume", "essentials"],
       equipment_needed: ["barbell", "dumbbells", "cables", "machines"],
     },
-    description: "A 90-minute full-body hypertrophy session. Higher volume and more accessories than the 60-minute version. Perfect for those who can train intensely once or twice a week and want maximum muscle stimulation.",
+    description: "A 90-minute high-volume full-body hypertrophy session. More sets, more accessories, more growth stimulus — for athletes who want maximum results from 1-2 weekly sessions.",
     overview_markdown: `
-# Casual Template III - High Volume Full Body
+# HAYL Essentials III — High Volume Full Body
 
-**Duration**: 90 Minutes  
-**Split**: 1-Day (Full Body)  
-**Focus**: Hypertrophy (Muscle Building)  
-**Level**: Casual / Amateur
+**Duration**: 90 min | **Split**: Full Body | **Focus**: Hypertrophy | **Level**: Essentials+
 
-## The Philosophy
-This is the high-volume version of the casual 1-day split. With 90 minutes available, we can afford more sets on the main compound lifts and a much more extensive accessory circuit to hit every muscle group from multiple angles.
+## Why This Program
+The extended version of Essentials I. With 90 minutes, you unlock more volume on compound lifts and a comprehensive 3-round accessory circuit that leaves no muscle group untrained.
 
-## Key Principles
-1. **Time Under Tension (TUT)** - Focus on slow eccentrics (30-40s per set)
-2. **Alternating Efficiency** - Pausing muscle groups while working others
-3. **Ascending Intensity** - Starting light and ramping to hard/all-out sets
-4. **Complete Coverage** - No muscle group left behind in the 3-round circuit
+## Core Principles
+- **Time Under Tension** — slow eccentrics (30-40s per set) for maximum hypertrophy
+- **Alternating Supersets** — rest one group while training another
+- **Ascending Intensity** — ramp from light to all-out across each exercise
+- **Complete Coverage** — the 3-round circuit ensures total-body stimulation
 
-## Equipment Needed
-- Barbell + Plates
-- Dumbbells
-- Cable Machine
-- Lat Pull-down / Pull-up Station
-- Leg Press / Squat Machine
-- Leg Extension / Leg Curl Machines
+## Coach's Notes
+> This is our highest-volume Essentials template. If you finish all 3 accessory rounds with energy to spare, increase the weight — you're underloading.
+
+## Equipment
+Barbell, Dumbbells, Cable Machine, Lat Pull-down, Leg Press, Leg Extension, Leg Curl
     `,
     schedule_markdown: `
 ## Daily Structure
@@ -106,16 +101,16 @@ This is the high-volume version of the casual 1-day split. With 90 minutes avail
 - Shoulders → Biceps → Triceps → Quads → Hamstrings → Calves
     `,
     philosophy_markdown: `
-## The Value of Volume
+## The Science Behind HAYL Essentials III
 
-**Volume as a Driver of Hypertrophy**  
-While intensity (weight) is important, total volume (sets x reps) is one of the primary drivers of muscle growth. 90 minutes allows for the volume necessary to see significant changes even on a low-frequency split.
+**Volume Drives Growth**
+Total training volume (sets × reps) is a primary driver of hypertrophy. 90 minutes provides the runway for the high-volume stimulus that accelerates muscle adaptation, even at 1-2x/week frequency.
 
-**TUT for Joint Safety**  
-By focusing on Time Under Tension and slow negatives, we can achieve high muscle stimulation without needing extreme weights that might stress joints, making this perfect for casual trainees.
+**TUT Protects Joints**
+Slow eccentrics achieve high muscle stimulation without requiring extreme loads that stress joints — critical for sustainable, long-term progress.
 
-**The "Beast" Rounds**  
-The accessory circuit is where the real work happens. If you still have energy after 2 rounds, the 3rd round is where you push to the limit to signal for adaptation.
+**The Final Round**
+If you still have energy after Round 2 of the accessory circuit, Round 3 is where real adaptation begins. Push to the limit here.
     `,
     source_refs: [
       { docId: "HTLT_Greg.pdf", page: 76, note: "Casual Template III - 1-Day Split, 90 min, Hypertrophy" }
