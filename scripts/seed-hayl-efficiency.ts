@@ -36,9 +36,6 @@ const EXERCISES = [
   { name: "Romanian Deadlift", muscleGroup: "Hamstrings", instructions: "Hinge at hips with slight knee bend. Lower weight along shins until hamstring stretch. Squeeze glutes to return. Keep back neutral throughout." },
   { name: "Dumbbell Bench Press", muscleGroup: "Chest", instructions: "Flat bench. Lower dumbbells to chest level with elbows at 45°. Press up and slightly inward. Control the negative for 2-3 seconds." },
   { name: "Bent-Over Dumbbell Row", muscleGroup: "Back", instructions: "Hinge at 45°. Pull dumbbells to hip crease. Squeeze shoulder blades together at top. Control the descent — no momentum." },
-  { name: "Dumbbell Overhead Press", muscleGroup: "Shoulders", instructions: "Standing or seated. Press dumbbells overhead without arching back. Lock out at top. Control descent to ear level." },
-  { name: "Dumbbell Reverse Lunge", muscleGroup: "Legs", instructions: "Step back into lunge. Front knee tracks over toe. Drive through front heel to stand. Alternate legs each rep." },
-  { name: "Push-up (Weighted or Bodyweight)", muscleGroup: "Chest", instructions: "Hands shoulder-width. Lower chest to floor with elbows at 45°. Full lockout at top. Add weight vest or plate for progression." },
   { name: "Renegade Row", muscleGroup: "Back", instructions: "Push-up position with dumbbells. Row one dumbbell to hip while stabilizing with the other arm. Minimize hip rotation. Alternate sides." },
   { name: "Dumbbell Thruster", muscleGroup: "Full Body", instructions: "Hold dumbbells at shoulders. Squat to parallel, then drive up explosively and press overhead in one fluid motion. This is the king of density moves." },
 

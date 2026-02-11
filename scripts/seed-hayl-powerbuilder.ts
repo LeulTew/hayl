@@ -48,6 +48,7 @@ const EXERCISES = [
   { name: "Weighted Dip", muscleGroup: "Triceps", instructions: "Add weight via belt or dumbbell between feet. Lean forward for chest, upright for triceps. Full ROM." },
   { name: "Leg Curl Machine", muscleGroup: "Hamstrings", instructions: "Seated or lying. Full contraction at peak. 3s eccentric. Don't let the weight stack slam." },
   { name: "Walking Dumbbell Lunge", muscleGroup: "Legs", instructions: "Step forward into lunge. Front knee tracks over toe. Drive through front heel. Alternate legs. Keep torso upright." },
+  { name: "Romanian Deadlift", muscleGroup: "Hamstrings", instructions: "Hinge at hips with slight knee bend. Lower weight along shins until hamstring stretch. Squeeze glutes to return. Keep back neutral throughout." },
 ];
 
 const PROGRAM = {
