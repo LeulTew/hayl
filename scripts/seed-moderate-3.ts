@@ -1,7 +1,7 @@
 /**
- * Seed Script: Moderate Template III
- * Source: HTLT_Greg.pdf (Pages 92-96)
- * Naming: moderate-2day-90min-hypertrophy
+ * Seed Script: HAYL Hybrid III
+ * Origin: Source 2 (Pages 92-96)
+ * Slug: moderate-2day-90min-hypertrophy
  */
 
 import { ConvexHttpClient } from "convex/browser";
@@ -18,7 +18,7 @@ const client = new ConvexHttpClient(convexUrl);
 
 const PROGRAM = {
   slug: "moderate-2day-90min-hypertrophy",
-  title: "Moderate Template III",
+  title: "HAYL Hybrid III",
   canonicalVersion: "v1.0",
   difficulty: "intermediate" as const,
   splitType: "2-day" as const,
@@ -33,7 +33,7 @@ async function main() {
     process.exit(1);
   }
 
-  console.log("🌱 Seeding Moderate Template III (2-Day, 90min, Hypertrophy)...");
+  console.log("🌱 Seeding HAYL Hybrid III (2-Day, 90min, Hypertrophy)...");
 
   // Fetch Exercise IDs
   const exercises = (await client.query(api.exercises.listAll)) as Doc<"exercises">[];
@@ -62,7 +62,7 @@ async function main() {
   const planId = await client.mutation(api.programs.seedDerivedPlan, {
     programId, adminSecret: adminSecret,
     version: "v1.0.0",
-    author: "Coach Greg / Hayl Adaptation",
+    author: "HAYL Performance Team",
     variant: {
       difficulty: "intermediate",
       splitFreq: "2-day",
@@ -70,31 +70,26 @@ async function main() {
       tags: ["hypertrophy", "high-volume", "intermediate"],
       equipment_needed: ["barbell", "dumbbells", "cables", "machines"],
     },
-    description: "A 90-minute intermediate hypertrophy program. High volume, extensive accessory circuits, and drop sets/partials for maximum muscle growth and physical challenge.",
+    description: "A 90-minute intermediate hypertrophy program. High volume with extensive accessory circuits, drop sets, and partials for maximum muscle growth.",
     overview_markdown: `
-# Moderate Template III - 90 Min Full Body Hypertrophy Split
+# HAYL Hybrid III — 90 Min Hypertrophy Split
 
-**Duration**: 90 Minutes  
-**Split**: 2-Day (Legs/Biceps + Upper/Back)  
-**Focus**: Hypertrophy (Muscle Building)  
-**Level**: Intermediate / Trained lifter
+**Duration**: 90 min | **Split**: 2-Day (Legs/Biceps + Upper/Back) | **Focus**: Hypertrophy | **Level**: Hybrid+
 
-## The Philosophy
-With 90 minutes, this plan pushes volume to the limit. Each session consists of heavy main lifts followed by extensive circuits and finishing with high-intensity techniques like drop sets and partials.
+## Why This Program
+With 90 minutes, this plan pushes volume to the limit. Heavy main lifts, extensive circuits, and high-intensity techniques like drop sets and partials for maximal growth stimulus.
 
-## Key Principles
-1. **Time Under Tension (TUT)** - Every accessory set should be 30-45 seconds.
-2. **"Beast" Volume** - The 90-minute window allows for more sets and exercises than a standard split.
-3. **Drop Sets & Partials** - Used on finishers to push past failure and trigger maximal growth.
-4. **Resets on Deadlift** - Mandatory safety and technique focus for the first 3 heavy sets.
+## Core Principles
+- **Time Under Tension** — every accessory set lasts 30-45 seconds
+- **Volume Ceiling** — the 90-minute window unlocks more sets than a standard split
+- **Drop Sets & Partials** — used on finishers to push past failure
+- **Deadlift Resets** — mandatory for the first 3 heavy sets
 
-## Equipment Needed
-- Barbell + Plates
-- Dumbbells
-- Cable Machine
-- Lat Pull-down Station
-- Leg Press / machines
-- Adductor/Abductor Machines
+## Coach's Notes
+> This is our most demanding Hybrid hypertrophy template. If you're not training 4x/week consistently, start with Hybrid I before graduating here.
+
+## Equipment
+Barbell, Dumbbells, Cable Machine, Lat Pull-down, Leg Press, Adductor/Abductor Machines
     `,
     schedule_markdown: `
 ## Weekly Schedule (Recommended)

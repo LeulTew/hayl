@@ -1,7 +1,7 @@
 /**
- * Seed Script: Moderate Template I
- * Source: HTLT_Greg.pdf (Pages 82-86)
- * Naming: moderate-2day-60min-hypertrophy
+ * Seed Script: HAYL Hybrid I
+ * Origin: Source 2 (Pages 82-86)
+ * Slug: moderate-2day-60min-hypertrophy
  * Split: 2 Days (Day 1: Legs & Biceps, Day 2: Upper Body & Back)
  */
 
@@ -31,7 +31,7 @@ const EXERCISES = [
 
 const PROGRAM = {
   slug: "moderate-2day-60min-hypertrophy",
-  title: "Moderate Template I",
+  title: "HAYL Hybrid I",
   canonicalVersion: "v1.0",
   difficulty: "intermediate" as const,
   splitType: "2-day" as const,
@@ -46,7 +46,7 @@ async function main() {
     process.exit(1);
   }
 
-  console.log("🌱 Seeding Moderate Template I (2-Day, 60min, Hypertrophy)...");
+  console.log("🌱 Seeding HAYL Hybrid I (2-Day, 60min, Hypertrophy)...");
 
   // Seed new exercises
   await client.mutation(api.exercises.seedExercises, { exercises: EXERCISES, adminSecret: adminSecret });
@@ -79,7 +79,7 @@ async function main() {
   const planId = await client.mutation(api.programs.seedDerivedPlan, {
     programId, adminSecret: adminSecret,
     version: "v1.0.0",
-    author: "Coach Greg / Hayl Adaptation",
+    author: "HAYL Performance Team",
     variant: {
       difficulty: "intermediate",
       splitFreq: "2-day",
@@ -87,31 +87,26 @@ async function main() {
       tags: ["hypertrophy", "progressive-overload", "intermediate"],
       equipment_needed: ["barbell", "dumbbells", "cables", "machines"],
     },
-    description: "A 60-minute intermediate hypertrophy program. Designed for those training 4 days per week (2-day split repeated). Features higher frequency for each muscle group for maximum growth.",
+    description: "A 60-minute intermediate hypertrophy program. 2-day split repeated 4x/week for higher muscle frequency and maximum growth. Compound-first, controlled eccentrics.",
     overview_markdown: `
-# Moderate Template I - 2-Day Split Hypertrophy
+# HAYL Hybrid I — 2-Day Split Hypertrophy
 
-**Duration**: 60 Minutes  
-**Split**: 2-Day (Legs/Biceps + Upper/Back)  
-**Focus**: Hypertrophy (Muscle Building)  
-**Level**: Intermediate / Trained
+**Duration**: 60 min | **Split**: 2-Day (Legs/Biceps + Upper/Back) | **Focus**: Hypertrophy | **Level**: Hybrid
 
-## The Philosophy
-The Moderate Templates are designed for consistent 4-day-a-week training. By splitting the body into two days, you can hit every muscle group twice per week with high intensity and sufficient volume.
+## Why This Program
+The Hybrid tier is built for consistent 4-day-a-week athletes. By splitting the body into two days and repeating them, you hit every muscle group twice per week — the optimal frequency for intermediate hypertrophy.
 
-## Key Principles
-1. **Compound Lifts First** - Always start with the hardest movement of the day.
-2. **Frequency over Volume** - Hitting muscles twice a week is superior to once-a-week "bro splits."
-3. **Controlled Eccentrics** - Every rep counts; don't let gravity do the work.
-4. **Resets on Deadlift** - For hypertrophy and safety, pause and reset on the floor for the first 3 sets.
+## Core Principles
+- **Compound First** — always start with the hardest movement of the day
+- **2x Frequency** — hitting muscles twice/week outperforms once-a-week splits
+- **Controlled Eccentrics** — every rep counts; gravity is not your spotter
+- **Deadlift Resets** — pause and reset on the floor for hypertrophy and safety
 
-## Equipment Needed
-- Barbell + Plates
-- Dumbbells
-- Cable Machine
-- Lat Pull-down Station
-- Squat Machine or Rack
-- Adductor/Abductor Machines
+## Coach's Notes
+> This is where training gets serious. If you're graduating from Essentials, Hybrid I is your entry point. Commit to 4 days/week and the results will follow.
+
+## Equipment
+Barbell, Dumbbells, Cable Machine, Lat Pull-down, Squat Rack, Adductor/Abductor Machines
     `,
     schedule_markdown: `
 ## Weekly Schedule (Recommended)
