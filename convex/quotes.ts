@@ -24,7 +24,7 @@ export const seedQuotes = mutation({
     for (const quote of args.quotes) {
       const existing = await ctx.db
         .query("quotes")
-        .filter(q => q.eq(q.field("text"), quote.text))
+        .withIndex("by_text", (q) => q.eq("text", quote.text))
         .first();
       
       if (!existing) {

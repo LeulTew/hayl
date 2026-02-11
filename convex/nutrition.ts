@@ -43,7 +43,7 @@ export const seedIngredients = mutation({
       // Check for existing by exact name match
       const existing = await ctx.db
         .query("ingredients")
-        .filter((q) => q.eq(q.field("name"), ing.name))
+        .withIndex("by_name", (q) => q.eq("name", ing.name))
         .first();
 
       // Only skip if exact match
@@ -72,7 +72,7 @@ export const searchIngredients = query({
       // Return all local ingredients if no query
       return await ctx.db
         .query("ingredients")
-        .filter((q) => q.eq(q.field("isLocal"), true))
+        .withIndex("by_isLocal", (q) => q.eq("isLocal", true))
         .take(20);
     }
 
@@ -118,7 +118,7 @@ export const listLocal = query({
   handler: async (ctx: QueryCtx) => {
     return await ctx.db
       .query("ingredients")
-      .filter((q) => q.eq(q.field("isLocal"), true))
+      .withIndex("by_isLocal", (q) => q.eq("isLocal", true))
       .collect();
   },
 });

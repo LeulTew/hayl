@@ -27,10 +27,10 @@ export const seedExercises = mutation({
     let skipped = 0;
 
     for (const exercise of args.exercises) {
-      // Check for existing exercise by exact name match
+      // Check for existing exercise by exact name match (indexed)
       const existing = await ctx.db
         .query("exercises")
-        .filter((q) => q.eq(q.field("name"), exercise.name))
+        .withIndex("by_name", (q) => q.eq("name", exercise.name))
         .first();
 
       if (!existing) {
