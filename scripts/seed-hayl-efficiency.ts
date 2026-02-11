@@ -41,7 +41,7 @@ const EXERCISES = [
   { name: "Push-up (Weighted or Bodyweight)", muscleGroup: "Chest", instructions: "Hands shoulder-width. Lower chest to floor with elbows at 45°. Full lockout at top. Add weight vest or plate for progression." },
   { name: "Renegade Row", muscleGroup: "Back", instructions: "Push-up position with dumbbells. Row one dumbbell to hip while stabilizing with the other arm. Minimize hip rotation. Alternate sides." },
   { name: "Dumbbell Thruster", muscleGroup: "Full Body", instructions: "Hold dumbbells at shoulders. Squat to parallel, then drive up explosively and press overhead in one fluid motion. This is the king of density moves." },
-  { name: "Kettlebell/Dumbbell Swing", muscleGroup: "Full Body", instructions: "Hip hinge with explosive hip extension. Arms guide the weight, they don't lift it. Squeeze glutes hard at the top. Breathe out at peak." },
+
 ];
 
 const PROGRAM = {
@@ -107,7 +107,7 @@ async function main() {
       splitFreq: "1-day",
       durationMinutes: 30,
       tags: ["full-body", "density", "efficiency", "time-saver", "supersets"],
-      equipment_needed: ["dumbbells", "kettlebell"],
+      equipment_needed: ["dumbbells"],
     },
     description: "A 30-minute full-body density session. Antagonist supersets with zero wasted rest. Compound movements only. Train 3-5x/week for maximum frequency-driven gains.",
     overview_markdown: `
