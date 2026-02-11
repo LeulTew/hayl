@@ -124,7 +124,7 @@ Pausing on the bench press removes the "stretch reflex" or bounce, making your m
 Part 3 is your chance to catch any muscle groups that need extra attention. If you feel like a beast, hit 3 rounds; otherwise, 2 is plenty after the heavy work in Parts 1 and 2.
     `,
     source_refs: [
-      { docId: "HTLT_Greg.pdf", page: 79, note: "Casual Template IV - 1-Day Split, 90 min, Strength" }
+      { docId: "HTLT_Greg.pdf", page: 79, note: "HAYL Essentials IV — 1-Day, 90 min, Strength" }
     ],
     requires_human_review: false,
     days: [

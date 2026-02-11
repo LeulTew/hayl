@@ -113,7 +113,7 @@ Slow eccentrics achieve high muscle stimulation without requiring extreme loads 
 If you still have energy after Round 2 of the accessory circuit, Round 3 is where real adaptation begins. Push to the limit here.
     `,
     source_refs: [
-      { docId: "HTLT_Greg.pdf", page: 76, note: "Casual Template III - 1-Day Split, 90 min, Hypertrophy" }
+      { docId: "HTLT_Greg.pdf", page: 76, note: "HAYL Essentials III — 1-Day, 90 min, Hypertrophy" }
     ],
     requires_human_review: false,
     days: [

@@ -123,7 +123,7 @@ Research shows 5-8 reps with heavy weight is optimal for building strength while
 Squats, Deadlifts, Bench, Rows - these multi-joint movements give you the most bang for your buck when time is limited.
     `,
     source_refs: [
-      { docId: "HTLT_Greg.pdf", page: 71, note: "Casual Template II - 1-Day Split, 60 min, Strength" }
+      { docId: "HTLT_Greg.pdf", page: 71, note: "HAYL Essentials II — 1-Day, 60 min, Strength" }
     ],
     requires_human_review: false,
     days: [
