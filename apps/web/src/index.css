@@ -1,24 +1,29 @@
 @import "tailwindcss";
 
 @theme {
+  /* Warm Stone Palette */
   --color-hayl-bg: var(--hayl-bg);
   --color-hayl-surface: var(--hayl-surface);
   --color-hayl-text: var(--hayl-text);
   --color-hayl-muted: var(--hayl-muted);
   --color-hayl-accent: var(--hayl-accent);
   --color-hayl-border: var(--hayl-border);
+  --color-hayl-danger: var(--hayl-danger);
+  --color-hayl-success: var(--hayl-success);
 
-  --font-sans: "Inter", system-ui, sans-serif;
-  --font-heading: "Barlow Condensed", sans-serif;
+  /* Athletic Editorial Typography */
+  --font-display: "Bebas Neue", sans-serif;
+  --font-heading: "Teko", sans-serif;
+  --font-body: "DM Sans", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
 
-  /* Subtle Shadows for Depth (Premium Athletic) */
-  --shadow-subtle: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-premium:
-    0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  /* No Shadows - Depth via Borders & Layers */
+  --shadow-none: none;
 
+  /* Animations */
   --animate-fade-in: fadeIn 0.4s ease-out forwards;
   --animate-slide-up: slideUp 0.3s ease-out forwards;
+  --animate-scale-in: scaleIn 0.2s ease-out forwards;
 
   @keyframes fadeIn {
     from {
@@ -39,62 +44,110 @@
       opacity: 1;
     }
   }
+
+  @keyframes scaleIn {
+    from {
+      transform: scale(0.95);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
 }
 
-/* Custom Utilities */
-.font-heading {
-  font-family: "Barlow Condensed", sans-serif;
+/* Custom Utilities based on "Athletic Editorial" */
+.font-display {
+  font-family: var(--font-display);
   text-transform: uppercase;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.02em; /* Bebas is tight by default */
 }
 
-.athletic-border {
-  border: 1px solid var(--hayl-border);
+.font-heading {
+  font-family: var(--font-heading);
+  text-transform: uppercase;
+  letter-spacing: -0.02em; /* Teko looks better tight */
+  line-height: 1;
 }
 
-.athletic-card {
-  background: var(--hayl-surface);
-  border: 1px solid var(--hayl-border);
-  border-radius: 1.5rem; /* 24px - Airy/Nike feel */
-  padding: 1.5rem;
+.font-body {
+  font-family: var(--font-body);
 }
 
+.font-mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Color Tokens Implementation */
 :root {
-  /* Light Mode (Modern Athletic - Premium White/Gray) */
-  --hayl-bg: #fdfdfd;
-  --hayl-surface: #ffffff;
-  --hayl-text: #09090b; /* Zinc 950 */
-  --hayl-muted: #71717a; /* Zinc 500 */
-  --hayl-accent: #ff4d00;
-  --hayl-border: #e4e4e7; /* Zinc 200 */
+  /* Light Mode (Warm Stone) */
+  --hayl-bg: #fafaf9; /* Stone 50 */
+  --hayl-surface: #ffffff; /* Pure White */
+  --hayl-text: #0c0c0c; /* Black-ish */
+  --hayl-muted: #78716c; /* Stone 500 */
+  --hayl-accent: #ff4d00; /* International Orange */
+  --hayl-border: #e7e5e4; /* Stone 200 */
+  --hayl-danger: #dc2626; /* Red 600 */
+  --hayl-success: #16a34a; /* Green 600 */
+}
+
+.dark {
+  /* Dark Mode (Charcoal) */
+  --hayl-bg: #0c0c0c; /* Deep Black */
+  --hayl-surface: #161616; /* Off-Black */
+  --hayl-text: #f5f5f4; /* Stone 100 */
+  --hayl-muted: #a8a29e; /* Stone 400 */
+  --hayl-accent: #ff5722; /* Slightly brighter orange */
+  --hayl-border: #292524; /* Stone 800 */
+  --hayl-danger: #ef4444; /* Red 500 */
+  --hayl-success: #22c55e; /* Green 500 */
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --hayl-bg: #09090b;
-    --hayl-surface: #09090b;
-    --hayl-text: #fafafa;
-    --hayl-muted: #a1a1aa;
-    --hayl-accent: #ff4d00;
-    --hayl-border: #27272a;
+    --hayl-bg: #0c0c0c;
+    --hayl-surface: #161616;
+    --hayl-text: #f5f5f4;
+    --hayl-muted: #a8a29e;
+    --hayl-accent: #ff5722;
+    --hayl-border: #292524;
+    --hayl-danger: #ef4444;
+    --hayl-success: #22c55e;
   }
 }
 
-/* Manual Overrides */
-.dark {
-  --hayl-bg: #09090b;
-  --hayl-surface: #18181b;
-  --hayl-text: #fafafa;
-  --hayl-muted: #a1a1aa;
+.light {
+  --hayl-bg: #fafaf9;
+  --hayl-surface: #ffffff;
+  --hayl-text: #0c0c0c;
+  --hayl-muted: #78716c;
   --hayl-accent: #ff4d00;
-  --hayl-border: #27272a;
+  --hayl-border: #e7e5e4;
+  --hayl-danger: #dc2626;
+  --hayl-success: #16a34a;
 }
 
-.light {
-  --hayl-bg: #fdfdfd;
-  --hayl-surface: #ffffff;
-  --hayl-text: #09090b;
-  --hayl-muted: #71717a;
-  --hayl-accent: #ff4d00;
-  --hayl-border: #e4e4e7;
+/* Global Reset tweaks */
+body {
+  background-color: var(--hayl-bg);
+  color: var(--hayl-text);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  body {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Hide scrollbars but allow scrolling for clean look */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

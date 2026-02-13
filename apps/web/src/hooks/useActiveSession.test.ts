@@ -6,10 +6,12 @@ import { describe, it, expect, beforeEach, vi, type Mock } from 'vitest';
 // Mock Dexie
 vi.mock('../lib/db', () => ({
   db: {
+    transaction: vi.fn(async (_mode: string, _table: unknown, callback: () => Promise<void>) => callback()),
     sessions: {
       where: vi.fn().mockReturnThis(),
       equals: vi.fn().mockReturnThis(),
       first: vi.fn(),
+      get: vi.fn(),
       add: vi.fn(),
       update: vi.fn(),
     },
@@ -84,9 +86,15 @@ describe('useActiveSession', () => {
     };
 
     const { result } = renderHook(() => useActiveSession());
+    (db.sessions.get as Mock).mockResolvedValue({
+      id: 1,
+      state: 'active',
+      logs: [],
+      currentSetIndex: 0,
+    });
     
     await act(async () => {
-        await result.current.logSet('ex_1', 100, 10, 8);
+        await result.current.logSet('ex_1', 10, 100, 8);
     });
 
     expect(db.sessions.update).toHaveBeenCalledWith(1, expect.objectContaining({

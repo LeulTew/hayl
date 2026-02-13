@@ -43,24 +43,31 @@ export function useActiveSession() {
   /**
    * Records a set in the current session
    */
-  const logSet = useCallback(async (exerciseId: string, weight?: number, reps?: number, rpe?: number) => {
+  const logSet = useCallback(async (exerciseId: string, reps: number, weight?: number, rpe?: number) => {
     if (!activeSession?.id) return;
 
-    const newLog: LogEntry = {
-      exerciseId,
-      setId: crypto.randomUUID(),
-      weight,
-      reps,
-      rpe,
-      timestamp: Date.now(),
-    };
+    await db.transaction('rw', db.sessions, async () => {
+      const latestSession = await db.sessions.get(activeSession.id as number);
+      if (!latestSession?.id || latestSession.state !== 'active') return;
 
-    const updatedLogs = [...activeSession.logs, newLog];
-    
-    await db.sessions.update(activeSession.id, {
-      logs: updatedLogs,
-      currentSetIndex: activeSession.currentSetIndex + 1,
-      lastModifiedTs: Date.now(),
+      const nextSetIndex = latestSession.currentSetIndex;
+      const newLog: LogEntry = {
+        exerciseId,
+        setId: crypto.randomUUID(),
+        setIndex: nextSetIndex,
+        weight,
+        reps,
+        rpe,
+        timestamp: Date.now(),
+      };
+
+      const updatedLogs = [...latestSession.logs, newLog];
+
+      await db.sessions.update(latestSession.id, {
+        logs: updatedLogs,
+        currentSetIndex: nextSetIndex + 1,
+        lastModifiedTs: Date.now(),
+      });
     });
   }, [activeSession]);
 
