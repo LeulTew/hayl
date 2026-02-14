@@ -5,6 +5,7 @@ import { SplitSelector } from './components/workout/SplitSelector';
 import { WorkoutSession } from './components/workout/WorkoutSession';
 import { useActiveSession } from './hooks/useActiveSession';
 import { useUserProfile } from './hooks/useUserProfile';
+import { useTheme } from './hooks/useTheme';
 import { OnboardingFlow } from './components/onboarding/OnboardingFlow';
 import { HistoryView } from './components/history/HistoryView';
 import { SessionDetail } from './components/history/SessionDetail';
@@ -22,6 +23,7 @@ import { getActiveTab } from './types/navigation';
 function App() {
   const { activeSession, startSession } = useActiveSession();
   const { isOnboarded, isLoading: isProfileLoading } = useUserProfile();
+  useTheme(); // Initialize theme globally
   
   // Initial state logic
   const [view, setView] = useState<NavigationState>(() => {
@@ -96,7 +98,13 @@ function App() {
       {/* 2. Top Level Views */}
       <div className={isGlobalNavHidden ? 'hidden' : 'block'}>
         {effectiveView.type === 'dashboard' && (
-          <Dashboard onSelectProgram={(id) => setView({ type: 'programs', view: 'detail', programId: id })} />
+          <Dashboard 
+            onNavigate={(newState) => setView(newState)} 
+            onStartSession={async (dayIndex, programId, planId) => {
+              await startSession(programId, planId, dayIndex);
+              setView({ type: 'workout', data: { planId } });
+            }}
+          />
         )}
         
         {effectiveView.type === 'programs' && (

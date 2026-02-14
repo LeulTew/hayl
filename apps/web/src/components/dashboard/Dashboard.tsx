@@ -70,9 +70,10 @@ function getStreakDays(sessionStartTimes: number[]): number {
 
 interface DashboardProps {
   onNavigate: (view: NavigationState) => void;
+  onStartSession: (dayIndex: number, programId: string, planId: string) => void;
 }
 
-export function Dashboard({ onNavigate }: DashboardProps) {
+export function Dashboard({ onNavigate, onStartSession }: DashboardProps) {
   const { profile } = useUserProfile();
   const programs = useQuery(api.programs.list);
 
@@ -101,6 +102,16 @@ export function Dashboard({ onNavigate }: DashboardProps) {
   const displayProgramId = activePlan?.programId || recentProgramId;
   
   const activeProgram = programs?.find(p => p._id === displayProgramId);
+
+  // Next Session Calculation
+  const routineHistory = history.filter(s => 
+    s.planId === activePlanId && 
+    profile?.programStartDate && 
+    s.startTime >= profile.programStartDate
+  );
+  
+  const nextDayIndex = activePlan?.days ? routineHistory.length % activePlan.days.length : 0;
+  const nextDayTitle = activePlan?.days?.[nextDayIndex]?.title || 'Next Session';
 
   return (
     <Page className="pt-8">
@@ -132,7 +143,9 @@ export function Dashboard({ onNavigate }: DashboardProps) {
         <Card 
             className="p-4 flex flex-col justify-between h-32 bg-hayl-text text-hayl-bg border-transparent cursor-pointer hover:opacity-90 transition-opacity"
             onClick={() => {
-                if (activeProgram) {
+                if (activeProgram && activePlan) {
+                    onStartSession(nextDayIndex, activeProgram._id, activePlan._id);
+                } else if (activeProgram) {
                     onNavigate({ type: 'programs', view: 'detail', programId: activeProgram._id });
                 } else {
                     onNavigate({ type: 'programs', view: 'home' });
@@ -140,10 +153,10 @@ export function Dashboard({ onNavigate }: DashboardProps) {
             }}
         >
           <div className="font-heading uppercase text-[10px] tracking-widest opacity-60">
-              {activeProgram ? 'RESUME PROTOCOL' : 'START TRAINING'}
+              {activeProgram ? 'DEPLOY SESSION' : 'START TRAINING'}
           </div>
           <div className="font-heading text-2xl font-bold leading-none truncate">
-              {activeProgram ? activeProgram.title : 'FIND PROTOCOL'}
+              {activeProgram ? nextDayTitle : 'FIND PROTOCOL'}
           </div>
           <div className="flex items-center gap-2 text-[10px] font-mono opacity-60">
              <span>GO NOW</span>
@@ -180,8 +193,14 @@ export function Dashboard({ onNavigate }: DashboardProps) {
                  
                  <div className="hidden md:flex flex-col items-end gap-2">
                      <span className="text-[10px] font-mono text-hayl-muted uppercase">Next Session</span>
-                     <div className="h-12 px-6 rounded-full bg-hayl-text text-hayl-bg flex items-center justify-center font-heading font-black italic uppercase tracking-wider group-hover:bg-hayl-accent transition-colors">
-                        Deploy
+                     <div 
+                        className="h-12 px-6 rounded-full bg-hayl-text text-hayl-bg flex items-center justify-center font-heading font-black italic uppercase tracking-wider group-hover:bg-hayl-accent transition-colors cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onStartSession(nextDayIndex, activeProgram._id, activePlan._id);
+                        }}
+                      >
+                        {nextDayTitle}
                      </div>
                  </div>
                </div>
