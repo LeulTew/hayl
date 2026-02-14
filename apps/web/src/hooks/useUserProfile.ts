@@ -4,7 +4,9 @@ import { useCallback } from 'react';
 
 export function useUserProfile() {
   const profile = useLiveQuery(
-    () => db.userProfile.toCollection().first()
+    async () => (await db.userProfile.toCollection().first()) ?? null,
+    [],
+    null
   );
 
   const updateProfile = useCallback(async (data: Partial<UserProfile>) => {

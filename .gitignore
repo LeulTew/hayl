@@ -5,6 +5,7 @@ dist
 out
 build
 coverage
+.vscode/
 
 # Backend/Bun
 bun.lockb
