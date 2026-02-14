@@ -4,14 +4,15 @@
 
 ## 📊 Project Status Overview
 
-| Phase                        | Focus                                                     | Status           |
-| :--------------------------- | :-------------------------------------------------------- | :--------------- |
-| **I. Foundation**            | Repo, Stack, CI/CD, Safety                                | ✅ **COMPLETED** |
-| **II. The Engine**           | Data Schema, Content Seeding, Quote Bank, Standard Splits | ✅ **COMPLETED** |
-| **III. Workout UI**          | Evaluation, Active Timer, Asset Lazy-loading              | ✅ **COMPLETED** |
-| **IV. Nutrition (ET)**       | Addis-specific Foods, CICO Calc, Myth Busting             | ✅ **COMPLETED** |
-| **V. UX Interface Overhaul** | Complete UI Redesign, Desktop Support, Component Lib      | 🔴 **NEW**       |
-| **VI. Monetization**         | Telebirr Integration, Premium Locking                     | 🚧 **PAUSED**    |
+| Phase                        | Focus                                                     | Status             |
+| :--------------------------- | :-------------------------------------------------------- | :----------------- |
+| **I. Foundation**            | Repo, Stack, CI/CD, Safety                                | ✅ **COMPLETED**   |
+| **II. The Engine**           | Data Schema, Content Seeding, Quote Bank, Standard Splits | ✅ **COMPLETED**   |
+| **III. Workout UI**          | Evaluation, Active Timer, Asset Lazy-loading              | ✅ **COMPLETED**   |
+| **IV. Nutrition (ET)**       | Addis-specific Foods, CICO Calc, Myth Busting             | ✅ **COMPLETED**   |
+| **V. UX Interface Overhaul** | Complete UI Redesign, Design System, Component Lib        | ✅ **COMPLETED**   |
+| **VI. Routine Management**   | Active Plan Logic, Classified Selection, Dashboard 2.0    | 🚧 **IN PROGRESS** |
+| **VII. Monetization**        | Telebirr Integration, Premium Locking                     | ⏳ **PENDING**     |
 
 ---
 
@@ -192,114 +193,54 @@ Example from Coach Greg: _"Cheat on your curls, but don't cheat on your girlfrie
 
 ---
 
-### 🎨 PHASE V: UX Interface Overhaul (NEW)
+### ✅ PHASE V: UX Interface Overhaul
 
-> **Goal**: Complete redesign of the UI/UX to a premium, cohesive, and responsive experience that works beautifully on **both mobile AND desktop**.
+> **Goal**: Complete redesign of the UI/UX to a premium, cohesive, and responsive experience.
 
-#### 5.1 Design Philosophy & Hard Rules
+#### 5.1 Design System & Components
 
-##### ⛔ FORBIDDEN (The "Never Do" List)
+- [x] **Design Tokens**: "Warm Stone" palette, No-Shadow rules, "Athletic Editorial" typography.
+- [x] **Component Library**:
+  - `Button`, `Card`, `Badge`, `Input` (Custom, no specific lib deps).
+  - `Tabs` (Framer Motion rooted).
+  - `BottomSheet` (Mobile-first modal replacement).
+- [x] **Layout Architecture**:
+  - `NavBar`: Responsive (Bottom on Mobile, Side on Desktop).
+  - `Page`: Standardized container.
 
-| Rule                       | Reason                                                                 |
-| :------------------------- | :--------------------------------------------------------------------- |
-| **No Glassmorphism**       | Blurry overlays are overdone, look cheap, and hurt performance.        |
-| **No Shadows (Any Type)**  | No `box-shadow`, no `text-shadow`, no `drop-shadow`. Borders only.     |
-| **No Lame Fonts**          | System fonts and basic sans-serifs are banned. Use curated typography. |
-| **No Excessive Gradients** | Flat colors preferred. Gradients only for intentional accent moments.  |
-| **No Emoji Icons**         | All icons MUST be SVG from a consistent library (Lucide/Heroicons).    |
+#### 5.2 Responsive Layout Strategy
 
-##### ✅ REQUIRED (The "Always Do" List)
-
-| Rule                            | Implementation                                                            |
-| :------------------------------ | :------------------------------------------------------------------------ |
-| **Mobile-First, Desktop-Ready** | Design for mobile touch first, then expand layouts for desktop.           |
-| **Responsive Breakpoints**      | `sm` (640px), `md` (768px), `lg` (1024px), `xl` (1280px), `2xl` (1536px). |
-| **Keyboard Accessible**         | All interactive elements must be focusable and navigable via Tab.         |
-| **Touch Target 44px Min**       | All buttons and interactive elements must meet accessibility standards.   |
-
-#### 5.2 Color System (5-Level Semantic Palette)
-
-A strict, semantic color system with **5 levels**, where **3 have light/dark mode variants**.
-
-| Token Name       | Purpose                        | Light Mode | Dark Mode | Has Variant?         |
-| :--------------- | :----------------------------- | :--------- | :-------- | :------------------- |
-| `--hayl-bg`      | Page background                | `#FDFDFD`  | `#09090B` | ✅ Yes               |
-| `--hayl-surface` | Card/Container background      | `#FFFFFF`  | `#18181B` | ✅ Yes               |
-| `--hayl-text`    | Primary text color             | `#09090B`  | `#FAFAFA` | ✅ Yes               |
-| `--hayl-muted`   | Secondary/Disabled text        | `#71717A`  | `#A1A1AA` | ❌ No (Zinc neutral) |
-| `--hayl-accent`  | CTAs, Highlights (Brand Color) | `#FF4D00`  | `#FF4D00` | ❌ No (Fixed)        |
-
-**Usage Rules**:
-
-- `bg`: Only for the outermost `<body>` or main container.
-- `surface`: For cards, modals, sheets.
-- `text` / `muted`: For typography.
-- `accent`: Sparingly, for primary buttons and key highlights only.
-- **Borders**: Use `--hayl-muted` at 10-20% opacity for subtle dividers.
-
-#### 5.3 Typography Stack
-
-| Token            | Font Family        | Use Case                         |
-| :--------------- | :----------------- | :------------------------------- |
-| `--font-sans`    | `Inter`            | Body text, UI elements           |
-| `--font-heading` | `Barlow Condensed` | Headlines, Section titles, Stats |
-| `--font-mono`    | `JetBrains Mono`   | Code blocks, Timer displays      |
-
-**Rules**:
-
-- Headings: **Bold, Italic, Uppercase, Tight Tracking** (`font-black italic uppercase tracking-tighter`).
-- Body: Regular weight, ample line-height (`leading-relaxed`).
-- Data/Numbers: Monospace for timers and counters.
-
-#### 5.4 Component Strategy (21st.dev + shadcn/ui)
-
-We will use **shadcn/ui** as a base for accessible, unstyled primitives and source inspiration from **21st.dev** for premium patterns, then **heavily customize** to match our design system.
-
-**Component Adoption Workflow**:
-
-1. **IDENTIFY**: Find a primitive in shadcn/ui (e.g., Dialog, Tabs, Accordion).
-2. **COPY**: Install/copy the component into `apps/web/src/components/ui/`.
-3. **STRIP**: Remove ALL default Tailwind classes (especially shadows, rounded-lg, etc.).
-4. **REBRAND**: Apply Hayl design tokens (--hayl-\*, font-heading, etc.).
-5. **DOCUMENT**: Add JSDoc comments and usage examples.
-6. **TEST**: Verify accessibility (keyboard nav, focus rings, ARIA).
-
-**Core UI Components to Build/Customize**:
-
-| Component      | Source   | Priority | Notes                                       |
-| :------------- | :------- | :------- | :------------------------------------------ |
-| `Button`       | shadcn   | P0       | Primary, Secondary, Ghost, Link variants.   |
-| `Card`         | Custom   | P0       | No shadow. Border only. Rounded-2xl/3xl.    |
-| `Tabs`         | shadcn   | P0       | For Day/Phase navigation.                   |
-| `Dialog/Sheet` | shadcn   | P0       | For modals and bottom sheets.               |
-| `Input`        | shadcn   | P1       | For weight/reps entry. Large touch targets. |
-| `Accordion`    | shadcn   | P1       | For collapsible tips and exercise info.     |
-| `Timer`        | Custom   | P0       | Custom build for workout timers.            |
-| `Navbar`       | 21st.dev | P0       | "Tubelight" style bottom nav.               |
-| `Toast`        | shadcn   | P2       | For feedback messages.                      |
-
-#### 5.5 Responsive Layout Strategy
-
-**Mobile (Default)**:
-
-- Single Column: Stacked content, full-width cards.
-- Bottom Navigation: Persistent navbar for Workout, Exercises, Nutrition, Profile.
-- Floating Action Button (FAB): For primary actions like "Start Workout".
-
-**Desktop (lg+)**:
-
-- Two/Three Column Grids: Utilize horizontal space.
-- Sidebar Navigation: Convert bottom nav to a fixed left sidebar.
-- Sticky Headers: Keep context visible while scrolling.
-- Hover States: Add subtle hover effects for interactive elements (no shadow, use border/bg change).
+- [x] **Mobile-First**: Bottom navigation, touch targets > 44px.
+- [x] **Desktop**: Sidebar navigation transition.
 
 ---
 
-### 💎 PHASE VI: Monetization & Accounts
+### 🚧 PHASE VI: Routine Management
+
+> **Goal**: Allow users to commit to specific workout plans and track progress.
+
+#### 6.1 Backend Logic (Completed)
+
+- [x] **Schema**: Added `activePlanId` and `programStartDate` to `users`.
+- [x] **Sync**: Implemented `syncUserProfile` mutation.
+
+#### 6.2 Selection UI (Completed)
+
+- [x] **Program Explorer**: Added "Classified Selection" (Essentials, Hybrid, Elite).
+- [x] **Activation**: "Activate Routine" button in Program Guide.
+
+#### 6.3 Active Dashboard (In Progress)
+
+- [x] **"My Routine" Card**: Shows current plan, difficulty, and week progress.
+- [ ] **Next Workout Logic**: Smart link to the specific next session.
+
+---
+
+### 💎 PHASE VII: Monetization & Accounts
 
 **Goal**: Premium features for sustainability.
 
-#### 6.1 Telebirr Integration
+#### 7.1 Telebirr Integration
 
 - [x] **Implement Webhook**:
   - Replace `verifyTelebirrSignature` stub with real crypto logic.
@@ -307,7 +248,7 @@ We will use **shadcn/ui** as a base for accessible, unstyled primitives and sour
 - [ ] **Payment Flow**:
   - "Buy Plan" button -> Telebirr H5/App Switch.
 
-#### 6.2 Access Control
+#### 7.2 Access Control
 
 - [ ] **Guest vs. User**:
   - _Guest_: Access to "Foundations" & General Nutrition.
@@ -353,4 +294,4 @@ We will use **shadcn/ui** as a base for accessible, unstyled primitives and sour
 
 ---
 
-_Last Updated: 2026-02-12_
+_Last Updated: 2026-02-15_
