@@ -14,12 +14,11 @@ export function useUserProfile() {
   );
 
   const updateProfile = useCallback(async (data: Partial<UserProfile>) => {
-    let newProfileId = profile?.id;
     let finalProfile: UserProfile;
 
     if (!profile?.id) {
       // Create new local
-      newProfileId = await db.userProfile.add({
+      const newProfile: UserProfile = {
         name: '',
         gender: 'male',
         goal: 'maintain',
@@ -28,11 +27,12 @@ export function useUserProfile() {
         height: 175,
         age: 25,
         unitPreference: 'metric',
+        languagePreference: 'en',
         completedOnboarding: false,
         ...data
-      } as UserProfile);
-      
-      finalProfile = { ...data } as UserProfile; // Approximation for new user
+      };
+      await db.userProfile.add(newProfile);
+      finalProfile = newProfile;
     } else {
       // Update existing local
       await db.userProfile.update(profile.id, data);
@@ -40,16 +40,14 @@ export function useUserProfile() {
     }
 
     // Background Sync to Convex
-    // We try to sync, but if offline, we just skip (optimistic local-first)
-    // In a real PWA we'd use a sync queue.
     try {
-        const token = localStorage.getItem("hayl-token") || "guest_" + Date.now(); // Simple token mock
+        const token = localStorage.getItem("hayl-token") || "guest_" + Date.now();
         if (!localStorage.getItem("hayl-token")) localStorage.setItem("hayl-token", token);
 
         await syncMutation({
             tokenIdentifier: token,
             name: finalProfile.name || "Athlete",
-            currentPlanId: finalProfile.activePlanId as any, // Cast for ID type compat
+            currentPlanId: finalProfile.activePlanId as any,
             programStartDate: finalProfile.programStartDate,
         });
     } catch (e) {

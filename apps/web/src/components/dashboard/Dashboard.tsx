@@ -155,7 +155,7 @@ export function Dashboard({ onNavigate, onStartSession }: DashboardProps) {
               {activeProgram ? nextDayTitle : t('find_protocol')}
           </div>
           <div className="flex items-center gap-2 text-[10px] font-mono opacity-60">
-             <span>GO NOW</span>
+             <span>{t('go_now')}</span>
              <ArrowRight size={12} />
           </div>
         </Card>
