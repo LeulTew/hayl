@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
 import { Page } from "../ui/Page";
@@ -15,9 +16,12 @@ interface ProgramExplorerProps {
   onStartSession: (dayIndex: number) => void;
 }
 
+type FilterType = 'ALL' | 'ESSENTIALS' | 'HYBRID' | 'ELITE';
+
 export function ProgramExplorer({ view, planId, programId, onNavigate, onStartSession }: ProgramExplorerProps) {
   // Level 1: Fetch Data (Must be unconditional)
-  const programs = useQuery(api.programs.listAll) ?? [];
+  const allPrograms = useQuery(api.programs.listAll) ?? [];
+  const [filter, setFilter] = useState<FilterType>('ALL');
 
   // Level 3: Specific Plan Guide (e.g. "HAYL Essentials I - 3 Day")
   if (view === 'detail' && planId) {
@@ -47,11 +51,16 @@ export function ProgramExplorer({ view, planId, programId, onNavigate, onStartSe
     );
   }
 
-  // Level 1: Program List (Category View)
+  // Filter Logic
+  const filteredPrograms = allPrograms.filter(p => {
+    if (filter === 'ALL') return true;
+    if (filter === 'ESSENTIALS') return p.difficulty === 'beginner';
+    if (filter === 'HYBRID') return p.difficulty === 'intermediate';
+    if (filter === 'ELITE') return p.difficulty === 'elite';
+    return true;
+  });
 
-
-
-  if (!programs) {
+  if (!allPrograms) {
     return <Page><Skeleton className="h-64 w-full" /></Page>;
   }
 
@@ -62,8 +71,27 @@ export function ProgramExplorer({ view, planId, programId, onNavigate, onStartSe
         <p className="text-xs font-sans font-bold text-hayl-muted uppercase tracking-[0.2em]">Select your protocol</p>
       </header>
 
+      {/* Filter Tabs */}
+      <div className="flex gap-2 mb-8 overflow-x-auto pb-2 no-scrollbar">
+        {(['ALL', 'ESSENTIALS', 'HYBRID', 'ELITE'] as const).map((tab) => (
+            <button
+                key={tab}
+                onClick={() => setFilter(tab)}
+                className={`
+                    px-4 py-2 rounded-full text-[10px] font-heading font-bold uppercase tracking-[0.2em] border transition-all
+                    ${filter === tab 
+                        ? 'bg-hayl-text text-hayl-bg border-hayl-text' 
+                        : 'bg-transparent text-hayl-muted border-hayl-border hover:border-hayl-text'
+                    }
+                `}
+            >
+                {tab}
+            </button>
+        ))}
+      </div>
+
       <div className="space-y-4">
-        {programs.map((prog: Doc<"programs">) => (
+        {filteredPrograms.map((prog: Doc<"programs">) => (
           <div 
             key={prog._id}
             onClick={() => onNavigate({ 
@@ -88,6 +116,12 @@ export function ProgramExplorer({ view, planId, programId, onNavigate, onStartSe
              </div>
           </div>
         ))}
+
+        {filteredPrograms.length === 0 && (
+            <div className="py-12 text-center border border-dashed border-hayl-border rounded-2xl">
+                <p className="text-xs font-mono text-hayl-muted uppercase">No protocols found in this sector</p>
+            </div>
+        )}
       </div>
     </Page>
   );
