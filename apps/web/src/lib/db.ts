@@ -40,6 +40,7 @@ export interface UserProfile {
   height: number; // cm
   age: number;
   unitPreference: 'metric' | 'imperial';
+  languagePreference: 'en' | 'am';
   completedOnboarding: boolean;
   tdeeResult?: TDEEResult; // cached TDEE calculation
   
@@ -69,6 +70,11 @@ export class HaylDatabase extends Dexie {
     // Version 3: Routine Management
     this.version(3).stores({
       userProfile: '++id' // Implicit upgrade to add fields (activePlanId, programStartDate)
+    });
+
+    // Version 4: Localization
+    this.version(4).stores({
+      userProfile: '++id'
     });
   }
 }

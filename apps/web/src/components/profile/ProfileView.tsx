@@ -1,6 +1,7 @@
 import { useTheme } from '../../hooks/useTheme';
 import type { NavigationState } from '../../types/navigation';
 import { useUserProfile } from '../../hooks/useUserProfile';
+import { db } from '../../lib/db';
 import { Page } from '../ui/Page';
 import { SectionHeader } from '../ui/SectionHeader';
 import { Card } from '../ui/Card';
@@ -16,7 +17,7 @@ interface ProfileViewProps {
 
 export function ProfileView({ onNavigate }: ProfileViewProps) {
   const { theme, setTheme } = useTheme();
-  const { profile } = useUserProfile();
+  const { profile, updateProfile } = useUserProfile();
 
   const tdee = profile?.tdeeResult?.tdee || 2500;
    const isImperial = profile?.unitPreference === 'imperial';
@@ -77,7 +78,7 @@ export function ProfileView({ onNavigate }: ProfileViewProps) {
           >
              <div className="flex items-center gap-4">
                 <History className="text-hayl-muted" />
-                <span className="font-heading text-lg font-bold">MISSION LOGBOOK</span>
+                <span className="font-heading text-lg font-bold uppercase">Mission Logbook</span>
              </div>
              <Badge variant="outline">HISTORY</Badge>
           </div>
@@ -85,13 +86,59 @@ export function ProfileView({ onNavigate }: ProfileViewProps) {
           <div className="p-5 flex justify-between items-center">
              <div className="flex items-center gap-4">
                 <Settings className="text-hayl-muted" />
-                <span className="font-heading text-lg font-bold">INTERFACE THEME</span>
+                <span className="font-heading text-lg font-bold uppercase">Interface Theme</span>
              </div>
              <ThemeToggle value={theme} onChange={setTheme} />
           </div>
+
+          <div className="p-5 flex justify-between items-center">
+             <div className="flex items-center gap-4">
+                <Settings className="text-hayl-muted" />
+                <span className="font-heading text-lg font-bold uppercase">Measurement Units</span>
+             </div>
+             <div className="flex bg-hayl-bg rounded-lg p-1 border border-hayl-border">
+                <button 
+                  onClick={() => updateProfile({ unitPreference: 'metric' })}
+                  className={`px-3 py-1 rounded-md text-[10px] font-mono transition-all ${!isImperial ? 'bg-hayl-text text-hayl-bg' : 'text-hayl-muted'}`}
+                >
+                  METRIC
+                </button>
+                <button 
+                  onClick={() => updateProfile({ unitPreference: 'imperial' })}
+                  className={`px-3 py-1 rounded-md text-[10px] font-mono transition-all ${isImperial ? 'bg-hayl-text text-hayl-bg' : 'text-hayl-muted'}`}
+                >
+                  US
+                </button>
+             </div>
+          </div>
+
+          <div className="p-5 flex justify-between items-center">
+             <div className="flex items-center gap-4">
+                <Settings className="text-hayl-muted" />
+                <span className="font-heading text-lg font-bold uppercase">Language</span>
+             </div>
+             <div className="flex bg-hayl-bg rounded-lg p-1 border border-hayl-border">
+                <button 
+                  onClick={() => updateProfile({ languagePreference: 'en' })}
+                  className={`px-3 py-1 rounded-md text-[10px] font-mono transition-all ${profile?.languagePreference !== 'am' ? 'bg-hayl-text text-hayl-bg' : 'text-hayl-muted'}`}
+                >
+                  ENGLISH
+                </button>
+                <button 
+                  onClick={() => updateProfile({ languagePreference: 'am' })}
+                  className={`px-3 py-1 rounded-md text-[10px] font-mono transition-all ${profile?.languagePreference === 'am' ? 'bg-hayl-text text-hayl-bg' : 'text-hayl-muted'}`}
+                >
+                  AMHARIC
+                </button>
+             </div>
+          </div>
         </Card>
 
-        <Button variant="danger" fullWidth className="mt-8 justify-between px-6" disabled>
+        <Button variant="danger" fullWidth className="mt-8 justify-between px-6" onClick={() => {
+           if (confirm("Reset all local data? This cannot be undone.")) {
+              db.delete().then(() => window.location.reload());
+           }
+        }}>
            <span>FACTORY RESET</span> <LogOut size={18} />
         </Button>
       </section>
