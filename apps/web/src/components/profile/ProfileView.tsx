@@ -11,7 +11,8 @@ import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import { ThemeToggle } from '../ui/ThemeToggle';
 import { StatBlock } from '../ui/StatBlock';
-import { Settings, LogOut, History, Loader2 } from 'lucide-react';
+import { BottomSheet } from '../ui/BottomSheet';
+import { Settings, LogOut, History, Loader2, AlertTriangle } from 'lucide-react';
 
 interface ProfileViewProps {
    onNavigate?: (view: NavigationState) => void;
@@ -22,6 +23,7 @@ export function ProfileView({ onNavigate }: ProfileViewProps) {
   const { profile, updateProfile } = useUserProfile();
   const { t } = useTranslation();
   const [isResetting, setIsResetting] = useState(false);
+  const [isResetModalOpen, setIsResetModalOpen] = useState(false);
 
   const tdee = profile?.tdeeResult?.tdee || 2500;
   const isImperial = profile?.unitPreference === 'imperial';
@@ -31,17 +33,17 @@ export function ProfileView({ onNavigate }: ProfileViewProps) {
   const ageLabel = profile?.age ?? '--';
 
   const handleFactoryReset = async () => {
-     if (confirm(t('reset_confirm'))) {
-        setIsResetting(true);
-        try {
-           await db.delete();
-           localStorage.clear();
-           window.location.reload();
-        } catch (e) {
-           console.error(e);
-           setIsResetting(false);
-        }
-     }
+    if (!isResetModalOpen) return; // Prevent accidental execution without modal
+    setIsResetting(true);
+    try {
+      await db.delete();
+      localStorage.clear();
+      window.location.reload();
+    } catch (e) {
+      console.error(e);
+      setIsResetting(false);
+      setIsResetModalOpen(false);
+    }
   };
 
   return (
@@ -156,7 +158,7 @@ export function ProfileView({ onNavigate }: ProfileViewProps) {
           variant="danger" 
           fullWidth 
           className="mt-8 justify-between px-6" 
-          onClick={handleFactoryReset}
+          onClick={() => setIsResetModalOpen(true)}
           disabled={isResetting}
         >
            {isResetting ? (
@@ -166,6 +168,46 @@ export function ProfileView({ onNavigate }: ProfileViewProps) {
            )}
         </Button>
       </section>
+
+      {/* Custom Reset Confirmation */}
+      <BottomSheet 
+        isOpen={isResetModalOpen} 
+        onClose={() => !isResetting && setIsResetModalOpen(false)}
+        title={t('factory_reset')}
+      >
+        <div className="flex flex-col items-center text-center gap-6 py-4">
+           <div className="w-16 h-16 rounded-3xl bg-hayl-danger/10 flex items-center justify-center text-hayl-danger">
+              <AlertTriangle size={32} />
+           </div>
+           
+           <div className="space-y-2">
+             <h4 className="font-heading text-2xl font-bold uppercase">{t('reset_confirm')}</h4>
+             <p className="font-body text-sm text-hayl-muted">
+               This will purge all local workout history, profile data, and synchronization tokens. This process is irreversible.
+             </p>
+           </div>
+
+           <div className="w-full flex flex-col gap-3 pt-4">
+             <Button 
+               variant="danger" 
+               fullWidth 
+               onClick={handleFactoryReset}
+               disabled={isResetting}
+               size="lg"
+             >
+               {isResetting ? 'PURGING DATA...' : 'YES, PURGE EVERYTHING'}
+             </Button>
+             <Button 
+               variant="ghost" 
+               fullWidth 
+               onClick={() => setIsResetModalOpen(false)}
+               disabled={isResetting}
+             >
+               CANCEL
+             </Button>
+           </div>
+        </div>
+      </BottomSheet>
     </Page>
   );
 }

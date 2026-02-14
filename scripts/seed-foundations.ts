@@ -47,9 +47,11 @@ async function main() {
     console.error("❌ ADMIN_SECRET is not set in environment.");
     process.exit(1);
   }
+  // const adminSecret = ""; // Dummy
 
   console.log("🌱 Seeding Hayl Foundations (High Quality)...");
 
+  // 1. Seed Exercises
   // 1. Seed Exercises
   await client.mutation(api.exercises.seedExercises, { exercises: EXERCISES, adminSecret: adminSecret });
   console.log("✅ Exercises seeded.");
@@ -66,6 +68,7 @@ async function main() {
     return id;
   };
 
+  // 3. Seed Program Container
   // 3. Seed Program Container
   const programIds = (await client.mutation(api.programs.seedPrograms, { programs: [PROGRAM], adminSecret: adminSecret })) as Record<string, Id<"programs">>;
   const programId = programIds[PROGRAM.slug];
