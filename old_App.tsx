@@ -8,33 +8,41 @@ import { useUserProfile } from './hooks/useUserProfile';
 import { OnboardingFlow } from './components/onboarding/OnboardingFlow';
 import { HistoryView } from './components/history/HistoryView';
 import { SessionDetail } from './components/history/SessionDetail';
+
 import { PlanGuide } from './components/guide/PlanGuide';
+
+export type TopLevelView = 'dashboard' | 'exercises' | 'nutrition' | 'profile';
+
+export type ViewState = 
+  | { type: 'landing' }
+  | { type: 'split-selector'; data: { programId: string } }
+  | { type: 'guide'; data: { planId: string; programId: string } }
+  | { type: 'workout'; data: { planId: string } }
+  | { type: 'onboarding' }
+  | { type: 'history' }
+  | { type: 'session-detail'; sessionId: string }
+  | { type: TopLevelView };
+
 import { ExerciseLibrary } from './components/exercises/ExerciseLibrary';
 import { NutritionHub } from './components/nutrition/NutritionHub';
 import { ProfileView } from './components/profile/ProfileView';
 import { GlobalNav } from './components/navigation/GlobalNav';
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
-import { ProgramExplorer } from './components/programs/ProgramExplorer';
-
-import type { NavigationState, TopLevelView } from './types/navigation';
-import { getActiveTab } from './types/navigation';
 
 function App() {
   const { activeSession, startSession } = useActiveSession();
   const { isOnboarded, isLoading: isProfileLoading } = useUserProfile();
   
   // Initial state logic
-  const [view, setView] = useState<NavigationState>(() => {
+  const [view, setView] = useState<ViewState>(() => {
     if (activeSession?.id && activeSession.state === 'active') {
       return { type: 'workout', data: { planId: activeSession.planId } };
     }
     return { type: 'landing' };
   });
 
-  const effectiveView: NavigationState = (() => {
+  const effectiveView: ViewState = (() => {
     if (activeSession?.id && activeSession.state === 'active') {
-      // Force workout view if session is active
-      // But allow transient views? No, active workout locks screen usually.
       return { type: 'workout', data: { planId: activeSession.planId } };
     }
 
@@ -45,25 +53,25 @@ function App() {
     return view;
   })();
 
-  const currentActiveTab = getActiveTab(effectiveView);
-  const isGlobalNavHidden = !currentActiveTab; 
+  const isTopLevelView = (type: string): type is TopLevelView => {
+    return ['dashboard', 'exercises', 'nutrition', 'profile'].includes(type);
+  };
+
+  const currentActiveTab = isTopLevelView(effectiveView.type) ? effectiveView.type : 'dashboard';
+  const isGlobalNavHidden = effectiveView.type === 'landing' || effectiveView.type === 'workout' || effectiveView.type === 'split-selector' || effectiveView.type === 'guide' || effectiveView.type === 'history' || effectiveView.type === 'session-detail';
 
   // Core Navigation Handlers
   const handlePlanSelection = (planId: string) => {
     if (view.type === 'split-selector') {
-      // Legacy path: Navigate to Guide View
+      // Navigate to Guide View
       setView({ type: 'guide', data: { planId, programId: view.data.programId } });
     }
   };
 
   const handleStartWorkout = async (dayIndex: number) => {
-    // Handle start from legacy guide or new programs explorer
     if (view.type === 'guide') {
       await startSession(view.data.programId, view.data.planId, dayIndex);
       setView({ type: 'workout', data: { planId: view.data.planId } });
-    } else if (view.type === 'programs' && view.view === 'detail' && view.programId && view.planId) {
-       await startSession(view.programId, view.planId, dayIndex);
-       setView({ type: 'workout', data: { planId: view.planId } });
     }
   };
 
@@ -94,42 +102,18 @@ function App() {
       )}
 
       {/* 2. Top Level Views */}
-      <div className={isGlobalNavHidden ? 'hidden' : 'block'}>
+      <div className={(effectiveView.type === 'landing' || effectiveView.type === 'workout' || effectiveView.type === 'split-selector' || effectiveView.type === 'guide' || effectiveView.type === 'history' || effectiveView.type === 'session-detail') ? 'hidden' : 'block'}>
         {effectiveView.type === 'dashboard' && (
-          <Dashboard onSelectProgram={(id) => setView({ type: 'programs', view: 'detail', programId: id })} />
+          <Dashboard onSelectProgram={(id) => setView({ type: 'split-selector', data: { programId: id } })} />
         )}
-        
-        {effectiveView.type === 'programs' && (
-           <ProgramExplorer 
-             view={effectiveView.view} 
-             planId={effectiveView.planId}
-             programId={effectiveView.programId}
-             onNavigate={(newState) => setView(newState)}
-             onStartSession={handleStartWorkout} 
-           />
-        )}
-
-        {effectiveView.type === 'exercises' && (
-           <ExerciseLibrary 
-             view={effectiveView.view} 
-             filter={effectiveView.filter}
-             exerciseId={effectiveView.exerciseId}
-             onNavigate={(newState) => setView(newState)}
-           />
-        )}
-        {effectiveView.type === 'nutrition' && (
-           <NutritionHub 
-             view={effectiveView.view}
-             contentId={effectiveView.contentId}
-             onNavigate={(newState) => setView(newState)}
-           />
-        )}
+        {effectiveView.type === 'exercises' && <ExerciseLibrary />}
+        {effectiveView.type === 'nutrition' && <NutritionHub />}
         {effectiveView.type === 'profile' && (
-          <ProfileView onNavigate={(view) => setView(view as NavigationState)} />
+          <ProfileView onNavigate={(view) => setView(view)} />
         )}
       </div>
 
-      {/* 3. Split Selector Overlay (Legacy/Fallback) */}
+      {/* 3. Split Selector Overlay */}
       {effectiveView.type === 'split-selector' && (
         <div className="fixed inset-0 z-50 bg-hayl-bg p-6 pt-10 overflow-y-auto animate-in slide-in-from-bottom duration-500">
           <SplitSelector 
@@ -140,7 +124,7 @@ function App() {
         </div>
       )}
 
-      {/* 4. Plan Guide View (Legacy) */}
+      {/* 4. Plan Guide View (NEW) */}
       {effectiveView.type === 'guide' && (
         <div className="fixed inset-0 z-50 bg-hayl-bg overflow-y-auto animate-in fade-in duration-300">
           <PlanGuide 
@@ -174,16 +158,10 @@ function App() {
         />
       )}
 
-      {/* 8. Global Navigation Bar */}
+      {/* 6. Global Navigation Bar */}
       <GlobalNav 
-        currentView={currentActiveTab as TopLevelView} 
-        onViewChange={(newView: TopLevelView) => {
-            // Reset to 'home' view when switching tabs
-            if (newView === 'programs') setView({ type: 'programs', view: 'home' });
-            else if (newView === 'exercises') setView({ type: 'exercises', view: 'home' });
-            else if (newView === 'nutrition') setView({ type: 'nutrition', view: 'home' });
-            else setView({ type: newView });
-        }}
+        currentView={currentActiveTab} 
+        onViewChange={(newView: TopLevelView) => setView({ type: newView })}
         isHidden={isGlobalNavHidden}
       />
       </div>
@@ -193,3 +171,4 @@ function App() {
 }
 
 export default App;
+

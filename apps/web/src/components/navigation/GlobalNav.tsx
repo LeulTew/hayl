@@ -1,5 +1,5 @@
-import type { TopLevelView } from '../../App';
-import { LayoutDashboard, BookOpen, Utensils, User } from 'lucide-react';
+import type { TopLevelView } from '../../types/navigation';
+import { LayoutDashboard, BookOpen, Utensils, User, Zap } from 'lucide-react';
 import { NavBar, type NavItem } from '../ui/NavBar';
 
 interface GlobalNavProps {
@@ -10,14 +10,15 @@ interface GlobalNavProps {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { id: 'dashboard', label: 'WORKOUT', icon: LayoutDashboard },
+  { id: 'dashboard', label: 'HOME', icon: LayoutDashboard },
+  { id: 'programs', label: 'PLANS', icon: Zap },
   { id: 'exercises', label: 'LIBRARY', icon: BookOpen },
   { id: 'nutrition', label: 'FUEL', icon: Utensils },
   { id: 'profile', label: 'PROFILE', icon: User },
 ];
 
 function isTopLevelView(id: string): id is TopLevelView {
-  return id === 'dashboard' || id === 'exercises' || id === 'nutrition' || id === 'profile';
+  return id === 'dashboard' || id === 'programs' || id === 'exercises' || id === 'nutrition' || id === 'profile';
 }
 
 export function GlobalNav({ currentView, onViewChange, isHidden }: GlobalNavProps) {

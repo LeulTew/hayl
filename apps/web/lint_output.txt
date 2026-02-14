@@ -1,0 +1,41 @@
+
+/home/leul/Documents/github/hayl/apps/web/src/components/dashboard/Dashboard.tsx
+  71:15  error  Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+/home/leul/Documents/github/hayl/apps/web/src/components/dashboard/Dashboard.tsx:71:15
+  69 |   const history = useLiveQuery(() => db.sessions.where('state').equals('completed').toArray()) || [];
+  70 |   
+> 71 |   const now = Date.now();
+     |               ^^^^^^^^^^ Cannot call impure function
+  72 |   const weeklyWorkouts = history.filter(s => {
+  73 |     const diff = now - s.startTime;
+  74 |     return diff < 7 * 24 * 60 * 60 * 1000;  react-hooks/purity
+
+/home/leul/Documents/github/hayl/apps/web/src/components/workout/WorkoutSession.tsx
+  67:84  error    Compilation Skipped: Existing memoization could not be preserved
+
+React Compiler has skipped optimizing this component because the existing manual memoization could not be preserved. The inferred dependencies did not match the manually specified dependencies, which could cause the value to change more or less frequently than expected. The inferred dependency was `activeSession.currentExerciseIndex`, but the source dependencies were [currentDay, activeSession?.currentExerciseIndex]. Inferred different dependency than source.
+
+/home/leul/Documents/github/hayl/apps/web/src/components/workout/WorkoutSession.tsx:67:84
+   65 |   
+   66 |   // Data flattening & Current State
+>  67 |   const { allExercises, currentExercise, phasesInfo, currentPhaseIndex } = useMemo(() => {
+      |                                                                                    ^^^^^^^
+>  68 |      if (!currentDay || !activeSession) return { allExercises: [], currentExercise: null, phasesInfo: [], currentPhaseIndex: 0 };
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  69 |
+      …
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  96 |      return { allExercises: all, currentExercise: currentEx, phasesInfo: phases, currentPhaseIndex: phaseIdx };
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  97 |   }, [currentDay, activeSession?.currentExerciseIndex]);
+      | ^^^^ Could not preserve existing manual memoization
+   98 |
+   99 |   // Loading State
+  100 |    if (!plan || !activeSession) {  react-hooks/preserve-manual-memoization
+  97:6   warning  React Hook useMemo has a missing dependency: 'activeSession'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        react-hooks/exhaustive-deps
+
+✖ 3 problems (2 errors, 1 warning)
+

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
 import { ArrowRight, Trophy, Activity, Dumbbell } from 'lucide-react';
@@ -67,9 +68,10 @@ export function Dashboard({ onSelectProgram }: DashboardProps) {
 
   // Real Stats from Local DB
   const history = useLiveQuery(() => db.sessions.where('state').equals('completed').toArray()) || [];
-
+  
+  const [now] = useState(() => Date.now());
   const weeklyWorkouts = history.filter(s => {
-    const diff = Date.now() - s.startTime;
+    const diff = now - s.startTime;
     return diff < 7 * 24 * 60 * 60 * 1000;
   }).length;
 

@@ -1,5 +1,5 @@
 import { useTheme } from '../../hooks/useTheme';
-import type { ViewState } from '../../App';
+import type { NavigationState } from '../../types/navigation';
 import { useUserProfile } from '../../hooks/useUserProfile';
 import { Page } from '../ui/Page';
 import { SectionHeader } from '../ui/SectionHeader';
@@ -11,7 +11,7 @@ import { StatBlock } from '../ui/StatBlock';
 import { Settings, LogOut, History } from 'lucide-react';
 
 interface ProfileViewProps {
-   onNavigate?: (view: ViewState) => void;
+   onNavigate?: (view: NavigationState) => void;
 }
 
 export function ProfileView({ onNavigate }: ProfileViewProps) {

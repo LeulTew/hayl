@@ -199,7 +199,7 @@ export function OnboardingFlow({ onComplete }: { onComplete: () => void }) {
           </div>
         );
 
-      case 4: // Stats
+      case 4: { // Stats
         // Helper for unit conversion UI
         const isMetric = data.unitPreference === 'metric';
         const heightDisplay = isMetric ? data.height : Math.round((data.height || 0) / 2.54); // cm to inches roughly for display? No, keep logic simple.
@@ -262,6 +262,7 @@ export function OnboardingFlow({ onComplete }: { onComplete: () => void }) {
             <Button fullWidth onClick={next} className="mt-8">CALCULATE & FINISH</Button>
           </div>
         );
+      }
 
       default:
         return null;

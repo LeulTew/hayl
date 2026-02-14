@@ -94,14 +94,29 @@ export function WorkoutSession({ planId }: { planId: string }) {
      }
 
      return { allExercises: all, currentExercise: currentEx, phasesInfo: phases, currentPhaseIndex: phaseIdx };
-  }, [currentDay, activeSession?.currentExerciseIndex]);
+  }, [currentDay, activeSession]);
 
-  // Loading State
-   if (!plan || !activeSession) {
+   // Loading State
+   if (plan === null) {
+     return (
+        <Page className="flex flex-col items-center justify-center min-h-[60vh] space-y-6 text-center">
+           <p className="font-heading text-3xl font-bold uppercase text-hayl-text">Plan Not Found</p>
+           <p className="font-body text-sm text-hayl-muted">The workout plan for this session is no longer available.</p>
+           <Button variant="outline" onClick={discardSession}>Discard Session</Button>
+        </Page>
+     );
+   }
+
+   if (plan === undefined || !activeSession) {
     return (
       <Page className="flex flex-col items-center justify-center min-h-[60vh] space-y-8">
-         <Skeleton className="w-16 h-16 rounded-full" />
-         <p className="font-heading font-bold text-hayl-text uppercase tracking-widest animate-pulse">Initializing Session...</p>
+         <Skeleton className="w-16 h-16 rounded-full animate-pulse" />
+         <div className="text-center space-y-4">
+            <p className="font-heading font-bold text-hayl-text uppercase tracking-widest animate-pulse">Initializing Session...</p>
+            <Button variant="ghost" size="sm" onClick={discardSession} className="text-xs text-hayl-muted hover:text-hayl-error">
+                CANCEL & DISCARD
+            </Button>
+         </div>
       </Page>
     );
   }
