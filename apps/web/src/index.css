@@ -12,9 +12,9 @@
   --color-hayl-success: var(--hayl-success);
 
   /* Athletic Editorial Typography */
-  --font-display: "Bebas Neue", sans-serif;
-  --font-heading: "Teko", sans-serif;
-  --font-body: "DM Sans", sans-serif;
+  --font-display: "Bebas Neue", "Noto Sans Ethiopic", sans-serif;
+  --font-heading: "Teko", "Noto Sans Ethiopic", sans-serif;
+  --font-body: "DM Sans", "Noto Sans Ethiopic", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
 
   /* No Shadows - Depth via Borders & Layers */

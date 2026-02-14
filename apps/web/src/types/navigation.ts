@@ -50,12 +50,7 @@ export type NavigationState =
 export function getActiveTab(state: NavigationState): TopLevelView | null {
   switch (state.type) {
     case 'dashboard': return 'dashboard';
-    case 'programs': return 'dashboard'; // Programs live under Dashboard or their own tab? Plan says "Program Explorer" is a major feature.
-    // Wait, GlobalNav has: Dashboard, library, nutrition, profile.
-    // Program Explorer replaces "SplitSelector"?
-    // Let's map 'programs' to 'dashboard' active state for now, or add a 'programs' tab?
-    // Current GlobalNav: Dashboard, Exercises, Nutrition, Profile.
-    // We should probably keep 'Programs' accessible from Dashboard Card?
+    case 'programs': return 'programs';
     
     case 'exercises': return 'exercises';
     case 'nutrition': return 'nutrition';

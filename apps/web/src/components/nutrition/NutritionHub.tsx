@@ -5,6 +5,7 @@ import type { NavigationState } from "../../types/navigation";
 import { IngredientSearch } from './IngredientSearch';
 import { MacroCalculator } from './MacroCalculator';
 import { MythBuster } from './MythBuster';
+import { MarkdownText } from "../ui/MarkdownText";
 
 interface NutritionHubProps {
   view?: 'home' | 'article' | 'plan-list' | 'plan-detail';
@@ -93,12 +94,12 @@ export function NutritionHub({ view = 'home', contentId, onNavigate }: Nutrition
         </div>
         
         <header className="mb-8">
-            <h1 className="text-5xl font-heading font-black italic tracking-tighter uppercase leading-none mb-2">{article.title}</h1>
+            <h1 className="text-3xl md:text-5xl font-heading font-black italic tracking-tighter uppercase leading-none mb-2 break-words">{article.title}</h1>
             <p className="text-lg font-sans text-hayl-muted uppercase tracking-widest text-xs font-bold">{article.subtitle}</p>
         </header>
 
         <div className="prose prose-hayl text-hayl-text whitespace-pre-line font-sans leading-relaxed">
-            {article.content}
+            <MarkdownText content={article.content} />
         </div>
       </Page>
     );
@@ -120,19 +121,19 @@ export function NutritionHub({ view = 'home', contentId, onNavigate }: Nutrition
             <p className="text-xs font-sans text-hayl-muted uppercase tracking-widest font-bold">Curated Nutrition Plans</p>
         </header>
 
-        <div className="space-y-4">
+        <div className="grid gap-4">
             {MEAL_PLANS.map(plan => (
                 <div 
                     key={plan.id}
                     className="p-6 border border-hayl-border bg-hayl-surface rounded-xl hover:border-hayl-text cursor-pointer transition-all group"
                     onClick={() => handleNavigate({ type: 'nutrition', view: 'plan-detail', contentId: plan.id })}
                 >
-                    <div className="flex justify-between items-start mb-2">
-                        <h3 className="text-2xl font-heading font-bold uppercase italic">{plan.title}</h3>
-                        <span className="font-mono text-sm border border-hayl-text px-2 py-0.5 rounded-full">{plan.calories} kcal</span>
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2 gap-2">
+                        <h3 className="text-xl md:text-2xl font-heading font-bold uppercase italic break-words leading-tight">{plan.title}</h3>
+                        <span className="font-mono text-sm border border-hayl-text px-2 py-0.5 rounded-full self-start shrink-0">{plan.calories} kcal</span>
                     </div>
-                    <p className="text-hayl-muted text-sm mb-4">{plan.description}</p>
-                    <div className="flex gap-2">
+                    <p className="text-hayl-muted text-sm mb-4 line-clamp-2">{plan.description}</p>
+                    <div className="flex gap-2 flex-wrap">
                         {plan.tags.map(tag => (
                             <span key={tag} className="text-[10px] uppercase font-bold text-hayl-muted bg-hayl-bg px-2 py-1 rounded">{tag}</span>
                         ))}

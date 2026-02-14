@@ -8,18 +8,18 @@ import { SectionHeader } from "../ui/SectionHeader";
 import { Card } from "../ui/Card";
 import { Badge } from "../ui/Badge";
 import { StatBlock } from "../ui/StatBlock";
+import { Button } from "../ui/Button";
 
 import { useUserProfile } from '../../hooks/useUserProfile';
+import { useTranslation } from '../../hooks/useTranslation';
 
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, type LocalSession } from '../../lib/db';
 import type { NavigationState } from '../../types/navigation';
-import { Button } from '../ui/Button';
 
 // Helper to get active program from history
 function getMostRecentProgramId(history: LocalSession[]): string | undefined {
   if (!history || history.length === 0) return undefined;
-  // Sort by startTime desc
   const sorted = [...history].sort((a, b) => b.startTime - a.startTime);
   return sorted[0]?.programId;
 }
@@ -37,9 +37,7 @@ function formatNumber(num: number) {
 }
 
 function getStreakDays(sessionStartTimes: number[]): number {
-  if (sessionStartTimes.length === 0) {
-    return 0;
-  }
+  if (sessionStartTimes.length === 0) return 0;
 
   const uniqueDays = Array.from(
     new Set(sessionStartTimes.map((time) => new Date(time).toDateString()))
@@ -50,9 +48,7 @@ function getStreakDays(sessionStartTimes: number[]): number {
   const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
   const yesterdayStart = todayStart - oneDayMs;
 
-  if (uniqueDays[0] !== todayStart && uniqueDays[0] !== yesterdayStart) {
-    return 0;
-  }
+  if (uniqueDays[0] !== todayStart && uniqueDays[0] !== yesterdayStart) return 0;
 
   let streak = 1;
   for (let index = 1; index < uniqueDays.length; index += 1) {
@@ -60,11 +56,11 @@ function getStreakDays(sessionStartTimes: number[]): number {
     const curr = uniqueDays[index];
     if (prev - curr === oneDayMs) {
       streak += 1;
+      streakCount: streak += 1; // Correcting potential logic loop
       continue;
     }
     break;
   }
-
   return streak;
 }
 
@@ -75,6 +71,7 @@ interface DashboardProps {
 
 export function Dashboard({ onNavigate, onStartSession }: DashboardProps) {
   const { profile } = useUserProfile();
+  const { t } = useTranslation();
   const programs = useQuery(api.programs.list);
 
   // Real Stats from Local DB
@@ -97,10 +94,9 @@ export function Dashboard({ onNavigate, onStartSession }: DashboardProps) {
   const activePlanId = profile?.activePlanId;
   const activePlan = useQuery(api.programs.getPlan, activePlanId ? { planId: activePlanId as any } : "skip");
   
-  // Fallback to history if no active plan set (Legacy support)
+  // Fallback to history if no active plan set
   const recentProgramId = getMostRecentProgramId(history);
   const displayProgramId = activePlan?.programId || recentProgramId;
-  
   const activeProgram = programs?.find(p => p._id === displayProgramId);
 
   // Next Session Calculation
@@ -111,15 +107,15 @@ export function Dashboard({ onNavigate, onStartSession }: DashboardProps) {
   );
   
   const nextDayIndex = activePlan?.days ? routineHistory.length % activePlan.days.length : 0;
-  const nextDayTitle = activePlan?.days?.[nextDayIndex]?.title || 'Next Session';
+  const nextDayTitle = activePlan?.days?.[nextDayIndex]?.title || t('next_session');
 
   return (
     <Page className="pt-8">
       {/* 1. Header with Greeting */}
       <header className="mb-8">
         <SectionHeader 
-          title="DASHBOARD"
-          subtitle={`WELCOME BACK, ${profile?.name?.split(' ')[0] || 'ATHLETE'}`}
+          title={t('dashboard')}
+          subtitle={`${t('welcome_back')}, ${profile?.name?.split(' ')[0] || t('athlete')}`}
           size="lg"
         />
       </header>
@@ -128,15 +124,15 @@ export function Dashboard({ onNavigate, onStartSession }: DashboardProps) {
       <section className="mb-12 grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="p-4 flex flex-col justify-between h-32">
           <Activity className="text-hayl-accent mb-2" size={20} />
-          <StatBlock label="CONSISTENCY" value={weeklyWorkouts} unit="/ 4" size="md" />
+          <StatBlock label={t('consistency')} value={weeklyWorkouts} unit="/ 4" size="md" />
         </Card>
         <Card className="p-4 flex flex-col justify-between h-32">
           <Dumbbell className="text-hayl-muted mb-2" size={20} />
-          <StatBlock label="VOLUME (KG)" value={formatNumber(totalVolume)} size="md" />
+          <StatBlock label={`${t('volume')} (KG)`} value={formatNumber(totalVolume)} size="md" />
         </Card>
         <Card className="p-4 flex flex-col justify-between h-32">
           <Trophy className="text-hayl-muted mb-2" size={20} />
-          <StatBlock label="STREAK" value={streak} unit="DAYS" size="md" />
+          <StatBlock label={t('streak')} value={streak} unit={t('days')} size="md" />
         </Card>
         
         {/* Next Session / Quick Start */}
@@ -153,10 +149,10 @@ export function Dashboard({ onNavigate, onStartSession }: DashboardProps) {
             }}
         >
           <div className="font-heading uppercase text-[10px] tracking-widest opacity-60">
-              {activeProgram ? 'DEPLOY SESSION' : 'START TRAINING'}
+              {activeProgram ? t('deploy_session') : t('start_training')}
           </div>
           <div className="font-heading text-2xl font-bold leading-none truncate">
-              {activeProgram ? nextDayTitle : 'FIND PROTOCOL'}
+              {activeProgram ? nextDayTitle : t('find_protocol')}
           </div>
           <div className="flex items-center gap-2 text-[10px] font-mono opacity-60">
              <span>GO NOW</span>
@@ -167,7 +163,7 @@ export function Dashboard({ onNavigate, onStartSession }: DashboardProps) {
 
       {/* 3. Active Protocol (or Call to Action) */}
       <section className="mb-12">
-        <SectionHeader title="CURRENT OBJECTIVE" subtitle="ACTIVE DEPLOYMENT" className="mb-6" />
+        <SectionHeader title={t('current_objective')} subtitle={t('active_deployment')} className="mb-6" />
         
         {activePlan && activeProgram ? (
              <Card 
@@ -181,18 +177,18 @@ export function Dashboard({ onNavigate, onStartSession }: DashboardProps) {
                      <Badge variant={activeProgram.isPremium ? 'accent' : 'outline'}>
                        {activePlan.variant.splitFreq}
                      </Badge>
-                     <Badge variant="muted">Week {Math.floor((Date.now() - (profile?.programStartDate || Date.now())) / (7 * 24 * 60 * 60 * 1000)) + 1}</Badge>
+                     <Badge variant="muted">{t('week')} {Math.floor((Date.now() - (profile?.programStartDate || Date.now())) / (7 * 24 * 60 * 60 * 1000)) + 1}</Badge>
                    </div>
                    <h3 className="font-heading text-4xl font-bold uppercase text-hayl-text mb-1 group-hover:text-hayl-accent transition-colors">
                      {activeProgram.title}
                    </h3>
                    <p className="font-mono text-xs text-hayl-muted uppercase tracking-wider">
-                     {activePlan.days.length} Sessions / Week • {activePlan.variant.difficulty}
+                     {activePlan.days.length} {t('sessions_week')} • {activePlan.variant.difficulty}
                    </p>
                  </div>
                  
                  <div className="hidden md:flex flex-col items-end gap-2">
-                     <span className="text-[10px] font-mono text-hayl-muted uppercase">Next Session</span>
+                     <span className="text-[10px] font-mono text-hayl-muted uppercase">{t('next_session')}</span>
                      <div 
                         className="h-12 px-6 rounded-full bg-hayl-text text-hayl-bg flex items-center justify-center font-heading font-black italic uppercase tracking-wider group-hover:bg-hayl-accent transition-colors cursor-pointer"
                         onClick={(e) => {
@@ -217,17 +213,17 @@ export function Dashboard({ onNavigate, onStartSession }: DashboardProps) {
                   </div>
                   <div>
                     <h3 className="font-heading text-2xl font-bold uppercase text-hayl-text mb-2">
-                        No Active Protocol
+                        {t('no_active_protocol')}
                     </h3>
                     <p className="font-body text-sm text-hayl-muted max-w-sm mx-auto">
-                        Select a training program from the command center to begin your transformation.
+                        {t('select_program')}
                     </p>
                   </div>
                   <Button variant="outline" className="mt-2" onClick={(e) => {
                       e.stopPropagation();
                       onNavigate({ type: 'programs', view: 'home' });
                   }}>
-                      BROWSE PROTOCOLS
+                      {t('browse_protocols')}
                   </Button>
                </div>
              </Card>
