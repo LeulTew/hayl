@@ -42,6 +42,10 @@ export interface UserProfile {
   unitPreference: 'metric' | 'imperial';
   completedOnboarding: boolean;
   tdeeResult?: TDEEResult; // cached TDEE calculation
+  
+  // Phase 6: Routine Management
+  activePlanId?: string; // The specific derivedPlan ID (e.g. "casual-1-4day")
+  programStartDate?: number; // Timestamp when they started this block
 }
 
 export class HaylDatabase extends Dexie {
@@ -60,6 +64,11 @@ export class HaylDatabase extends Dexie {
     this.version(2).stores({
       sessions: '++id, &sessionId, state, lastModifiedTs',
       userProfile: '++id' // easy single record access
+    });
+
+    // Version 3: Routine Management
+    this.version(3).stores({
+      userProfile: '++id' // Implicit upgrade to add fields (activePlanId, programStartDate)
     });
   }
 }

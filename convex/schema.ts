@@ -133,7 +133,13 @@ export default defineSchema({
     tokenIdentifier: v.string(),
     name: v.string(),
     isPremium: v.boolean(),
+    // Legacy (Deprecated in favor of specific plan)
     currentProgramId: v.optional(v.id("programs")),
+    
+    // Phase 6: Precise Tracking
+    currentPlanId: v.optional(v.id("derivedPlans")),
+    programStartDate: v.optional(v.number()),
+    
     createdAt: v.number(),
   }).index("by_token", ["tokenIdentifier"]),
 
