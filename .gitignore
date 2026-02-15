@@ -19,3 +19,5 @@ assets/reference-docs/*
 
 
 .env.local
+.vercel
+.env*.local
