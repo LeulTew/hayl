@@ -28,10 +28,18 @@ export function ProfileView({ onNavigate }: ProfileViewProps) {
   
   // Edit State
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editForm, setEditForm] = useState({
+  const [editForm, setEditForm] = useState<{
+    name: string;
+    weight: string;
+    height: string;
+    experience: 'beginner' | 'intermediate' | 'elite';
+    goal: 'cut' | 'maintain' | 'bulk';
+  }>({
     name: '',
     weight: '',
-    height: ''
+    height: '',
+    experience: 'beginner',
+    goal: 'maintain'
   });
 
   const tdee = profile?.tdeeResult?.tdee || 2500;
@@ -45,7 +53,9 @@ export function ProfileView({ onNavigate }: ProfileViewProps) {
     setEditForm({
       name: profile?.name || '',
       weight: isImperial ? Math.round((profile?.weight || 0) * 2.20462).toString() : (profile?.weight?.toString() || ''),
-      height: isImperial ? Math.round((profile?.height || 0) / 2.54).toString() : (profile?.height?.toString() || '')
+      height: isImperial ? Math.round((profile?.height || 0) / 2.54).toString() : (profile?.height?.toString() || ''),
+      experience: profile?.experience || 'beginner',
+      goal: profile?.goal || 'maintain'
     });
     setIsEditModalOpen(true);
   };
@@ -57,7 +67,9 @@ export function ProfileView({ onNavigate }: ProfileViewProps) {
     await updateProfile({
       name: editForm.name,
       weight: isImperial ? weightVal / 2.20462 : weightVal,
-      height: isImperial ? heightVal * 2.54 : heightVal
+      height: isImperial ? heightVal * 2.54 : heightVal,
+      experience: editForm.experience,
+      goal: editForm.goal
     });
     setIsEditModalOpen(false);
   };
@@ -231,6 +243,46 @@ export function ProfileView({ onNavigate }: ProfileViewProps) {
                 value={editForm.height} 
                 onChange={(e) => setEditForm(prev => ({ ...prev, height: e.target.value }))}
               />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-xs font-heading text-hayl-muted uppercase">Experience Level</label>
+            <div className="flex gap-2">
+                {(['beginner', 'intermediate', 'elite'] as const).map((level) => (
+                    <button
+                        key={level}
+                        onClick={() => setEditForm(prev => ({ ...prev, experience: level }))}
+                        className={`flex-1 py-3 rounded-xl border text-xs font-bold uppercase transition-all
+                            ${editForm.experience === level 
+                                ? 'bg-hayl-text text-hayl-bg border-hayl-text' 
+                                : 'bg-hayl-surface text-hayl-muted border-hayl-border hover:border-hayl-text/50'
+                            }
+                        `}
+                    >
+                        {level}
+                    </button>
+                ))}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-xs font-heading text-hayl-muted uppercase">Primary Goal</label>
+            <div className="grid grid-cols-3 gap-2">
+                {(['cut', 'maintain', 'bulk'] as const).map((goal) => (
+                    <button
+                        key={goal}
+                        onClick={() => setEditForm(prev => ({ ...prev, goal: goal }))}
+                        className={`py-3 rounded-xl border text-xs font-bold uppercase transition-all
+                            ${editForm.goal === goal 
+                                ? 'bg-hayl-text text-hayl-bg border-hayl-text' 
+                                : 'bg-hayl-surface text-hayl-muted border-hayl-border hover:border-hayl-text/50'
+                            }
+                        `}
+                    >
+                        {goal}
+                    </button>
+                ))}
             </div>
           </div>
 
