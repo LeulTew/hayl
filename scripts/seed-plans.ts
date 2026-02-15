@@ -25,33 +25,12 @@ if (!convexUrl) {
 const client = new ConvexHttpClient(convexUrl);
 
 /**
+/**
  * Programs to seed.
  */
-const PROGRAMS = [
-  /*
-   * Note: "Hayl Foundations" is seeded via `scripts/seed-foundations.ts`
-   * to allow for richer content and separation of concerns.
-   */
-
-  {
-    slug: "hayl-intermediate",
-    title: "Hayl Intermediate",
-    canonicalVersion: "v1.0.0",
-    difficulty: "intermediate" as const,
-    splitType: "4-day" as const,
-    isPremium: false,
-    published: true,
-  },
-  {
-    slug: "greg-derived-hard",
-    title: "The Greg Protocol (Hard)",
-    canonicalVersion: "v1.0.0",
-
-    difficulty: "elite" as const,
-    splitType: "ppl" as const,
-    isPremium: true,
-    published: false, // Requires human review
-  },
+const PROGRAMS: any[] = [
+  // Programs are now seeded by their respective content scripts (e.g. seed-foundations.ts, seed-hardcore.ts)
+  // This file is kept as a utility if we need to seed metadata-only programs in the future.
 ];
 
 async function main() {

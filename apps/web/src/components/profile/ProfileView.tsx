@@ -12,7 +12,8 @@ import { Button } from '../ui/Button';
 import { ThemeToggle } from '../ui/ThemeToggle';
 import { StatBlock } from '../ui/StatBlock';
 import { BottomSheet } from '../ui/BottomSheet';
-import { Settings, LogOut, History, Loader2, AlertTriangle } from 'lucide-react';
+import { Input } from '../ui/Input';
+import { Settings, LogOut, History, Loader2, AlertTriangle, Pencil } from 'lucide-react';
 
 interface ProfileViewProps {
    onNavigate?: (view: NavigationState) => void;
@@ -24,6 +25,14 @@ export function ProfileView({ onNavigate }: ProfileViewProps) {
   const { t } = useTranslation();
   const [isResetting, setIsResetting] = useState(false);
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
+  
+  // Edit State
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editForm, setEditForm] = useState({
+    name: '',
+    weight: '',
+    height: ''
+  });
 
   const tdee = profile?.tdeeResult?.tdee || 2500;
   const isImperial = profile?.unitPreference === 'imperial';
@@ -31,6 +40,27 @@ export function ProfileView({ onNavigate }: ProfileViewProps) {
   const displayHeight = profile?.height === undefined ? '--' : Math.round(isImperial ? profile.height / 2.54 : profile.height);
   const genderCode = profile?.gender === 'male' ? 'M' : profile?.gender === 'female' ? 'F' : '--';
   const ageLabel = profile?.age ?? '--';
+
+  const openEditModal = () => {
+    setEditForm({
+      name: profile?.name || '',
+      weight: isImperial ? Math.round((profile?.weight || 0) * 2.20462).toString() : (profile?.weight?.toString() || ''),
+      height: isImperial ? Math.round((profile?.height || 0) / 2.54).toString() : (profile?.height?.toString() || '')
+    });
+    setIsEditModalOpen(true);
+  };
+
+  const saveProfile = async () => {
+    const weightVal = parseFloat(editForm.weight);
+    const heightVal = parseFloat(editForm.height);
+    
+    await updateProfile({
+      name: editForm.name,
+      weight: isImperial ? weightVal / 2.20462 : weightVal,
+      height: isImperial ? heightVal * 2.54 : heightVal
+    });
+    setIsEditModalOpen(false);
+  };
 
   const handleFactoryReset = async () => {
     if (!isResetModalOpen) return; // Prevent accidental execution without modal
@@ -50,8 +80,8 @@ export function ProfileView({ onNavigate }: ProfileViewProps) {
     <Page>
       <header className="mb-10 flex justify-between items-end">
         <SectionHeader title={t('profile')} subtitle={t('operator_card')} size="lg" />
-        <Button variant="outline" size="icon" disabled aria-label="Settings unavailable">
-          <Settings size={20} />
+        <Button variant="outline" size="icon" onClick={openEditModal} aria-label="Edit Profile">
+          <Pencil size={20} />
         </Button>
       </header>
 
@@ -168,6 +198,48 @@ export function ProfileView({ onNavigate }: ProfileViewProps) {
            )}
         </Button>
       </section>
+
+      {/* Edit Profile Modal */}
+      <BottomSheet
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        title="Edit Profile"
+      >
+        <div className="space-y-6 pt-4">
+          <div className="space-y-2">
+            <label className="text-xs font-heading text-hayl-muted uppercase">Name</label>
+            <Input 
+              value={editForm.name} 
+              onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
+              placeholder="YOUR NAME"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-xs font-heading text-hayl-muted uppercase">Weight ({isImperial ? 'LBS' : 'KG'})</label>
+              <Input 
+                type="number"
+                value={editForm.weight} 
+                onChange={(e) => setEditForm(prev => ({ ...prev, weight: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs font-heading text-hayl-muted uppercase">Height ({isImperial ? 'IN' : 'CM'})</label>
+              <Input 
+                type="number"
+                value={editForm.height} 
+                onChange={(e) => setEditForm(prev => ({ ...prev, height: e.target.value }))}
+              />
+            </div>
+          </div>
+
+          <Button fullWidth onClick={saveProfile}>
+            SAVE CHANGES
+          </Button>
+          <div className="h-4" /> 
+        </div>
+      </BottomSheet>
 
       {/* Custom Reset Confirmation */}
       <BottomSheet 

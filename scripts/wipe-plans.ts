@@ -19,7 +19,11 @@ async function main() {
   console.log("🧹 Wiping all Derived Plans...");
   try {
     const count = await client.mutation(api.programs.wipeDerivedPlans, { adminSecret: adminSecret });
-    console.log(`✅ Deleted ${count} plans.`);
+    console.log(`✅ Deleted ${count} derived plans.`);
+
+    console.log("🧹 Wiping all Programs...");
+    const progCount = await client.mutation(api.programs.wipePrograms, { adminSecret: adminSecret });
+    console.log(`✅ Deleted ${progCount} programs.`);
   } catch (err) {
     console.error("❌ Failed to wipe plans:", err);
   }

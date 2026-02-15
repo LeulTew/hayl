@@ -293,3 +293,22 @@ export const wipeDerivedPlans = mutation({
     return plans.length;
   },
 });
+
+/**
+ * Wipes all programs. (Admin use only)
+ */
+export const wipePrograms = mutation({
+  args: { adminSecret: v.string() },
+  handler: async (ctx: MutationCtx, args) => {
+    if (args.adminSecret !== process.env.ADMIN_SECRET) {
+      throw new Error("❌ Unauthorized: Invalid Admin Secret");
+    }
+
+    const programs = await ctx.db.query("programs").collect();
+    for (const program of programs) {
+      await ctx.db.delete(program._id);
+    }
+    console.log(`[WIPE] Deleted ${programs.length} programs.`);
+    return programs.length;
+  },
+});
