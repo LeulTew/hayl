@@ -79,9 +79,12 @@ export function NavBar({ items, activeId, onChange, className }: NavBarProps) {
         className
       )}>
         {/* Logo Area */}
-        <div className="mb-12">
-            <h1 className="font-display text-5xl text-hayl-text leading-none tracking-tight">HAYL</h1>
-            <p className="font-heading text-xs text-hayl-accent tracking-[0.2em] font-bold mt-1">PERFORMANCE ENGINE</p>
+        <div className="mb-12 flex items-center gap-4">
+            <img src="/logo.png" alt="HAYL Logo" className="w-12 h-12 rounded-xl object-contain" />
+            <div>
+              <h1 className="font-display text-5xl text-hayl-text leading-none tracking-tight">HAYL</h1>
+              <p className="font-heading text-xs text-hayl-accent tracking-[0.2em] font-bold mt-1">PERFORMANCE ENGINE</p>
+            </div>
         </div>
 
         {/* Navigation Items */}
