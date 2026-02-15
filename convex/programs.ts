@@ -34,6 +34,25 @@ export const listAll = query({
   },
 });
 
+export const listWithMetadata = query({
+  args: {},
+  handler: async (ctx: QueryCtx) => {
+    const programs = await ctx.db.query("programs").collect();
+    // Optimization: In a real large app, we'd index this or denormalize. 
+    // For <100 plans, fetching all derived plans is fine (likely <1MB data).
+    const plans = await ctx.db.query("derivedPlans").collect();
+    
+    return programs.map(p => {
+        const programPlans = plans.filter(plan => plan.programId === p._id);
+        const durations = [...new Set(programPlans.map(pp => pp.variant.durationMinutes))];
+        return {
+            ...p,
+            durations
+        };
+    });
+  },
+});
+
 /**
  * Gets derived plans for a specific program.
  * 
