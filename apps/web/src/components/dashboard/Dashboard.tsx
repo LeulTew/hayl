@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
+import type { Id } from "../../../../../convex/_generated/dataModel";
 import { ArrowRight, Trophy, Activity, Dumbbell, Zap } from 'lucide-react';
 
 import { Page } from "../ui/Page";
@@ -56,7 +57,6 @@ function getStreakDays(sessionStartTimes: number[]): number {
     const curr = uniqueDays[index];
     if (prev - curr === oneDayMs) {
       streak += 1;
-      streakCount: streak += 1; // Correcting potential logic loop
       continue;
     }
     break;
@@ -75,24 +75,30 @@ export function Dashboard({ onNavigate, onStartSession }: DashboardProps) {
   const programs = useQuery(api.programs.list);
 
   // Real Stats from Local DB
-  const history = useLiveQuery(() => db.sessions.where('state').equals('completed').toArray()) || [];
+  const rawHistory = useLiveQuery(() => db.sessions.where('state').equals('completed').toArray());
+  const history = useMemo(() => rawHistory || [], [rawHistory]);
   
-  const [now] = useState(() => Date.now());
-  const weeklyWorkouts = history.filter(s => {
-    const diff = now - s.startTime;
-    return diff < 7 * 24 * 60 * 60 * 1000;
-  }).length;
+  const [stableNow] = useState(() => Date.now());
 
-  const totalVolume = history.reduce((acc, s) => {
-    const sessionVol = s.logs.reduce((vol, log) => vol + (log.weight || 0) * log.reps, 0);
-    return acc + sessionVol;
-  }, 0);
+  const weeklyWorkouts = useMemo(() => {
+    return history.filter(s => {
+      const diff = stableNow - s.startTime;
+      return diff < 7 * 24 * 60 * 60 * 1000;
+    }).length;
+  }, [history, stableNow]);
 
-  const streak = getStreakDays(history.map((session) => session.startTime));
+  const totalVolume = useMemo(() => {
+    return history.reduce((acc, s) => {
+      const sessionVol = s.logs.reduce((vol, log) => vol + (log.weight || 0) * log.reps, 0);
+      return acc + sessionVol;
+    }, 0);
+  }, [history]);
+
+  const streak = useMemo(() => getStreakDays(history.map((session) => session.startTime)), [history]);
   
   // Phase 6: Active Routine Logic
   const activePlanId = profile?.activePlanId;
-  const activePlan = useQuery(api.programs.getPlan, activePlanId ? { planId: activePlanId as any } : "skip");
+  const activePlan = useQuery(api.programs.getPlan, activePlanId ? { planId: activePlanId as Id<"derivedPlans"> } : "skip");
   
   // Fallback to history if no active plan set
   const recentProgramId = getMostRecentProgramId(history);
@@ -177,7 +183,7 @@ export function Dashboard({ onNavigate, onStartSession }: DashboardProps) {
                      <Badge variant={activeProgram.isPremium ? 'accent' : 'outline'}>
                        {activePlan.variant.splitFreq}
                      </Badge>
-                     <Badge variant="muted">{t('week')} {Math.floor((Date.now() - (profile?.programStartDate || Date.now())) / (7 * 24 * 60 * 60 * 1000)) + 1}</Badge>
+                      <Badge variant="muted">{t('week')} {Math.floor((stableNow - (profile?.programStartDate || stableNow)) / (7 * 24 * 60 * 60 * 1000)) + 1}</Badge>
                    </div>
                    <h3 className="font-heading text-4xl font-bold uppercase text-hayl-text mb-1 group-hover:text-hayl-accent transition-colors">
                      {activeProgram.title}
