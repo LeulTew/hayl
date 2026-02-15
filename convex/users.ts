@@ -26,6 +26,9 @@ export const syncUserProfile = mutation({
     name: v.string(),
     currentPlanId: v.optional(v.id("derivedPlans")),
     programStartDate: v.optional(v.number()),
+    // Phase 7: Profile Expansion
+    experience: v.optional(v.union(v.literal("beginner"), v.literal("intermediate"), v.literal("elite"))),
+    goal: v.optional(v.string())
   },
   handler: async (ctx, args) => {
     const existing = await ctx.db
@@ -38,6 +41,8 @@ export const syncUserProfile = mutation({
         name: args.name,
         currentPlanId: args.currentPlanId,
         programStartDate: args.programStartDate,
+        experienceLevel: args.experience,
+        primaryGoal: args.goal
       });
       return existing._id;
     } else {
@@ -47,6 +52,8 @@ export const syncUserProfile = mutation({
         isPremium: false,
         currentPlanId: args.currentPlanId,
         programStartDate: args.programStartDate,
+        experienceLevel: args.experience,
+        primaryGoal: args.goal,
         createdAt: Date.now(),
       });
       return id;

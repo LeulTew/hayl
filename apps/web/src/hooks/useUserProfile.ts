@@ -3,6 +3,7 @@ import { api } from "../../../../convex/_generated/api";
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, type UserProfile } from '../lib/db';
 import { useCallback } from 'react';
+import type { Id } from "../../../../convex/_generated/dataModel";
 
 export function useUserProfile() {
   const syncMutation = useMutation(api.users.syncUserProfile);
@@ -47,8 +48,10 @@ export function useUserProfile() {
         await syncMutation({
             tokenIdentifier: token,
             name: finalProfile.name || "Athlete",
-            currentPlanId: finalProfile.activePlanId as any,
+            currentPlanId: finalProfile.activePlanId as Id<"derivedPlans"> | undefined,
             programStartDate: finalProfile.programStartDate,
+            experience: finalProfile.experience,
+            goal: finalProfile.goal
         });
     } catch (e) {
         console.warn("Sync failed (offline?)", e);

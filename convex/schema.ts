@@ -139,6 +139,11 @@ export default defineSchema({
     // Phase 6: Precise Tracking
     currentPlanId: v.optional(v.id("derivedPlans")),
     programStartDate: v.optional(v.number()),
+
+    // Phase 7: Smart Recommendations
+    experienceLevel: v.optional(v.union(v.literal("beginner"), v.literal("intermediate"), v.literal("elite"))),
+    primaryGoal: v.optional(v.string()), // e.g., "hypertrophy", "strength", "endurance"
+    
     
     createdAt: v.number(),
   }).index("by_token", ["tokenIdentifier"]),
