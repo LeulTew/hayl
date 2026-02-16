@@ -118,7 +118,7 @@ export function MacroCalculator() {
         <div className="animate-in fade-in slide-in-from-bottom-8 duration-700">
             <div className="flex justify-between items-baseline mb-8 border-b border-hayl-border pb-6">
                 <span className="text-hayl-muted font-heading font-bold uppercase text-[10px] tracking-[0.3em]">Maintenance Load</span>
-                <span className="text-6xl font-heading font-black italic">{result.tdee} <span className="text-sm font-heading not-italic opacity-40">KCAL</span></span>
+                <span className="text-6xl font-heading font-black italic">{result.tdee} <span className="text-sm font-heading not-italic opacity-40 uppercase">kcal</span></span>
             </div>
             
             <p className="text-[9px] text-hayl-muted/50 mb-10 font-bold uppercase tracking-[0.4em] text-center">
@@ -141,7 +141,7 @@ function MacroCard({ title, data }: { title: string, data: TDEEResult['macros'][
         <div className="bg-hayl-bg p-8 rounded-[2rem] border border-hayl-border hover:border-hayl-text transition-all group">
             <div className="flex justify-between items-center mb-6">
                 <h4 className="font-heading font-bold uppercase italic text-xl">{title}</h4>
-                <div className="font-heading font-black text-3xl italic">{data.calories} <span className="text-xs font-bold not-italic opacity-40">KCAL</span></div>
+                <div className="font-heading font-black text-3xl italic">{data.calories} <span className="text-xs font-bold not-italic opacity-40 uppercase">kcal</span></div>
             </div>
             <div className="grid grid-cols-3 gap-6">
                 <div className="p-4 bg-hayl-surface rounded-2xl border border-transparent group-hover:border-hayl-border transition-all">
