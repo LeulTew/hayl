@@ -21,7 +21,7 @@ export function ThemeToggle({ value, onChange, className }: ThemeToggleProps) {
         type="button"
         onClick={() => onChange('light')}
         className={cn(
-          "p-2 rounded-full transition-all text-hayl-muted hover:text-hayl-text",
+          "p-2 rounded-full transition-all text-hayl-muted hover:text-hayl-accent hover:bg-hayl-bg/60",
           value === 'light' && "bg-hayl-text text-hayl-bg shadow-sm"
         )}
         aria-label="Light Mode"
@@ -32,7 +32,7 @@ export function ThemeToggle({ value, onChange, className }: ThemeToggleProps) {
         type="button"
         onClick={() => onChange('system')}
         className={cn(
-          "p-2 rounded-full transition-all text-hayl-muted hover:text-hayl-text",
+          "p-2 rounded-full transition-all text-hayl-muted hover:text-hayl-accent hover:bg-hayl-bg/60",
           value === 'system' && "bg-hayl-text text-hayl-bg shadow-sm"
         )}
         aria-label="System Theme"
@@ -43,7 +43,7 @@ export function ThemeToggle({ value, onChange, className }: ThemeToggleProps) {
         type="button"
         onClick={() => onChange('dark')}
         className={cn(
-          "p-2 rounded-full transition-all text-hayl-muted hover:text-hayl-text",
+          "p-2 rounded-full transition-all text-hayl-muted hover:text-hayl-accent hover:bg-hayl-bg/60",
           value === 'dark' && "bg-hayl-text text-hayl-bg shadow-sm"
         )}
         aria-label="Dark Mode"

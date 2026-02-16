@@ -1,5 +1,6 @@
 import Dexie, { type Table } from 'dexie';
 import type { TDEEResult } from '@hayl/shared';
+import type { SessionKpis } from './sessionMetrics';
 
 // Define strict types for our Local DB
 export interface LocalSession {
@@ -17,6 +18,7 @@ export interface LocalSession {
   currentSetIndex: number;
 
   logs: LogEntry[]; 
+  kpis?: SessionKpis;
   lastModifiedTs: number;
 }
 

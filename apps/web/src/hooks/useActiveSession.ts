@@ -1,5 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, type LocalSession, type LogEntry } from '../lib/db';
+import { computeSessionKpis } from '../lib/sessionMetrics';
 import { useCallback } from 'react';
 
 /**
@@ -188,9 +189,15 @@ export function useActiveSession() {
   const finishSession = useCallback(async () => {
     if (!activeSession?.id) return;
 
+    const endTime = Date.now();
+    const logs = activeSession.logs ?? [];
+    const hasRealWork = logs.length > 0;
+    const kpis = computeSessionKpis(logs, activeSession.startTime ?? endTime, endTime);
+
     await db.sessions.update(activeSession.id, {
-      state: 'completed',
-      endTime: Date.now(),
+      state: hasRealWork ? 'completed' : 'discarded',
+      endTime,
+      kpis: hasRealWork ? kpis : undefined,
       lastModifiedTs: Date.now(),
     });
   }, [activeSession]);

@@ -7,7 +7,9 @@ import { Page } from '../ui/Page';
 import { SectionHeader } from '../ui/SectionHeader';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
-import { ArrowLeft, Clock, Calendar } from 'lucide-react';
+import { StatBlock } from '../ui/StatBlock';
+import { computeSessionKpis } from '../../lib/sessionMetrics';
+import { ArrowLeft, Clock, Calendar, ChevronDown } from 'lucide-react';
 
 interface SessionDetailProps {
   sessionId: string;
@@ -27,6 +29,8 @@ export function SessionDetail({ sessionId, onBack }: SessionDetailProps) {
   
   if (!session) return <Page><div className="animate-pulse">Loading Record...</div></Page>;
 
+  const kpis = session.kpis ?? computeSessionKpis(session.logs, session.startTime, session.endTime);
+
   const formatDate = (ts: number) => new Intl.DateTimeFormat('en-US', { 
     dateStyle: 'full', timeStyle: 'short' 
   }).format(new Date(ts));
@@ -37,14 +41,18 @@ export function SessionDetail({ sessionId, onBack }: SessionDetailProps) {
     return `${minutes} min`;
   };
 
-  // Group logs by exercise for display
+    // Group logs by exercise for display
   const exerciseLogs = exerciseIds.map(id => {
       const exercise = relevantExercises?.[id as string];
       const logs = session.logs.filter(l => l.exerciseId === id).sort((a,b) => a.setIndex - b.setIndex);
+      const averageReps = logs.length > 0 ? logs.reduce((acc, log) => acc + log.reps, 0) / logs.length : 0;
+      const averageWeight = logs.length > 0 ? logs.reduce((acc, log) => acc + (log.weight || 0), 0) / logs.length : 0;
       return {
           id,
           name: exercise?.name || 'Unknown Exercise',
-          logs
+        logs,
+        averageReps,
+        averageWeight,
       };
   });
 
@@ -59,7 +67,7 @@ export function SessionDetail({ sessionId, onBack }: SessionDetailProps) {
                 SESSION RECORD ID: {sessionId.slice(0,8)}
             </p>
             <h1 className="font-heading text-3xl font-bold uppercase leading-none">
-                {session.programId.replace(/-/g, ' ')}
+            WORKOUT SESSION · DAY {session.currentDayIndex + 1}
             </h1>
         </div>
       </header>
@@ -81,25 +89,54 @@ export function SessionDetail({ sessionId, onBack }: SessionDetailProps) {
          </Card>
       </div>
 
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <Card className="p-4">
+          <StatBlock label="Sets" value={kpis.totalSets} size="sm" />
+        </Card>
+        <Card className="p-4">
+          <StatBlock label="Volume" value={Math.round(kpis.totalVolumeKg)} unit="kg" size="sm" />
+        </Card>
+        <Card className="p-4">
+          <StatBlock label="Avg Reps" value={kpis.avgRepsPerSet.toFixed(1)} unit="/set" size="sm" />
+        </Card>
+        <Card className="p-4">
+          <StatBlock label="Avg Weight" value={kpis.avgWeightKg.toFixed(1)} unit="kg" size="sm" />
+        </Card>
+      </div>
+
       <div className="space-y-6">
         <SectionHeader title="PERFORMANCE LOG" subtitle="EXERCISE BREAKDOWN" size="sm" />
         
         {exerciseLogs.map((ex) => (
-            <Card key={ex.id} className="p-5">
-                <h3 className="font-heading text-xl font-bold uppercase mb-4 text-hayl-text border-b border-hayl-border pb-2">
-                    {ex.name}
-                </h3>
-                <div className="space-y-2">
-                    {ex.logs.map((log, i) => (
-                        <div key={i} className="flex justify-between items-center text-sm font-mono p-2 bg-hayl-bg/50 rounded-lg">
-                            <span className="text-hayl-muted font-bold">SET {log.setIndex + 1}</span>
-                            <div className="flex gap-4">
-                                <span className="font-bold">{log.weight || '--'} <span className="text-[10px] text-hayl-muted font-heading">KG</span></span>
-                                <span className="font-bold">{log.reps} <span className="text-[10px] text-hayl-muted font-heading">REPS</span></span>
-                            </div>
-                        </div>
-                    ))}
+            <Card key={ex.id} className="p-0 overflow-hidden">
+              <details className="group">
+                <summary className="list-none cursor-pointer px-5 py-4 flex items-center justify-between border-b border-hayl-border">
+                  <div>
+                    <h3 className="font-heading text-xl font-bold uppercase text-hayl-text">
+                      {ex.name}
+                    </h3>
+                    <p className="text-[10px] font-mono text-hayl-muted uppercase">
+                      {ex.logs.length} sets · {ex.averageReps.toFixed(1)} avg reps · {ex.averageWeight.toFixed(1)} avg kg
+                    </p>
+                  </div>
+                  <ChevronDown size={18} className="text-hayl-muted group-open:rotate-180 transition-transform" />
+                </summary>
+
+                <div className="p-4 space-y-2">
+                  {ex.logs.map((log) => (
+                    <div key={log.setId} className="flex justify-between items-center text-sm font-mono p-2 bg-hayl-bg/50 rounded-lg">
+                      <span className="text-hayl-muted font-bold">SET {log.setIndex + 1}</span>
+                      <div className="flex gap-4">
+                        <span className="font-bold">{log.weight ?? '--'} <span className="text-[10px] text-hayl-muted font-heading">kg</span></span>
+                        <span className="font-bold">{log.reps} <span className="text-[10px] text-hayl-muted font-heading">reps</span></span>
+                        {typeof log.rpe === 'number' && (
+                          <span className="font-bold">RPE {log.rpe}</span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
+              </details>
             </Card>
         ))}
       </div>

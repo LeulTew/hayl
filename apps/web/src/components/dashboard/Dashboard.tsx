@@ -38,6 +38,11 @@ function formatNumber(num: number) {
   return numberFormatter.format(num);
 }
 
+function getDayStartTimestamp(ts: number): number {
+  const date = new Date(ts);
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+}
+
 function getStreakDays(sessionStartTimes: number[]): number {
   if (sessionStartTimes.length === 0) return 0;
 
@@ -79,22 +84,30 @@ export function Dashboard({ onNavigate, onStartSession }: DashboardProps) {
 
   // Real Stats from Local DB
   const rawHistory = useLiveQuery(() => db.sessions.where('state').equals('completed').toArray());
-  const history = useMemo(() => rawHistory || [], [rawHistory]);
+  const history = useMemo(
+    () => (rawHistory || []).filter((session) => (session.logs?.length ?? 0) > 0),
+    [rawHistory],
+  );
   
   const [stableNow] = useState(() => Date.now());
 
   const weeklyWorkouts = useMemo(() => {
-    return history.filter(s => {
-      const diff = stableNow - s.startTime;
-      return diff < 7 * 24 * 60 * 60 * 1000;
-    }).length;
+    const sevenDaysAgo = stableNow - 7 * 24 * 60 * 60 * 1000;
+    const workoutDays = new Set(
+      history
+        .filter((session) => session.startTime >= sevenDaysAgo)
+        .map((session) => getDayStartTimestamp(session.startTime)),
+    );
+    return workoutDays.size;
   }, [history, stableNow]);
 
-  const totalVolume = useMemo(() => {
-    return history.reduce((acc, s) => {
+  const averageVolume = useMemo(() => {
+    if (history.length === 0) return 0;
+    const totalVolume = history.reduce((acc, s) => {
       const sessionVol = s.logs.reduce((vol, log) => vol + (log.weight || 0) * log.reps, 0);
       return acc + sessionVol;
     }, 0);
+    return totalVolume / history.length;
   }, [history]);
 
   const streak = useMemo(() => getStreakDays(history.map((session) => session.startTime)), [history]);
@@ -102,6 +115,7 @@ export function Dashboard({ onNavigate, onStartSession }: DashboardProps) {
   // Phase 6: Active Routine Logic
   const activePlanId = profile?.activePlanId || activeRoutine?.planId;
   const activePlan = useQuery(api.programs.getPlan, activePlanId ? { planId: activePlanId as Id<"derivedPlans"> } : "skip");
+  const consistencyTarget = activePlan?.days?.length ?? 4;
   
   // Fallback to history if no active plan set
   const recentProgramId = getMostRecentProgramId(history);
@@ -135,11 +149,11 @@ export function Dashboard({ onNavigate, onStartSession }: DashboardProps) {
       <section className="mb-12 grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="p-4 flex flex-col justify-between h-32">
           <Activity className="text-hayl-accent mb-2" size={20} />
-          <StatBlock label={t('consistency')} value={weeklyWorkouts} unit="/ 4" size="md" />
+          <StatBlock label={t('consistency')} value={weeklyWorkouts} unit={`/ ${consistencyTarget}`} size="md" />
         </Card>
         <Card className="p-4 flex flex-col justify-between h-32">
           <Dumbbell className="text-hayl-muted mb-2" size={20} />
-          <StatBlock label={`${t('volume')} (KG)`} value={formatNumber(totalVolume)} size="md" />
+          <StatBlock label={`AVG ${t('volume')} (KG)`} value={formatNumber(averageVolume)} size="md" />
         </Card>
         <Card className="p-4 flex flex-col justify-between h-32">
           <Trophy className="text-hayl-muted mb-2" size={20} />

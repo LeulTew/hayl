@@ -121,7 +121,7 @@ export function ProfileView({ onNavigate }: ProfileViewProps) {
            <StatBlock label={t('height')} value={displayHeight} unit={isImperial ? 'IN' : 'CM'} />
         </Card>
         <Card className="p-4 col-span-2 flex justify-between items-center">
-           <StatBlock label={t('daily_target')} value={Math.round(tdee)} unit="KCAL" size="lg" />
+            <StatBlock label={t('daily_target')} value={Math.round(tdee)} unit="kcal" size="lg" />
            <div className="text-right">
               <p className="font-heading text-xs text-hayl-muted uppercase">{t('maintenance')}</p>
               <p className="font-mono text-sm text-hayl-text">{(profile?.tdeeResult?.bmr || 0)} BMR</p>

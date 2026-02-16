@@ -105,8 +105,13 @@ describe('useActiveSession', () => {
     }));
   });
 
-  it('should finish a session', async () => {
-    mockActiveSession = { id: 1, state: 'active' };
+  it('should finish a session with logs as completed', async () => {
+    mockActiveSession = {
+      id: 1,
+      state: 'active',
+      startTime: Date.now() - 60_000,
+      logs: [{ exerciseId: 'ex_1', reps: 10, weight: 40 }],
+    };
 
     const { result } = renderHook(() => useActiveSession());
 
@@ -116,6 +121,25 @@ describe('useActiveSession', () => {
 
     expect(db.sessions.update).toHaveBeenCalledWith(1, expect.objectContaining({
       state: 'completed',
+    }));
+  });
+
+  it('should discard a session when no sets were logged', async () => {
+    mockActiveSession = {
+      id: 1,
+      state: 'active',
+      startTime: Date.now() - 60_000,
+      logs: [],
+    };
+
+    const { result } = renderHook(() => useActiveSession());
+
+    await act(async () => {
+      await result.current.finishSession();
+    });
+
+    expect(db.sessions.update).toHaveBeenCalledWith(1, expect.objectContaining({
+      state: 'discarded',
     }));
   });
 
