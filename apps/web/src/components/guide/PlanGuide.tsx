@@ -120,26 +120,12 @@ export function PlanGuide({ planId, onStartSession, onBack }: PlanGuideProps) {
             ← Return to Command
             </button>
 
-            {isActive ? (
-                <div className="flex items-center gap-2">
-                    {!isReordering && (
-                       <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="gap-2 text-[10px] uppercase tracking-widest"
-                          disabled={isRoutineApiUnavailable}
-                          onClick={() => setIsReordering(true)}
-                       >
-                          <Edit3 size={14} />
-                          Reorder
-                       </Button>
-                    )}
-                    <div className="flex items-center gap-2 px-4 py-2 bg-hayl-text text-hayl-bg rounded-full border border-hayl-text">
+                  {isActive ? (
+                     <div className="flex items-center gap-2 px-4 py-2 bg-hayl-text text-hayl-bg rounded-full border border-hayl-text">
                         <Check size={14} strokeWidth={3} />
                         <span className="text-[10px] font-heading font-bold uppercase tracking-[0.2em]">Active</span>
-                    </div>
-                </div>
-            ) : (
+                     </div>
+                  ) : (
                 <Button
                     onClick={handleActivate}
                     disabled={isActivating}
@@ -169,38 +155,29 @@ export function PlanGuide({ planId, onStartSession, onBack }: PlanGuideProps) {
         </div>
       </header>
 
-      {/* Content Tabs / Sections */}
+         {/* Content Sections */}
       <div className="space-y-12">
-        {/* Overview */}
+            {/* Deploy Section (Primary) */}
         <section>
-          <h2 className="text-xl font-heading font-black italic tracking-tighter uppercase mb-4 flex items-center gap-3">
-            <span className="w-2 h-2 rounded-full bg-hayl-text" /> 
-            Mission Overview
-          </h2>
-          <div className="bg-hayl-surface p-6 rounded-4xl shadow-sm border border-hayl-border">
-             <MarkdownText content={plan.overview_markdown || "No briefing available."} />
-          </div>
-        </section>
+               <div className="mb-6 flex items-center justify-between gap-3">
+                  <h2 className="text-xl font-heading font-black italic tracking-tighter uppercase flex items-center gap-3">
+                     <span className="w-2 h-2 rounded-full bg-hayl-text" />
+                     Deploy Session
+                  </h2>
+                  {isActive && !isReordering && (
+                     <Button
+                        variant="ghost"
+                        size="sm"
+                        className="gap-2 text-[10px] uppercase tracking-widest"
+                        disabled={isRoutineApiUnavailable}
+                        onClick={() => setIsReordering(true)}
+                     >
+                        <Edit3 size={14} />
+                        Reorder Days
+                     </Button>
+                  )}
+               </div>
 
-        {/* Philosophy */}
-        {plan.philosophy_markdown && (
-          <section>
-            <h2 className="text-xl font-heading font-black italic tracking-tighter uppercase mb-4 flex items-center gap-3">
-              <span className="w-2 h-2 rounded-full bg-hayl-text" /> 
-              Science & Theory
-            </h2>
-                  <div className="bg-hayl-surface p-6 rounded-4xl shadow-sm border border-hayl-border">
-              <MarkdownText content={plan.philosophy_markdown} />
-            </div>
-          </section>
-        )}
-
-        {/* Schedule / Schedule Selector */}
-        <section>
-           <h2 className="text-xl font-heading font-black italic tracking-tighter uppercase mb-6 flex items-center gap-3">
-            <span className="w-2 h-2 rounded-full bg-hayl-text" /> 
-            Deploy Session
-          </h2>
           <div className={`grid gap-4 ${isReordering ? 'opacity-95' : ''}`}>
             {orderedDays.map((day, idx) => (
               <div
@@ -256,6 +233,45 @@ export function PlanGuide({ planId, onStartSession, onBack }: PlanGuideProps) {
             ))}
           </div>
         </section>
+
+            {/* Knowledge Sections (Secondary, Collapsible) */}
+            {!isReordering && (
+               <>
+                  <section>
+                     <details className="group rounded-4xl border border-hayl-border bg-hayl-surface p-4" open>
+                        <summary className="cursor-pointer list-none flex items-center justify-between gap-3">
+                           <span className="text-xl font-heading font-black italic tracking-tighter uppercase flex items-center gap-3">
+                              <span className="w-2 h-2 rounded-full bg-hayl-text" />
+                              Mission Overview
+                           </span>
+                           <span className="text-[10px] font-heading font-bold uppercase tracking-widest text-hayl-muted group-open:hidden">Expand</span>
+                           <span className="text-[10px] font-heading font-bold uppercase tracking-widest text-hayl-muted hidden group-open:inline">Collapse</span>
+                        </summary>
+                        <div className="pt-4 px-2">
+                           <MarkdownText content={plan.overview_markdown || "No briefing available."} />
+                        </div>
+                     </details>
+                  </section>
+
+                  {plan.philosophy_markdown && (
+                     <section>
+                        <details className="group rounded-4xl border border-hayl-border bg-hayl-surface p-4">
+                           <summary className="cursor-pointer list-none flex items-center justify-between gap-3">
+                              <span className="text-xl font-heading font-black italic tracking-tighter uppercase flex items-center gap-3">
+                                 <span className="w-2 h-2 rounded-full bg-hayl-text" />
+                                 Science & Theory
+                              </span>
+                              <span className="text-[10px] font-heading font-bold uppercase tracking-widest text-hayl-muted group-open:hidden">Expand</span>
+                              <span className="text-[10px] font-heading font-bold uppercase tracking-widest text-hayl-muted hidden group-open:inline">Collapse</span>
+                           </summary>
+                           <div className="pt-4 px-2">
+                              <MarkdownText content={plan.philosophy_markdown} />
+                           </div>
+                        </details>
+                     </section>
+                  )}
+               </>
+            )}
       </div>
 
          {saveError && (
