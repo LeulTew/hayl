@@ -10,18 +10,21 @@ interface SessionHeaderProps {
 
 export function SessionHeader({ dayTitle, startTime, onAbort }: SessionHeaderProps) {
   return (
-    <header className="mb-6 flex justify-between items-end">
+    <header className="mb-6 flex justify-between items-start">
       <SectionHeader 
         title="ACTIVE SESSION" 
         subtitle={dayTitle} 
       />
-      <div className="flex flex-col items-end gap-2">
+      <div className="flex flex-col items-end gap-3">
         <GlobalTimer startTime={startTime} isActive={true} />
         {onAbort && (
             <Button 
-                variant="ghost" 
+                variant="outline" 
                 size="sm" 
-                className="text-hayl-danger h-auto py-0 px-2 text-xs font-mono opacity-50 hover:opacity-100"
+                className="
+                    border-hayl-danger/50 text-hayl-danger hover:bg-hayl-danger hover:text-white
+                    h-7 px-4 text-xs font-heading font-bold tracking-wider
+                "
                 onClick={onAbort}
             >
                 ABORT

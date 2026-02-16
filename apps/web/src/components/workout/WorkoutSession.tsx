@@ -64,6 +64,17 @@ export function WorkoutSession({ planId }: { planId: string }) {
    // Swipe State
    const [touchStart, setTouchStart] = useState<number | null>(null);
    const [touchEnd, setTouchEnd] = useState<number | null>(null);
+   const [showNavIndicators, setShowNavIndicators] = useState(true);
+
+   // Scroll listener for indicators
+   useEffect(() => {
+     const handleScroll = () => {
+       // Hide indicators if scrolled down past the "visual feed" (header + tabs ~250px)
+       setShowNavIndicators(window.scrollY < 250);
+     };
+     window.addEventListener('scroll', handleScroll);
+     return () => window.removeEventListener('scroll', handleScroll);
+   }, []);
 
   // Wake Lock
   useEffect(() => {
@@ -470,7 +481,8 @@ export function WorkoutSession({ planId }: { planId: string }) {
      >
       <SessionHeader 
         dayTitle={currentDay.title} 
-        startTime={activeSession.startTime} 
+        startTime={activeSession.startTime}
+        onAbort={handleFinishAttempt} 
       />
 
       <div className="mb-6">
@@ -481,14 +493,43 @@ export function WorkoutSession({ planId }: { planId: string }) {
          />
       </div>
 
-      <ExerciseView 
-         exerciseId={currentGroup.exerciseId as Id<'exercises'>}
-         totalSets={currentGroup.setsTotal}
-         repsTarget={currentExercise.reps} // Use current item for reps metadata
-         restSeconds={currentExercise.restSeconds}
-         exerciseIndex={currentSummary?.displayIndex ?? activeSession.currentExerciseIndex}
-         totalExercises={completion.summaries.length} // Count of GROUPS
-      />
+      <div className="relative">
+         <ExerciseView 
+            exerciseId={currentGroup.exerciseId as Id<'exercises'>}
+            totalSets={currentGroup.setsTotal}
+            repsTarget={currentExercise.reps} // Use current item for reps metadata
+            restSeconds={currentExercise.restSeconds}
+            exerciseIndex={currentSummary?.displayIndex ?? activeSession.currentExerciseIndex}
+            totalExercises={completion.summaries.length} // Count of GROUPS
+         />
+
+         {/* Mobile Navigation Indicators (Non-Sticky) */}
+         <div 
+            className={`md:hidden absolute left-2 top-1/2 -translate-y-1/2 z-20 transition-all duration-500 pointer-events-none
+               ${(!currentSummary || currentSummary.displayIndex === 0) 
+                  ? 'opacity-0' 
+                  : 'opacity-40'
+               }
+            `}
+         >
+            <div className="w-10 h-10 items-center justify-center rounded-full bg-hayl-surface/90 border border-hayl-border shadow-lg flex text-hayl-text/40">
+               <ChevronRight size={20} className="rotate-180" />
+            </div>
+         </div>
+
+         <div 
+            className={`md:hidden absolute right-2 top-1/2 -translate-y-1/2 z-20 transition-all duration-500 pointer-events-none
+               ${(!currentSummary || (completion && currentSummary.displayIndex >= completion.summaries.length - 1)) 
+                  ? 'opacity-0' 
+                  : 'opacity-40'
+               }
+            `}
+         >
+            <div className="w-10 h-10 items-center justify-center rounded-full bg-hayl-surface/90 border border-hayl-border shadow-lg flex text-hayl-text/40">
+               <ChevronRight size={20} />
+            </div>
+         </div>
+      </div>
 
          <div className="mb-4 rounded-2xl border border-hayl-border bg-hayl-surface/50 p-4 space-y-4">
             <div className="flex items-center justify-between gap-3">
@@ -596,31 +637,46 @@ export function WorkoutSession({ planId }: { planId: string }) {
          onLog={handleLog}
       />
 
-         <div className="fixed bottom-0 left-0 right-0 p-4 bg-hayl-bg border-t border-hayl-border z-40 md:static md:bg-transparent md:border-0 md:mt-8">
-            <div className="grid grid-cols-3 gap-2">
-               <Button
-                  size="md"
-                  variant="outline"
-                  disabled={!currentSummary || currentSummary.displayIndex <= 0}
-                  onClick={handlePrevExercise}
-               >
-                  ← PREV
-               </Button>
-               <Button
-                  size="md"
-                  onClick={handleNextExercise}
-               >
-                  NEXT →
-               </Button>
-               <Button
-                  size="md"
-                  variant="ghost"
-                  onClick={handleFinishAttempt}
-               >
-                  END NOW
-               </Button>
-            </div>
-         </div>
+     {/* Navigation Indicators (Floating / Subtle) */}
+     {/* Left Indicator - Prev */}
+     <div 
+        className={`hidden md:block fixed left-0 top-1/2 -translate-y-1/2 z-20 transition-all duration-500 pointer-events-auto 
+          ${(!currentSummary || currentSummary.displayIndex === 0 || !showNavIndicators) 
+            ? 'opacity-0 pointer-events-none translate-x-[-20px]' 
+            : 'opacity-40 md:opacity-20 hover:opacity-100 md:hover:opacity-80 cursor-pointer'
+          }
+        `}
+        onClick={handlePrevExercise}
+        title="Previous Exercise"
+     >
+        {/* Mobile: High opacity circle | Desktop: Gradient shade */}
+        <div className="hidden md:flex w-12 h-32 items-center justify-center rounded-r-2xl bg-gradient-to-r from-hayl-text/10 to-transparent">
+           <ChevronRight size={32} className="rotate-180 text-hayl-text" />
+        </div>
+        <div className="flex md:hidden w-10 h-10 items-center justify-center rounded-full bg-hayl-surface/80 border border-hayl-border shadow-lg">
+           <ChevronRight size={20} className="rotate-180 text-hayl-text" />
+        </div>
+     </div>
+
+     {/* Right Indicator - Next */}
+     <div 
+        className={`hidden md:block fixed right-0 top-1/2 -translate-y-1/2 z-20 transition-all duration-500 pointer-events-auto 
+          ${(!currentSummary || (completion && currentSummary.displayIndex >= completion.summaries.length - 1) || !showNavIndicators) 
+            ? 'opacity-0 pointer-events-none translate-x-[20px]' 
+            : 'opacity-40 md:opacity-20 hover:opacity-100 md:hover:opacity-80 cursor-pointer'
+          }
+        `}
+        onClick={handleNextExercise}
+        title="Next Exercise"
+     >
+        {/* Mobile: High opacity circle | Desktop: Gradient shade */}
+        <div className="hidden md:flex w-12 h-32 items-center justify-center rounded-l-2xl bg-gradient-to-l from-hayl-text/10 to-transparent">
+           <ChevronRight size={32} className="text-hayl-text" />
+        </div>
+        <div className="flex md:hidden w-10 h-10 items-center justify-center rounded-full bg-hayl-surface/80 border border-hayl-border shadow-lg">
+           <ChevronRight size={20} className="text-hayl-text" />
+        </div>
+     </div>
 
          {showWarningModal.show && showWarningModal.data && (
             <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
