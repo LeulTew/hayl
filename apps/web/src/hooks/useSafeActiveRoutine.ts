@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useConvex } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 
@@ -17,6 +17,11 @@ export function useSafeActiveRoutine(tokenIdentifier: string | null) {
   const convex = useConvex();
   const [activeRoutine, setActiveRoutine] = useState<ActiveRoutineState | null>(null);
   const [isUnavailable, setIsUnavailable] = useState(false);
+  const [refreshTick, setRefreshTick] = useState(0);
+
+  const refresh = useCallback(() => {
+    setRefreshTick((prev) => prev + 1);
+  }, []);
 
   useEffect(() => {
     if (!tokenIdentifier) {
@@ -52,11 +57,12 @@ export function useSafeActiveRoutine(tokenIdentifier: string | null) {
     return () => {
       cancelled = true;
     };
-  }, [convex, tokenIdentifier]);
+  }, [convex, tokenIdentifier, refreshTick]);
 
   return {
     activeRoutine: tokenIdentifier ? activeRoutine : null,
     isLoading: false,
     isUnavailable: tokenIdentifier ? isUnavailable : false,
+    refresh,
   };
 }

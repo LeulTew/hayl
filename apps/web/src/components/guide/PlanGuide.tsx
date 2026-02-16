@@ -23,9 +23,15 @@ export function PlanGuide({ planId, onStartSession, onBack }: PlanGuideProps) {
   const [isReordering, setIsReordering] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
    const [saveError, setSaveError] = useState<string | null>(null);
+   const [isLiquidGlassEnabled, setIsLiquidGlassEnabled] = useState(false);
+   const [committedDayOrder, setCommittedDayOrder] = useState<number[] | null>(null);
   
   const token = typeof window !== 'undefined' ? localStorage.getItem("hayl-token") : null;
-   const { activeRoutine, isUnavailable: isRoutineApiUnavailable } = useSafeActiveRoutine(token);
+   const {
+      activeRoutine,
+      isUnavailable: isRoutineApiUnavailable,
+      refresh: refreshActiveRoutine,
+   } = useSafeActiveRoutine(token);
 
   const isActive = profile?.activePlanId === planId;
 
@@ -34,19 +40,53 @@ export function PlanGuide({ planId, onStartSession, onBack }: PlanGuideProps) {
 
    const getPersistedOrder = useCallback(() => {
       if (!plan) return [] as number[];
+      if (committedDayOrder && committedDayOrder.length > 0) {
+        return committedDayOrder;
+      }
       if (activeRoutine?.planId === planId) {
          return activeRoutine.dayOrder.map((d: { dayIndex: number }) => d.dayIndex);
       }
       return plan.days.map((d: { dayIndex: number }) => d.dayIndex);
-   }, [plan, activeRoutine, planId]);
+   }, [plan, activeRoutine, planId, committedDayOrder]);
 
   useEffect(() => {
-     if (plan && !isReordering) {
+    if (activeRoutine?.planId === planId) {
+      setCommittedDayOrder(activeRoutine.dayOrder.map((d: { dayIndex: number }) => d.dayIndex));
+    }
+  }, [activeRoutine, planId]);
+
+  useEffect(() => {
+     if (plan && !isReordering && !isSaving) {
         // Initial order from active routine or plan defaults
         const initialOrder = getPersistedOrder();
         setTempDayOrder(initialOrder);
      }
-   }, [plan, isReordering, getPersistedOrder]);
+   }, [plan, isReordering, isSaving, getPersistedOrder]);
+
+   useEffect(() => {
+      if (typeof window === "undefined") return;
+
+      const ua = window.navigator.userAgent || "";
+      const isiPhone = /iPhone/i.test(ua);
+      const supportsBackdrop =
+         typeof CSS !== "undefined" &&
+         (CSS.supports("backdrop-filter", "blur(16px)") ||
+            CSS.supports("-webkit-backdrop-filter", "blur(16px)"));
+
+      setIsLiquidGlassEnabled(isiPhone && supportsBackdrop);
+   }, []);
+
+   const liquidCardClass = isLiquidGlassEnabled
+      ? "bg-hayl-surface/65 backdrop-blur-xl border-hayl-border/70"
+      : "bg-hayl-surface border-hayl-border";
+
+   const liquidActionBarClass = isLiquidGlassEnabled
+      ? "bg-hayl-surface/75 backdrop-blur-2xl border border-hayl-border text-hayl-text"
+      : "bg-hayl-text text-hayl-bg";
+
+   const liquidGhostButtonClass = isLiquidGlassEnabled
+      ? "bg-hayl-bg/60 hover:bg-hayl-bg/80 text-hayl-text border-hayl-border"
+      : "bg-hayl-bg/10 hover:bg-hayl-bg/20 text-hayl-bg border-transparent";
 
   const orderedDays = useMemo(() => {
      if (!plan) return [];
@@ -76,6 +116,7 @@ export function PlanGuide({ planId, onStartSession, onBack }: PlanGuideProps) {
      setSaveError(null);
      setIsReordering(false);
      setTempDayOrder(optimisticOrder);
+     setCommittedDayOrder(optimisticOrder);
      setIsSaving(true);
 
      try {
@@ -84,8 +125,10 @@ export function PlanGuide({ planId, onStartSession, onBack }: PlanGuideProps) {
            orderedDayIndexes: optimisticOrder,
            planId: planId as Id<'derivedPlans'>
         });
+        refreshActiveRoutine();
      } catch (err) {
         setTempDayOrder(previousOrder);
+        setCommittedDayOrder(previousOrder);
         setSaveError("Could not save your new order. Reverted to previous schedule.");
         console.error("Failed to reorder:", err);
      } finally {
@@ -183,8 +226,10 @@ export function PlanGuide({ planId, onStartSession, onBack }: PlanGuideProps) {
               <div
                 key={day.dayIndex}
                 className={`
-                            group relative overflow-hidden bg-hayl-surface p-6 rounded-4xl border transition-all 
-                   ${isReordering ? 'border-hayl-accent bg-hayl-accent/5' : 'border-hayl-border hover:border-hayl-text'}
+                                          group relative overflow-hidden p-6 rounded-4xl border transition-all
+                            ${isReordering
+                                 ? `border-hayl-accent ${isLiquidGlassEnabled ? 'bg-hayl-accent/15 backdrop-blur-xl' : 'bg-hayl-accent/5'}`
+                                 : `${liquidCardClass} hover:border-hayl-text`}
                 `}
               >
                  <div className="relative z-10 flex justify-between items-center">
@@ -238,7 +283,7 @@ export function PlanGuide({ planId, onStartSession, onBack }: PlanGuideProps) {
             {!isReordering && (
                <>
                   <section>
-                     <details className="group rounded-4xl border border-hayl-border bg-hayl-surface p-4" open>
+                     <details className={`group rounded-4xl border p-4 ${liquidCardClass}`} open>
                         <summary className="cursor-pointer list-none flex items-center justify-between gap-3">
                            <span className="text-xl font-heading font-black italic tracking-tighter uppercase flex items-center gap-3">
                               <span className="w-2 h-2 rounded-full bg-hayl-text" />
@@ -255,7 +300,7 @@ export function PlanGuide({ planId, onStartSession, onBack }: PlanGuideProps) {
 
                   {plan.philosophy_markdown && (
                      <section>
-                        <details className="group rounded-4xl border border-hayl-border bg-hayl-surface p-4">
+                        <details className={`group rounded-4xl border p-4 ${liquidCardClass}`}>
                            <summary className="cursor-pointer list-none flex items-center justify-between gap-3">
                               <span className="text-xl font-heading font-black italic tracking-tighter uppercase flex items-center gap-3">
                                  <span className="w-2 h-2 rounded-full bg-hayl-text" />
@@ -293,22 +338,22 @@ export function PlanGuide({ planId, onStartSession, onBack }: PlanGuideProps) {
       {/* Reorder Action Bar */}
       {isReordering && (
          <div className="fixed bottom-24 left-1/2 -translate-x-1/2 w-[90%] max-w-md z-50 animate-in slide-in-from-bottom duration-300">
-            <div className="bg-hayl-text text-hayl-bg p-4 rounded-3xl flex items-center justify-between shadow-2xl">
+            <div className={`p-4 rounded-3xl flex items-center justify-between shadow-2xl ${liquidActionBarClass}`}>
                <div className="hidden sm:block pl-2">
-                  <p className="font-heading font-bold uppercase text-xs tracking-widest text-hayl-bg/60">Tactical Reorder</p>
-                  <p className="text-[10px] font-mono uppercase text-hayl-bg/40">Manual Override Active</p>
+                  <p className={`font-heading font-bold uppercase text-xs tracking-widest ${isLiquidGlassEnabled ? 'text-hayl-muted' : 'text-hayl-bg/60'}`}>Tactical Reorder</p>
+                  <p className={`text-[10px] font-mono uppercase ${isLiquidGlassEnabled ? 'text-hayl-muted/70' : 'text-hayl-bg/40'}`}>Manual Override Active</p>
                </div>
                <div className="flex gap-2 w-full sm:w-auto">
                   <Button 
                      variant="ghost" 
-                     className="bg-hayl-bg/10 hover:bg-hayl-bg/20 text-hayl-bg border-transparent flex-1 sm:flex-initial"
+                     className={`${liquidGhostButtonClass} flex-1 sm:flex-initial`}
                      onClick={handleCancelReorder}
                   >
                      <X size={16} className="mr-2" />
                      CANCEL
                   </Button>
                   <Button 
-                     className="bg-hayl-accent text-white flex-1 sm:flex-initial"
+                     className={`bg-hayl-accent text-white flex-1 sm:flex-initial ${isLiquidGlassEnabled ? 'border border-hayl-border/60' : ''}`}
                      onClick={handleSaveOrder}
                      disabled={isSaving}
                   >
