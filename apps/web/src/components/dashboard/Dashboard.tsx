@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { useQuery } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
 import type { Id } from "../../../../../convex/_generated/dataModel";
-import { ArrowRight, Trophy, Activity, Dumbbell, Zap } from 'lucide-react';
+import { ArrowRight, Trophy, Activity, Dumbbell, Zap, CalendarDays, CheckCircle2, Clock3 } from 'lucide-react';
 
 import { Page } from "../ui/Page";
 import { SectionHeader } from "../ui/SectionHeader";
@@ -41,6 +41,20 @@ function formatNumber(num: number) {
 function getDayStartTimestamp(ts: number): number {
   const date = new Date(ts);
   return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+}
+
+function formatShortDate(ts: number) {
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: 'numeric',
+  }).format(new Date(ts));
+}
+
+function formatMonthYear(ts: number) {
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'long',
+    year: 'numeric',
+  }).format(new Date(ts));
 }
 
 function getStreakDays(sessionStartTimes: number[]): number {
@@ -133,6 +147,86 @@ export function Dashboard({ onNavigate, onStartSession }: DashboardProps) {
   const nextDayIndex = activeRoutine?.nextDayIndex ?? fallbackNextDayIndex;
   const nextDay = activePlan?.days?.find((day) => day.dayIndex === nextDayIndex) ?? activePlan?.days?.[nextDayIndex];
   const nextDayTitle = nextDay?.title || t('next_session');
+
+  const completedDayStarts = useMemo(
+    () => new Set(history.map((session) => getDayStartTimestamp(session.startTime))),
+    [history],
+  );
+
+  const upcomingSessions = useMemo(() => {
+    if (!activePlan?.days?.length) return [];
+    const count = Math.max(5, Math.min(10, consistencyTarget + 2));
+    return Array.from({ length: count }).map((_, offset) => {
+      const dayStart = getDayStartTimestamp(stableNow + offset * 24 * 60 * 60 * 1000);
+      const cycleDay = activePlan.days[(nextDayIndex + offset) % activePlan.days.length];
+      return {
+        id: `${cycleDay.dayIndex}-${dayStart}`,
+        dayStart,
+        dayIndex: cycleDay.dayIndex,
+        title: cycleDay.title,
+      };
+    });
+  }, [activePlan, consistencyTarget, nextDayIndex, stableNow]);
+
+  const upcomingDayStarts = useMemo(
+    () => new Set(upcomingSessions.map((session) => session.dayStart)),
+    [upcomingSessions],
+  );
+
+  const recentCompleted = useMemo(
+    () =>
+      [...history]
+        .sort((left, right) => right.startTime - left.startTime)
+        .slice(0, 5),
+    [history],
+  );
+
+  const monthGrid = useMemo(() => {
+    const now = new Date(stableNow);
+    const year = now.getFullYear();
+    const month = now.getMonth();
+
+    const firstDay = new Date(year, month, 1);
+    const firstWeekdayMondayFirst = (firstDay.getDay() + 6) % 7;
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const todayStart = getDayStartTimestamp(stableNow);
+
+    const cells: Array<
+      | { type: 'empty'; key: string }
+      | {
+          type: 'day';
+          key: string;
+          dayNumber: number;
+          dayStart: number;
+          isToday: boolean;
+          isCompleted: boolean;
+          isUpcoming: boolean;
+        }
+    > = [];
+
+    for (let index = 0; index < firstWeekdayMondayFirst; index += 1) {
+      cells.push({ type: 'empty', key: `empty-${index}` });
+    }
+
+    for (let day = 1; day <= daysInMonth; day += 1) {
+      const dayStart = new Date(year, month, day).getTime();
+      cells.push({
+        type: 'day',
+        key: `day-${day}`,
+        dayNumber: day,
+        dayStart,
+        isToday: dayStart === todayStart,
+        isCompleted: completedDayStarts.has(dayStart),
+        isUpcoming: upcomingDayStarts.has(dayStart),
+      });
+    }
+
+    return {
+      label: formatMonthYear(stableNow),
+      weekDays: ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'],
+      cells,
+    };
+  }, [completedDayStarts, upcomingDayStarts, stableNow]);
 
   return (
     <Page className="pt-8">
@@ -253,6 +347,110 @@ export function Dashboard({ onNavigate, onStartSession }: DashboardProps) {
                </div>
              </Card>
         )}
+      </section>
+
+      <section className="mb-12">
+        <SectionHeader title="TRAINING CALENDAR" subtitle="HISTORY + UPCOMING" className="mb-6" />
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <Card className="lg:col-span-2 p-4 md:p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <CalendarDays className="text-hayl-accent" size={18} />
+                <p className="font-heading font-bold uppercase tracking-widest text-xs text-hayl-muted">{monthGrid.label}</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-7 gap-2">
+              {monthGrid.weekDays.map((weekday) => (
+                <div key={weekday} className="text-center text-[10px] font-heading uppercase tracking-widest text-hayl-muted">
+                  {weekday}
+                </div>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-7 gap-2 mt-2">
+              {monthGrid.cells.map((cell) => {
+                if (cell.type === 'empty') {
+                  return <div key={cell.key} className="h-10 rounded-lg" />;
+                }
+
+                const cellClassName = [
+                  'h-10 rounded-lg border text-xs font-mono flex items-center justify-center',
+                  cell.isToday
+                    ? 'border-hayl-text bg-hayl-text text-hayl-bg'
+                    : cell.isCompleted
+                      ? 'border-hayl-success/50 bg-hayl-success/10 text-hayl-text'
+                      : cell.isUpcoming
+                        ? 'border-hayl-accent/50 bg-hayl-accent/10 text-hayl-text'
+                        : 'border-hayl-border bg-hayl-surface text-hayl-muted',
+                ].join(' ');
+
+                return (
+                  <div key={cell.key} className={cellClassName}>
+                    {cell.dayNumber}
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3 mt-4 text-[10px] font-heading uppercase tracking-widest text-hayl-muted">
+              <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-hayl-success" />Completed</span>
+              <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-hayl-accent" />Upcoming</span>
+              <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-hayl-text" />Today</span>
+            </div>
+          </Card>
+
+          <Card className="p-4 md:p-5">
+            <div className="mb-5">
+              <p className="text-[10px] font-heading uppercase tracking-widest text-hayl-muted mb-2">UPCOMING</p>
+              <div className="space-y-2">
+                {upcomingSessions.length > 0 ? upcomingSessions.slice(0, 4).map((session, index) => (
+                  <button
+                    type="button"
+                    key={session.id}
+                    className="w-full rounded-xl border border-hayl-border bg-hayl-surface px-3 py-2 text-left hover:border-hayl-accent/50 transition-colors"
+                    onClick={() => {
+                      if (!activeProgram || !activePlan) return;
+                      onStartSession(session.dayIndex, activeProgram._id, activePlan._id);
+                    }}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-mono text-xs text-hayl-text truncate">{session.title}</span>
+                      <span className="text-[10px] font-heading uppercase text-hayl-muted">{index === 0 ? 'NEXT' : `${index + 1}`}</span>
+                    </div>
+                    <p className="text-[10px] font-mono uppercase text-hayl-muted mt-1">{formatShortDate(session.dayStart)}</p>
+                  </button>
+                )) : (
+                  <p className="text-xs font-mono text-hayl-muted">Select a program to generate upcoming sessions.</p>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <p className="text-[10px] font-heading uppercase tracking-widest text-hayl-muted mb-2">RECENT COMPLETED</p>
+              <div className="space-y-2">
+                {recentCompleted.length > 0 ? recentCompleted.slice(0, 4).map((session) => (
+                  <div key={session.sessionId} className="rounded-xl border border-hayl-border bg-hayl-bg/30 px-3 py-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-mono text-xs text-hayl-text truncate">DAY {session.currentDayIndex + 1}</span>
+                      <span className="inline-flex items-center gap-1 text-[10px] text-hayl-success"><CheckCircle2 size={12} /> DONE</span>
+                    </div>
+                    <p className="text-[10px] font-mono uppercase text-hayl-muted mt-1 inline-flex items-center gap-1">
+                      <Clock3 size={12} /> {formatShortDate(session.startTime)}
+                    </p>
+                  </div>
+                )) : (
+                  <p className="text-xs font-mono text-hayl-muted">No completed sessions yet.</p>
+                )}
+              </div>
+            </div>
+
+            <Button className="mt-4" variant="outline" fullWidth onClick={() => onNavigate({ type: 'history' })}>
+              OPEN FULL LOGBOOK
+            </Button>
+          </Card>
+        </div>
       </section>
     </Page>
   );
