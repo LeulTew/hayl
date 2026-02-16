@@ -42,8 +42,9 @@ export function useActiveSession() {
 
   /**
    * Records a set in the current session
+   * Now handles auto-progression if the item is complete.
    */
-  const logSet = useCallback(async (exerciseId: string, reps: number, weight?: number, rpe?: number) => {
+  const logSet = useCallback(async (exerciseId: string, reps: number, weight?: number, rpe?: number, totalSetsForCurrentItem?: number) => {
     if (!activeSession?.id) return;
 
     await db.transaction('rw', db.sessions, async () => {
@@ -62,10 +63,37 @@ export function useActiveSession() {
       };
 
       const updatedLogs = [...latestSession.logs, newLog];
+      
+      let nextExerciseIndex = latestSession.currentExerciseIndex;
+      let nextSessionSetIndex = nextSetIndex + 1;
+
+      // Auto-advance logic: If we just finished the last set of the CURRENT item
+      if (totalSetsForCurrentItem && nextSessionSetIndex >= totalSetsForCurrentItem) {
+          // Check if there is a next item
+          // We can't know for sure here without the full plan, but the UI calls this with the Item's total sets.
+          // If we hit the limit, we effectively "finish" this item. 
+          // However, distinguishing between "Next Set of SAME exercise (split)" vs "Next Exercise" is tricky in data layer.
+          // Strategy: The UI handles the "Next" button for explicit moves. 
+          // For now, we just increment the set index. 
+          // IMPROVEMENT: If the user wants "Next" to mean "Next Exercise Item", that is `nextExercise()`.
+          // If they want "Next Set", that is just logging.
+          
+          // If the user request implies that "Next" should jump to the next ITEM if the current ITEM is done:
+          // We'll actually leave the index auto-advancement to the UI or a separate explicit call to avoid confusion.
+          // BUT, to fix the "1/1" issue where it stays stuck, we need to ensure the `currentSetIndex` is relative to the ITEM.
+          
+          // Actually, the issue described is "changing through the exercises not sets".
+          // If I have 4 items of "Squat 1 set", when I finish item 1, I want to go to item 2 immediately.
+          
+          // Let's TRY to advance if we completed the sets for this specific item instance.
+           nextExerciseIndex++;
+           nextSessionSetIndex = 0; // Reset set index for the NEW item
+      }
 
       await db.sessions.update(latestSession.id, {
         logs: updatedLogs,
-        currentSetIndex: nextSetIndex + 1,
+        currentExerciseIndex: nextExerciseIndex,
+        currentSetIndex: nextSessionSetIndex,
         lastModifiedTs: Date.now(),
       });
     });

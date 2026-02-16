@@ -15,6 +15,8 @@ import { ExerciseView } from "./session/ExerciseView";
 import { SetLogger } from "./session/SetLogger";
 import { RestTimer } from "./RestTimer";
 import { PhaseTabs } from "./PhaseTabs";
+import { BottomSheet } from "../ui/BottomSheet";
+import { ChevronDown, ChevronRight, Circle, CheckCircle2, ListFilter } from "lucide-react";
 
 // ... [Interfaces kept same] ...
 interface WorkoutItem {
@@ -43,7 +45,7 @@ interface WorkoutPlan {
 }
 
 export function WorkoutSession({ planId }: { planId: string }) {
-   const { activeSession, logSet, skipSet, nextExercise, previousExercise, jumpToExercise, finishSession, discardSession } = useActiveSession();
+   const { activeSession, logSet, skipSet, jumpToExercise, finishSession, discardSession } = useActiveSession();
   const { requestLock, releaseLock } = useWakeLock();
   
   // UX Hooks
@@ -57,6 +59,11 @@ export function WorkoutSession({ planId }: { planId: string }) {
       data: import("../../lib/workout/ux-constants").WorkoutWarning | null;
       unfinished: { name: string; setsDone: number; setsTotal: number; setsLeft: number; ratio: number }[];
    }>({ show: false, data: null, unfinished: [] });
+   const [isNavOpen, setIsNavOpen] = useState(false);
+   
+   // Swipe State
+   const [touchStart, setTouchStart] = useState<number | null>(null);
+   const [touchEnd, setTouchEnd] = useState<number | null>(null);
 
   // Wake Lock
   useEffect(() => {
@@ -123,20 +130,44 @@ export function WorkoutSession({ planId }: { planId: string }) {
 
    const completion = useMemo(() => {
       const sessionLogs = activeSession?.logs ?? [];
-      const summaries = allExercises.map((exercise, index) => {
-         const logsForExercise = sessionLogs.filter((log) => log.exerciseId === exercise.exerciseId);
+      
+      // Group all items of the same exercise globally
+      const groupsMap = new Map<string, {
+         exerciseId: string;
+         name: string;
+         setsTotal: number;
+         firstIndex: number;
+      }>();
+
+      allExercises.forEach((item, index) => {
+         const existing = groupsMap.get(item.exerciseId);
+         if (existing) {
+            existing.setsTotal += item.sets;
+         } else {
+            const resolved = exerciseMap?.[item.exerciseId as string];
+            groupsMap.set(item.exerciseId, {
+               exerciseId: item.exerciseId,
+               name: resolved?.name ?? `Exercise ${index + 1}`,
+               setsTotal: item.sets,
+               firstIndex: index
+            });
+         }
+      });
+
+      const summaries = Array.from(groupsMap.values()).map((group, index) => {
+         const logsForExercise = sessionLogs.filter((log) => log.exerciseId === group.exerciseId);
          const doneSetIndexes = new Set(logsForExercise.map((log) => log.setIndex));
-         const setsDone = Math.min(doneSetIndexes.size, exercise.sets);
-         const setsLeft = Math.max(0, exercise.sets - setsDone);
-         const ratio = exercise.sets > 0 ? setsDone / exercise.sets : 0;
-         const resolved = exerciseMap?.[exercise.exerciseId as string];
-         const name = resolved?.name ?? `Exercise ${index + 1}`;
+         const setsDone = Math.min(doneSetIndexes.size, group.setsTotal);
+         const setsLeft = Math.max(0, group.setsTotal - setsDone);
+         const ratio = group.setsTotal > 0 ? setsDone / group.setsTotal : 0;
 
          return {
-            index,
-            name,
+            index: group.firstIndex,
+            displayIndex: index,
+            exerciseId: group.exerciseId,
+            name: group.name,
             setsDone,
-            setsTotal: exercise.sets,
+            setsTotal: group.setsTotal,
             setsLeft,
             ratio,
          };
@@ -158,6 +189,16 @@ export function WorkoutSession({ planId }: { planId: string }) {
          unfinished: summaries.filter((item) => item.setsDone < item.setsTotal),
       };
    }, [allExercises, activeSession?.logs, exerciseMap]);
+
+   const currentSummary = useMemo(() => {
+       if (!activeSession) return null;
+       return completion.summaries.find(s => 
+          activeSession.currentExerciseIndex >= s.index && 
+          (s.displayIndex + 1 < completion.summaries.length 
+             ? activeSession.currentExerciseIndex < completion.summaries[s.displayIndex + 1].index 
+             : true)
+       );
+   }, [completion.summaries, activeSession]);
 
    const handleFinishAttempt = () => {
       const warning = getCompletionWarning({
@@ -270,23 +311,79 @@ export function WorkoutSession({ planId }: { planId: string }) {
   }
 
   // Current Exercise Logs
-  const currentLogs = activeSession.logs
-    .filter(l => l.exerciseId === currentExercise.exerciseId)
-    .sort((a, b) => (a.setIndex ?? 0) - (b.setIndex ?? 0));
+  // --- Group Logic for Main View ---
+  const currentGroup = currentSummary ?? {
+     exerciseId: currentExercise.exerciseId,
+     name: exerciseMap?.[currentExercise.exerciseId as string]?.name ?? 'Loading...',
+     setsTotal: currentExercise.sets,
+     firstIndex: activeSession.currentExerciseIndex,
+     setsDone: 0
+  };
+
+  // Calculate real-time set index based on logs for this exercise group
+  const logsForCurrentGroup = activeSession.logs.filter(l => l.exerciseId === currentGroup.exerciseId);
+  const currentGroupSetIndex = logsForCurrentGroup.length; 
 
   const handleLog = (reps: number, weight?: number, rpe?: number) => {
-     logSet(currentExercise.exerciseId, reps, weight, rpe);
+     // Pass total sets of the specific *item* for auto-advance
+     logSet(currentGroup.exerciseId, reps, weight, rpe, currentExercise.sets);
+     
      if (currentExercise.restSeconds > 0) {
         setRestTimer({ active: true, seconds: currentExercise.restSeconds });
      }
   };
 
+  // --- Navigation Logic ---
+  const handleNextExercise = () => {
+     if (!currentSummary) return;
+     const nextSummary = completion.summaries[currentSummary.displayIndex + 1];
+     if (nextSummary) {
+        void jumpToExercise(nextSummary.index, nextSummary.exerciseId);
+     } else {
+        handleFinishAttempt();
+     }
+  };
+
+  const handlePrevExercise = () => {
+     if (!currentSummary) return;
+     const prevSummary = completion.summaries[currentSummary.displayIndex - 1];
+     if (prevSummary) {
+        void jumpToExercise(prevSummary.index, prevSummary.exerciseId);
+     }
+  };
+
+  // --- Swipe Handlers ---
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+     setTouchEnd(null); 
+     setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+     setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEndHandler = () => {
+     if (!touchStart || !touchEnd) return;
+     const distance = touchStart - touchEnd;
+     const isLeftSwipe = distance > minSwipeDistance;
+     const isRightSwipe = distance < -minSwipeDistance;
+     if (isLeftSwipe) handleNextExercise();
+     if (isRightSwipe) handlePrevExercise();
+  };
+
   return (
-    <Page fullWidth className="max-w-xl mx-auto pb-32 pt-4">
+    <Page 
+        fullWidth 
+        className="max-w-xl mx-auto pb-32 pt-4 min-h-screen"
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEndHandler}
+     >
       <SessionHeader 
         dayTitle={currentDay.title} 
         startTime={activeSession.startTime} 
-        onAbort={discardSession} 
       />
 
       <div className="mb-6">
@@ -298,56 +395,121 @@ export function WorkoutSession({ planId }: { planId: string }) {
       </div>
 
       <ExerciseView 
-         exerciseId={currentExercise.exerciseId}
-         totalSets={currentExercise.sets}
-         repsTarget={currentExercise.reps}
+         exerciseId={currentGroup.exerciseId as Id<'exercises'>}
+         totalSets={currentGroup.setsTotal}
+         repsTarget={currentExercise.reps} // Use current item for reps metadata
          restSeconds={currentExercise.restSeconds}
-         exerciseIndex={activeSession.currentExerciseIndex}
-         totalExercises={allExercises.length}
+         exerciseIndex={currentSummary?.displayIndex ?? activeSession.currentExerciseIndex}
+         totalExercises={completion.summaries.length} // Count of GROUPS
       />
 
-         <div className="mb-4 rounded-2xl border border-hayl-border bg-hayl-surface/50 p-4 space-y-3">
+         <div className="mb-4 rounded-2xl border border-hayl-border bg-hayl-surface/50 p-4 space-y-4">
             <div className="flex items-center justify-between gap-3">
-               <label htmlFor="exercise-jump" className="text-[10px] font-heading font-bold uppercase tracking-widest text-hayl-muted">
-                  Exercise Navigation
+               <label className="text-[10px] font-heading font-bold uppercase tracking-widest text-hayl-muted">
+                  Tactical Navigator
                </label>
                <span className="text-xs font-mono text-hayl-muted">
-                  {completion.completedSetsCount}/{completion.totalSets} sets
+                  {completion.completedSetsCount}/{completion.totalSets} total sets
                </span>
             </div>
-            <select
-               id="exercise-jump"
-               className="w-full rounded-xl border border-hayl-border bg-hayl-bg px-3 py-2 text-sm text-hayl-text"
-               value={activeSession.currentExerciseIndex}
-               onChange={(event) => {
-                  const targetIndex = Number(event.target.value);
-                  const target = allExercises[targetIndex];
-                  if (!target) return;
-                  void jumpToExercise(targetIndex, target.exerciseId);
-               }}
+            
+            <button
+               type="button"
+               onClick={() => setIsNavOpen(true)}
+               className="w-full flex items-center justify-between gap-3 rounded-xl border border-hayl-border bg-hayl-bg px-4 py-3 text-left transition-all hover:border-hayl-accent/50 active:scale-[0.98]"
             >
-               {completion.summaries.map((item) => (
-                  <option key={`${item.name}-${item.index}`} value={item.index}>
-                     {`#${item.index + 1} ${item.name} · ${item.setsDone}/${item.setsTotal}`}
-                  </option>
-               ))}
-            </select>
-            <div className="grid grid-cols-2 gap-3 text-xs">
-               <p className="text-hayl-muted">Current exercise: <span className="font-mono text-hayl-text">{currentLogs.length}/{currentExercise.sets}</span></p>
-               <p className="text-hayl-muted text-right">Workout volume: <span className="font-mono text-hayl-text">{completion.completedSetsCount}/{completion.totalSets}</span></p>
+               <div className="flex flex-col">
+                  <span className="text-[10px] font-heading font-bold text-hayl-muted uppercase tracking-tighter">Current Target</span>
+                  <span className="text-sm font-bold text-hayl-text line-clamp-1">
+                     {currentSummary?.name ?? 'Loading...'}
+                  </span>
+               </div>
+               <div className="flex items-center gap-2 text-hayl-muted">
+                  <span className="text-xs font-mono bg-hayl-surface px-2 py-0.5 rounded border border-hayl-border">
+                     {currentSummary?.setsDone ?? 0}/{currentSummary?.setsTotal ?? 0}
+                  </span>
+                  <ChevronDown size={16} />
+               </div>
+            </button>
+
+            <div className="grid grid-cols-2 gap-3 text-[10px] uppercase font-heading font-bold tracking-widest">
+               <div className="flex items-center gap-1.5 text-hayl-muted">
+                  <ListFilter size={10} />
+                  <span>Phase Progress</span>
+               </div>
+               <p className="text-hayl-muted text-right">Volume Intensity</p>
             </div>
          </div>
 
+         <BottomSheet 
+            isOpen={isNavOpen} 
+            onClose={() => setIsNavOpen(false)}
+            title="SQUAD NAVIGATION"
+         >
+            <div className="space-y-2">
+               {completion.summaries.map((item) => {
+                  // Simple check for active based on index
+                  const isCurrent = activeSession.currentExerciseIndex >= item.index && 
+                     (item.displayIndex + 1 < completion.summaries.length 
+                        ? activeSession.currentExerciseIndex < completion.summaries[item.displayIndex + 1].index 
+                        : true);
+                  
+                  const isDone = item.setsDone >= item.setsTotal;
+
+                  return (
+                     <button
+                        key={`${item.name}-${item.index}`}
+                        onClick={() => {
+                           void jumpToExercise(item.index, item.exerciseId);
+                           setIsNavOpen(false);
+                        }}
+                        className={`
+                           w-full flex items-center justify-between p-4 rounded-2xl border transition-all
+                           ${isCurrent 
+                              ? 'bg-hayl-text border-hayl-text text-hayl-bg' 
+                              : 'bg-hayl-surface/50 border-hayl-border text-hayl-text hover:bg-hayl-surface'
+                           }
+                        `}
+                     >
+                        <div className="flex items-center gap-4">
+                           <div className={`
+                              w-8 h-8 rounded-full flex items-center justify-center border font-mono text-xs
+                              ${isCurrent ? 'border-hayl-bg/20 bg-hayl-bg/10' : 'border-hayl-border bg-hayl-bg'}
+                           `}>
+                              {item.displayIndex + 1}
+                           </div>
+                           <div className="text-left">
+                              <p className={`text-sm font-bold uppercase tracking-tight ${isCurrent ? 'text-hayl-bg' : 'text-hayl-text'}`}>
+                                 {item.name}
+                              </p>
+                              <p className={`text-[10px] font-mono ${isCurrent ? 'text-hayl-bg/60' : 'text-hayl-muted'}`}>
+                                 {item.setsDone}/{item.setsTotal} SETS COMPLETED
+                              </p>
+                           </div>
+                        </div>
+                        {isDone ? (
+                           <CheckCircle2 size={18} className={isCurrent ? 'text-hayl-bg' : 'text-hayl-success'} />
+                        ) : isCurrent ? (
+                           <ChevronRight size={18} className="text-hayl-bg opacity-50" />
+                        ) : (
+                           <Circle size={18} className="text-hayl-border" />
+                        )}
+                     </button>
+                  );
+               })}
+            </div>
+         </BottomSheet>
+
       <SetLogger 
-         currentSetIndex={activeSession.currentSetIndex}
-         totalSets={currentExercise.sets}
+         currentSetIndex={currentGroupSetIndex}
+         totalSets={currentGroup.setsTotal}
          repsTarget={currentExercise.reps}
-         previousWeight={currentLogs[currentLogs.length - 1]?.weight} // heuristic: use last set weight
-         logs={currentLogs}
+         previousWeight={logsForCurrentGroup[logsForCurrentGroup.length - 1]?.weight} 
+         logs={logsForCurrentGroup}
          onLog={handleLog}
-             onSkipSet={() => {
-               void skipSet();
-             }}
+         onSkipSet={() => {
+            void skipSet();
+         }}
       />
 
          <div className="fixed bottom-0 left-0 right-0 p-4 bg-hayl-bg border-t border-hayl-border z-40 md:static md:bg-transparent md:border-0 md:mt-8">
@@ -355,23 +517,14 @@ export function WorkoutSession({ planId }: { planId: string }) {
                <Button
                   size="md"
                   variant="outline"
-                  disabled={activeSession.currentExerciseIndex <= 0}
-                  onClick={() => {
-                     const previousIndex = activeSession.currentExerciseIndex - 1;
-                     const previous = allExercises[previousIndex];
-                     if (!previous) return;
-                     void previousExercise(previous.exerciseId);
-                  }}
+                  disabled={!currentSummary || currentSummary.displayIndex <= 0}
+                  onClick={handlePrevExercise}
                >
                   ← PREV
                </Button>
                <Button
                   size="md"
-                  onClick={() => {
-                     const nextIndex = activeSession.currentExerciseIndex + 1;
-                     const next = allExercises[nextIndex];
-                     void nextExercise(next?.exerciseId);
-                  }}
+                  onClick={handleNextExercise}
                >
                   NEXT →
                </Button>
@@ -426,6 +579,7 @@ export function WorkoutSession({ planId }: { planId: string }) {
             onComplete={() => setRestTimer({ active: false, seconds: 0 })}
             onSkip={() => setRestTimer({ active: false, seconds: 0 })}
             onAdd15={() => setRestTimer(prev => ({ ...prev, seconds: addTime(prev.seconds) }))}
+            onSubtract15={() => setRestTimer(prev => ({ ...prev, seconds: Math.max(0, prev.seconds - 15) }))}
          />
       )}
     </Page>

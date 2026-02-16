@@ -5,9 +5,10 @@ interface RestTimerProps {
     onComplete: () => void;
     onSkip: () => void;
     onAdd15?: () => void;
+    onSubtract15?: () => void;
 }
 
-export function RestTimer({ seconds, onComplete, onSkip, onAdd15 }: RestTimerProps) {
+export function RestTimer({ seconds, onComplete, onSkip, onAdd15, onSubtract15 }: RestTimerProps) {
     const [timeLeft, setTimeLeft] = useState(seconds);
 
     // Sync local timer if parent updates duration (e.g. +15s)
@@ -83,15 +84,26 @@ export function RestTimer({ seconds, onComplete, onSkip, onAdd15 }: RestTimerPro
                 </div>
 
                 <div className="flex flex-col gap-4 w-full">
-                    <button 
-                        onClick={() => {
-                            if (onAdd15) onAdd15();
-                            else setTimeLeft(prev => prev + 15);
-                        }}
-                        className="py-5 bg-hayl-bg rounded-2xl border border-hayl-border font-heading font-bold uppercase tracking-[0.2em] hover:border-hayl-text transition-all text-xs italic"
-                    >
-                        +15s
-                    </button>
+                    <div className="grid grid-cols-2 gap-3">
+                        <button 
+                            onClick={() => {
+                                if (onSubtract15) onSubtract15();
+                                else setTimeLeft(prev => Math.max(0, prev - 15));
+                            }}
+                            className="py-5 bg-hayl-bg rounded-2xl border border-hayl-border font-heading font-bold uppercase tracking-[0.2em] hover:border-hayl-text transition-all text-xs italic"
+                        >
+                            -15s
+                        </button>
+                        <button 
+                            onClick={() => {
+                                if (onAdd15) onAdd15();
+                                else setTimeLeft(prev => prev + 15);
+                            }}
+                            className="py-5 bg-hayl-bg rounded-2xl border border-hayl-border font-heading font-bold uppercase tracking-[0.2em] hover:border-hayl-text transition-all text-xs italic"
+                        >
+                            +15s
+                        </button>
+                    </div>
                     
                     <button 
                         onClick={onSkip}

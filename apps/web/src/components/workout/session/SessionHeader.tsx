@@ -5,7 +5,7 @@ import { GlobalTimer } from '../GlobalTimer';
 interface SessionHeaderProps {
   dayTitle: string;
   startTime: number;
-  onAbort: () => void;
+  onAbort?: () => void;
 }
 
 export function SessionHeader({ dayTitle, startTime, onAbort }: SessionHeaderProps) {
@@ -17,14 +17,16 @@ export function SessionHeader({ dayTitle, startTime, onAbort }: SessionHeaderPro
       />
       <div className="flex flex-col items-end gap-2">
         <GlobalTimer startTime={startTime} isActive={true} />
-        <Button 
-            variant="ghost" 
-            size="sm" 
-            className="text-hayl-danger h-auto py-0 px-2 text-xs font-mono opacity-50 hover:opacity-100"
-            onClick={onAbort}
-        >
-            ABORT
-        </Button>
+        {onAbort && (
+            <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-hayl-danger h-auto py-0 px-2 text-xs font-mono opacity-50 hover:opacity-100"
+                onClick={onAbort}
+            >
+                ABORT
+            </Button>
+        )}
       </div>
     </header>
   );
