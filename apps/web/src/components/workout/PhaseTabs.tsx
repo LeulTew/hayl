@@ -96,14 +96,6 @@ function PhaseTabsComponent({ phases, activeIndex, onTabClick }: PhaseTabsProps)
                 {isComplete ? '✓' : PHASE_ICONS[phase.name]}
               </span>
               <span className="italic tracking-tight">{PHASE_LABELS[phase.name]}</span>
-              
-              {/* Item count badge (Clean Style) */}
-              <span className={`
-                ml-1 text-[10px] tabular-nums font-bold
-                ${isActive ? 'opacity-70' : 'text-hayl-muted'}
-              `}>
-                {phase.completedCount}/{phase.itemCount}
-              </span>
             </div>
           </button>
         );

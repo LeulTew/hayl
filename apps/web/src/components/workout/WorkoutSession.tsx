@@ -45,7 +45,7 @@ interface WorkoutPlan {
 }
 
 export function WorkoutSession({ planId }: { planId: string }) {
-   const { activeSession, logSet, skipSet, jumpToExercise, finishSession, discardSession } = useActiveSession();
+   const { activeSession, logSet, jumpToExercise, finishSession, discardSession } = useActiveSession();
   const { requestLock, releaseLock } = useWakeLock();
   
   // UX Hooks
@@ -86,29 +86,116 @@ export function WorkoutSession({ planId }: { planId: string }) {
      
      const currentEx = all[activeSession.currentExerciseIndex];
 
-     const phases = currentDay.phases.map((phase, idx) => {
-        const start = currentDay.phases.slice(0, idx).reduce((acc, p) => acc + p.items.length, 0);
-        const end = start + phase.items.length;
-        const completed = Math.min(Math.max(0, activeSession.currentExerciseIndex - start), phase.items.length);
-        
-        return {
-            name: phase.name,
-            itemCount: phase.items.length,
-            completedCount: activeSession.currentExerciseIndex >= end ? phase.items.length : completed
-        };
+     // Consolidate phases by name (Warmup, Main, Accessory, Stretch)
+     const consolidatedPhasesMap = new Map<string, {
+        name: string;
+        itemCount: number;
+        completedCount: number;
+        startsAt: number[]; // Track starting indices in the flattened array
+     }>();
+
+     let runningCount = 0;
+     currentDay.phases.forEach((phase) => {
+        const existing = consolidatedPhasesMap.get(phase.name);
+        // Completed items for THIS specific block
+        const blockStart = runningCount;
+        const blockEnd = runningCount + phase.items.length;
+
+
+        if (existing) {
+           existing.itemCount += phase.items.length;
+           // Accumulate completed count correctly.
+           // Since activeSession.currentExerciseIndex is global, we need to check how many items *within this specific block* (blockStart to blockEnd) are completed.
+           // blockCompleted is calculated as: Math.min(Math.max(0, activeSession.currentExerciseIndex - blockStart), phase.items.length)
+           // This logic is correct for a sequential progression through blocks.
+           // However, if we have [Main, Accessory, Main], and we are in the second Main, the first Main is fully complete.
+           // My previous logic `activeSession.currentExerciseIndex >= blockEnd` handles this correctly for sequential blocks.
+           // Let's ensure `blockCompleted` logic is robust.
+           
+           const specificBlockCompleted = activeSession.currentExerciseIndex >= blockEnd 
+               ? phase.items.length 
+               : Math.max(0, Math.min(activeSession.currentExerciseIndex - blockStart, phase.items.length));
+
+           existing.completedCount += specificBlockCompleted;
+           existing.startsAt.push(blockStart);
+        } else {
+            const specificBlockCompleted = activeSession.currentExerciseIndex >= blockEnd 
+               ? phase.items.length 
+               : Math.max(0, Math.min(activeSession.currentExerciseIndex - blockStart, phase.items.length));
+
+           consolidatedPhasesMap.set(phase.name, {
+              name: phase.name,
+              itemCount: phase.items.length,
+              completedCount: specificBlockCompleted,
+              startsAt: [blockStart]
+           });
+        }
+        runningCount += phase.items.length;
      });
 
-     let phaseIdx = 0;
-     let count = 0;
-     for (let i = 0; i < currentDay.phases.length; i++) {
-        count += currentDay.phases[i].items.length;
-        if (activeSession.currentExerciseIndex < count) {
-            phaseIdx = i;
-            break;
-        }
-     }
 
-     return { allExercises: all, currentExercise: currentEx, phasesInfo: phases, currentPhaseIndex: phaseIdx };
+     // 2. Iterate Summaries (Groups) and count them per phase
+     const phaseCounts = new Map<string, { total: number; completed: number }>();
+     // Initialize all possible phases to 0
+     ['warmup', 'main', 'accessory', 'stretch'].forEach(p => phaseCounts.set(p, { total: 0, completed: 0 }));
+
+     // Helper: Check if an exercise group is complete
+     // A group is complete if ALL its raw items are swallowed by `activeSession.currentExerciseIndex`.
+     // But wait, `currentExerciseIndex` points to the *current* raw item.
+     // So items < current are complete.
+     
+     let runIdx = 0;
+     currentDay.phases.forEach(phase => {
+        const pName = phase.name;
+        // Verify we have a stats entry
+        if (!phaseCounts.has(pName)) phaseCounts.set(pName, { total: 0, completed: 0 });
+        const stats = phaseCounts.get(pName)!;
+
+        // Group items in this *phase block* by exerciseId
+        const groupsInBlock = new Map<string, { start: number; count: number }>();
+        phase.items.forEach((item, itemIdx) => {
+             const globalIdx = runIdx + itemIdx;
+             if (!groupsInBlock.has(item.exerciseId)) {
+                 groupsInBlock.set(item.exerciseId, { start: globalIdx, count: 0 });
+             }
+             groupsInBlock.get(item.exerciseId)!.count++;
+        });
+
+        // Now for each *group* in this block, check if it's completed
+        groupsInBlock.forEach((groupInfo) => {
+             stats.total += 1; // It's 1 exercise
+             // Is it completed?
+             // It is completed if the FIRST ITEM of the NEXT group is > current index?
+             // Or simpler: If existing logs for this exercise >= total sets? 
+             // We don't have logs here directly without circular dep.
+             // We use `activeSession.currentExerciseIndex`.
+             // If `currentExerciseIndex` is PAST the last item of this group.
+             const groupEnd = groupInfo.start + groupInfo.count;
+             if (activeSession.currentExerciseIndex >= groupEnd) {
+                 stats.completed += 1;
+             } else if (activeSession.currentExerciseIndex >= groupInfo.start) {
+                 // We are IN this group. It is active, not completed.
+             }
+        });
+
+        runIdx += phase.items.length;
+     });
+
+     const finalPhases = Array.from(phaseCounts.entries()).map(([name, stats]) => ({
+        name: name as 'warmup' | 'main' | 'accessory' | 'stretch',
+        itemCount: stats.total,
+        completedCount: stats.completed
+     })).filter(p => p.itemCount > 0); // Only show relevant phases
+     
+     const currentPhaseName = currentEx?.phaseName;
+     const phaseIdx = finalPhases.findIndex(p => p.name === currentPhaseName);
+
+     return { 
+        allExercises: all, 
+        currentExercise: currentEx, 
+        phasesInfo: finalPhases, 
+        currentPhaseIndex: phaseIdx !== -1 ? phaseIdx : 0
+     };
   }, [currentDay, activeSession]);
 
    const exerciseIds = useMemo(() => {
@@ -507,9 +594,6 @@ export function WorkoutSession({ planId }: { planId: string }) {
          previousWeight={logsForCurrentGroup[logsForCurrentGroup.length - 1]?.weight} 
          logs={logsForCurrentGroup}
          onLog={handleLog}
-         onSkipSet={() => {
-            void skipSet();
-         }}
       />
 
          <div className="fixed bottom-0 left-0 right-0 p-4 bg-hayl-bg border-t border-hayl-border z-40 md:static md:bg-transparent md:border-0 md:mt-8">

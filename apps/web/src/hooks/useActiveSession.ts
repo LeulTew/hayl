@@ -99,15 +99,26 @@ export function useActiveSession() {
     });
   }, [activeSession]);
 
-  const skipSet = useCallback(async () => {
+  const skipSet = useCallback(async (totalSetsForCurrentItem?: number) => {
     if (!activeSession?.id) return;
 
     await db.transaction('rw', db.sessions, async () => {
       const latestSession = await db.sessions.get(activeSession.id as number);
       if (!latestSession?.id || latestSession.state !== 'active') return;
 
+      const nextSetIndex = latestSession.currentSetIndex;
+      let nextExerciseIndex = latestSession.currentExerciseIndex;
+      let nextSessionSetIndex = nextSetIndex + 1;
+
+      // Auto-advance logic (Same as logSet)
+      if (totalSetsForCurrentItem && nextSessionSetIndex >= totalSetsForCurrentItem) {
+           nextExerciseIndex++;
+           nextSessionSetIndex = 0; 
+      }
+
       await db.sessions.update(latestSession.id, {
-        currentSetIndex: latestSession.currentSetIndex + 1,
+        currentExerciseIndex: nextExerciseIndex,
+        currentSetIndex: nextSessionSetIndex,
         lastModifiedTs: Date.now(),
       });
     });
