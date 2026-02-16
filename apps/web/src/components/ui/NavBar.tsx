@@ -22,12 +22,21 @@ interface NavBarProps {
 }
 
 export function NavBar({ items, activeId, onChange, className }: NavBarProps) {
+  const isIosLiquidGlass =
+    typeof window !== 'undefined' &&
+    /iPhone/i.test(window.navigator.userAgent || '') &&
+    typeof CSS !== 'undefined' &&
+    (CSS.supports('backdrop-filter', 'blur(16px)') ||
+      CSS.supports('-webkit-backdrop-filter', 'blur(16px)'));
   
   return (
     <>
       {/* Mobile Bottom Bar */}
       <div className={cn(
-        "fixed bottom-0 left-0 right-0 z-50 bg-hayl-bg border-t border-hayl-border md:hidden pb-safe", 
+        "fixed bottom-0 left-0 right-0 z-50 border-t md:hidden pb-safe",
+        isIosLiquidGlass
+          ? "bg-hayl-bg/70 backdrop-blur-2xl border-hayl-border/70"
+          : "bg-hayl-bg border-hayl-border",
         className
       )}>
         <div className="flex justify-around items-center h-16 px-2">
