@@ -4,10 +4,16 @@ interface RestTimerProps {
     seconds: number;
     onComplete: () => void;
     onSkip: () => void;
+    onAdd15?: () => void;
 }
 
-export function RestTimer({ seconds, onComplete, onSkip }: RestTimerProps) {
+export function RestTimer({ seconds, onComplete, onSkip, onAdd15 }: RestTimerProps) {
     const [timeLeft, setTimeLeft] = useState(seconds);
+
+    // Sync local timer if parent updates duration (e.g. +15s)
+    useEffect(() => {
+        setTimeLeft(seconds);
+    }, [seconds]);
     const safeSeconds = seconds > 0 ? seconds : 1;
     const progress = (timeLeft / safeSeconds) * 100;
     
@@ -78,10 +84,13 @@ export function RestTimer({ seconds, onComplete, onSkip }: RestTimerProps) {
 
                 <div className="flex flex-col gap-4 w-full">
                     <button 
-                        onClick={() => setTimeLeft(prev => prev + 30)}
+                        onClick={() => {
+                            if (onAdd15) onAdd15();
+                            else setTimeLeft(prev => prev + 15);
+                        }}
                         className="py-5 bg-hayl-bg rounded-2xl border border-hayl-border font-heading font-bold uppercase tracking-[0.2em] hover:border-hayl-text transition-all text-xs italic"
                     >
-                        +30s Logic Extension
+                        +15s
                     </button>
                     
                     <button 

@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useQuery } from "convex/react";
 import { useActiveSession } from "../../hooks/useActiveSession";
 import { useWakeLock } from "../../hooks/useWakeLock";
+import { useWorkoutUX } from "../../hooks/useWorkoutUX";
 import { api } from "../../../../../convex/_generated/api";
 import type { Id } from "../../../../../convex/_generated/dataModel";
 
@@ -15,6 +16,7 @@ import { SetLogger } from "./session/SetLogger";
 import { RestTimer } from "./RestTimer";
 import { PhaseTabs } from "./PhaseTabs";
 
+// ... [Interfaces kept same] ...
 interface WorkoutItem {
   exerciseId: Id<'exercises'>;
   sets: number;
@@ -44,13 +46,17 @@ export function WorkoutSession({ planId }: { planId: string }) {
   const { activeSession, logSet, nextExercise, finishSession, discardSession } = useActiveSession();
   const { requestLock, releaseLock } = useWakeLock();
   
+  // UX Hooks
+  const { addTime, getCompletionWarning } = useWorkoutUX();
+  
   const plan = useQuery(api.programs.getPlan, { planId: planId as Id<'derivedPlans'> }) as WorkoutPlan | undefined;
   
   const [restTimer, setRestTimer] = useState<{ active: boolean; seconds: number }>({ active: false, seconds: 0 });
+  const [showWarningModal, setShowWarningModal] = useState<{ show: boolean, data: import("../../lib/workout/ux-constants").WorkoutWarning | null }>({ show: false, data: null });
 
   // Wake Lock
   useEffect(() => {
-      if (activeSession?.id && activeSession.state === 'active') {
+    if (activeSession?.id && activeSession.state === 'active') {
       void requestLock();
     }
     return () => {
@@ -58,14 +64,12 @@ export function WorkoutSession({ planId }: { planId: string }) {
     };
    }, [activeSession?.id, activeSession?.state, requestLock, releaseLock]);
 
-  // Loading State
-
 
   const currentDay = plan?.days[activeSession?.currentDayIndex ?? 0];
   
   // Data flattening & Current State
   const { allExercises, currentExercise, phasesInfo, currentPhaseIndex } = useMemo(() => {
-     if (!currentDay || !activeSession) return { allExercises: [], currentExercise: null, phasesInfo: [], currentPhaseIndex: 0 };
+     if (!currentDay || !activeSession) return { allExercises: [] as (WorkoutItem & { phaseName: string })[], currentExercise: null, phasesInfo: [], currentPhaseIndex: 0 };
 
      const all = currentDay.phases.flatMap(phase => phase.items.map(item => ({ ...item, phaseName: phase.name })));
      
@@ -133,6 +137,31 @@ export function WorkoutSession({ planId }: { planId: string }) {
 
   // Session Completion View
   if (!currentExercise) {
+     const handleFinishClick = () => {
+        // Calculate completion stats for warning
+        // This is a simplified calculation for now, assuming if we are at this screen we are done.
+        // In reality we should check all logs against plan.
+        
+        // Use a dummy stats object for now since we are at the success screen
+        // Phase 1B will pass real stats here
+        const stats = {
+            totalExercises: allExercises.length,
+            completedExercisesCount: allExercises.length, // Optimistic
+            totalSets: allExercises.reduce((acc, ex) => acc + ex.sets, 0),
+            completedSetsCount: activeSession.logs.length,
+            skippedExercisesNames: [],
+            partialExerciseDetails: []
+        };
+
+        const warning = getCompletionWarning(stats);
+        
+        if (warning.severity !== 'none') {
+            setShowWarningModal({ show: true, data: warning });
+        } else {
+            void finishSession();
+        }
+     };
+
      return (
         <Page className="flex flex-col items-center justify-center min-h-screen text-center space-y-8">
            <div className="w-24 h-24 bg-hayl-text text-hayl-bg rounded-full flex items-center justify-center text-5xl font-heading font-black italic shadow-lg animate-bounce">✓</div>
@@ -140,9 +169,28 @@ export function WorkoutSession({ planId }: { planId: string }) {
               <h1 className="font-heading text-6xl font-black uppercase italic tracking-tighter leading-none mb-4 lowercase">Session Complete.</h1>
               <p className="font-sans text-xs font-bold uppercase tracking-[0.3em] text-hayl-muted">Data synced to local core</p>
            </div>
-           <Button size="lg" onClick={finishSession} className="w-full max-w-xs animate-in fade-in slide-in-from-bottom-8 duration-700">
+           
+           <Button size="lg" onClick={handleFinishClick} className="w-full max-w-xs animate-in fade-in slide-in-from-bottom-8 duration-700">
               FINALIZE LOG
            </Button>
+
+            {/* Simple Warning Modal fallback if needed */}
+            {showWarningModal.show && showWarningModal.data && (
+                <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
+                    <div className="bg-hayl-bg border border-hayl-border p-6 rounded-2xl max-w-sm w-full space-y-4">
+                        <h3 className="font-heading text-xl uppercase">{showWarningModal.data.title}</h3>
+                        <p className="whitespace-pre-wrap text-sm text-hayl-text/80">{showWarningModal.data.message}</p>
+                        <div className="flex gap-2 pt-2">
+                             <Button variant="outline" fullWidth onClick={() => setShowWarningModal({ show: false, data: null })}>
+                                {showWarningModal.data.cancelLabel}
+                             </Button>
+                             <Button fullWidth onClick={() => { setShowWarningModal({ show: false, data: null }); void finishSession(); }}>
+                                {showWarningModal.data.confirmLabel}
+                             </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </Page>
      );
   }
@@ -213,6 +261,7 @@ export function WorkoutSession({ planId }: { planId: string }) {
             seconds={restTimer.seconds} 
             onComplete={() => setRestTimer({ active: false, seconds: 0 })}
             onSkip={() => setRestTimer({ active: false, seconds: 0 })}
+            onAdd15={() => setRestTimer(prev => ({ ...prev, seconds: addTime(prev.seconds) }))}
          />
       )}
     </Page>
