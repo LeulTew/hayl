@@ -23,13 +23,22 @@ describe('RestTimer', () => {
     expect(onComplete).toHaveBeenCalled();
   });
 
-  it('should add 30 seconds when button clicked', async () => {
+  it('should add 15 seconds when button clicked', async () => {
     render(<RestTimer seconds={10} onComplete={vi.fn()} onSkip={vi.fn()} />);
 
-    const addButton = screen.getByText('+30s Logic Extension');
+    const addButton = screen.getByText('+15s');
     fireEvent.click(addButton);
 
-    expect(screen.getByText('0:40')).toBeInTheDocument();
+    expect(screen.getByText('0:25')).toBeInTheDocument();
+  });
+
+  it('should not go below 0 when subtracting 15 seconds', async () => {
+    render(<RestTimer seconds={10} onComplete={vi.fn()} onSkip={vi.fn()} />);
+
+    const subtractButton = screen.getByText('-15s');
+    fireEvent.click(subtractButton);
+
+    expect(screen.getByText('0:00')).toBeInTheDocument();
   });
 
   it('should call onSkip when skip button clicked', () => {

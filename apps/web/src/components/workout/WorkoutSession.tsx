@@ -642,7 +642,7 @@ export function WorkoutSession({ planId }: { planId: string }) {
      <div 
         className={`hidden md:block fixed left-0 top-1/2 -translate-y-1/2 z-20 transition-all duration-500 pointer-events-auto 
           ${(!currentSummary || currentSummary.displayIndex === 0 || !showNavIndicators) 
-            ? 'opacity-0 pointer-events-none translate-x-[-20px]' 
+                  ? 'opacity-0 pointer-events-none -translate-x-5' 
             : 'opacity-40 md:opacity-20 hover:opacity-100 md:hover:opacity-80 cursor-pointer'
           }
         `}
@@ -650,7 +650,7 @@ export function WorkoutSession({ planId }: { planId: string }) {
         title="Previous Exercise"
      >
         {/* Mobile: High opacity circle | Desktop: Gradient shade */}
-        <div className="hidden md:flex w-12 h-32 items-center justify-center rounded-r-2xl bg-gradient-to-r from-hayl-text/10 to-transparent">
+        <div className="hidden md:flex w-12 h-32 items-center justify-center rounded-r-2xl bg-linear-to-r from-hayl-text/10 to-transparent">
            <ChevronRight size={32} className="rotate-180 text-hayl-text" />
         </div>
         <div className="flex md:hidden w-10 h-10 items-center justify-center rounded-full bg-hayl-surface/80 border border-hayl-border shadow-lg">
@@ -662,7 +662,7 @@ export function WorkoutSession({ planId }: { planId: string }) {
      <div 
         className={`hidden md:block fixed right-0 top-1/2 -translate-y-1/2 z-20 transition-all duration-500 pointer-events-auto 
           ${(!currentSummary || (completion && currentSummary.displayIndex >= completion.summaries.length - 1) || !showNavIndicators) 
-            ? 'opacity-0 pointer-events-none translate-x-[20px]' 
+                  ? 'opacity-0 pointer-events-none translate-x-5' 
             : 'opacity-40 md:opacity-20 hover:opacity-100 md:hover:opacity-80 cursor-pointer'
           }
         `}
@@ -670,7 +670,7 @@ export function WorkoutSession({ planId }: { planId: string }) {
         title="Next Exercise"
      >
         {/* Mobile: High opacity circle | Desktop: Gradient shade */}
-        <div className="hidden md:flex w-12 h-32 items-center justify-center rounded-l-2xl bg-gradient-to-l from-hayl-text/10 to-transparent">
+        <div className="hidden md:flex w-12 h-32 items-center justify-center rounded-l-2xl bg-linear-to-l from-hayl-text/10 to-transparent">
            <ChevronRight size={32} className="text-hayl-text" />
         </div>
         <div className="flex md:hidden w-10 h-10 items-center justify-center rounded-full bg-hayl-surface/80 border border-hayl-border shadow-lg">

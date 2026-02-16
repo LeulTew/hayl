@@ -13,6 +13,7 @@ import { Button } from "../ui/Button";
 
 import { useUserProfile } from '../../hooks/useUserProfile';
 import { useTranslation } from '../../hooks/useTranslation';
+import { useSafeActiveRoutine } from '../../hooks/useSafeActiveRoutine';
 
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, type LocalSession } from '../../lib/db';
@@ -73,6 +74,8 @@ export function Dashboard({ onNavigate, onStartSession }: DashboardProps) {
   const { profile } = useUserProfile();
   const { t } = useTranslation();
   const programs = useQuery(api.programs.list);
+  const token = typeof window !== 'undefined' ? localStorage.getItem("hayl-token") : null;
+  const { activeRoutine } = useSafeActiveRoutine(token);
 
   // Real Stats from Local DB
   const rawHistory = useLiveQuery(() => db.sessions.where('state').equals('completed').toArray());
@@ -97,7 +100,7 @@ export function Dashboard({ onNavigate, onStartSession }: DashboardProps) {
   const streak = useMemo(() => getStreakDays(history.map((session) => session.startTime)), [history]);
   
   // Phase 6: Active Routine Logic
-  const activePlanId = profile?.activePlanId;
+  const activePlanId = profile?.activePlanId || activeRoutine?.planId;
   const activePlan = useQuery(api.programs.getPlan, activePlanId ? { planId: activePlanId as Id<"derivedPlans"> } : "skip");
   
   // Fallback to history if no active plan set
@@ -112,8 +115,10 @@ export function Dashboard({ onNavigate, onStartSession }: DashboardProps) {
     s.startTime >= profile.programStartDate
   );
   
-  const nextDayIndex = activePlan?.days ? routineHistory.length % activePlan.days.length : 0;
-  const nextDayTitle = activePlan?.days?.[nextDayIndex]?.title || t('next_session');
+  const fallbackNextDayIndex = activePlan?.days ? routineHistory.length % activePlan.days.length : 0;
+  const nextDayIndex = activeRoutine?.nextDayIndex ?? fallbackNextDayIndex;
+  const nextDay = activePlan?.days?.find((day) => day.dayIndex === nextDayIndex) ?? activePlan?.days?.[nextDayIndex];
+  const nextDayTitle = nextDay?.title || t('next_session');
 
   return (
     <Page className="pt-8">
