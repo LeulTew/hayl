@@ -295,3 +295,180 @@ Example from Coach Greg: _"Cheat on your curls, but don't cheat on your girlfrie
 ---
 
 _Last Updated: 2026-02-15_
+
+---
+
+# 🚀 2026 DEFINITIVE EXECUTION PLAN (Current Active Roadmap)
+
+> **Note**: This section supersedes conflicting items in the Legacy Plan below.
+> **Role Assignment**:
+>
+> - **Gemini 3 Pro High**: UX Semantics, Copy, Conceptual Modeling.
+> - **GPT-5.3 Codex**: Backend Logic, Implementation, Validation.
+
+## PHASE 0 — PROGRAM DATA INTEGRITY (BACKEND ONLY)
+
+**Agent**: GPT-5.3 Codex
+**Scope**: Backend / Database / APIs ONLY
+
+### Program
+
+- **Goal**: Allow users to reorder their days within selected/active routines.
+- **Tasks**:
+  - [x] Design and implement schema changes for user-specific active routines.
+  - [x] Implement persistent day ordering.
+  - [x] Implement per-day streak logging.
+  - [x] Add `day_order` indexing and streak persistence.
+  - [x] Expose clean reorder APIs.
+  - [x] Ensure reordering does NOT break streaks or history.
+
+---
+
+## PHASE 1 — WORKOUT MODE UX & STATE LOGIC
+
+### PHASE 1A — UX SEMANTICS
+
+**Agent**: Gemini 3 Pro High
+**Scope**: UX / Interaction / Copy ONLY
+
+- **New Interactions**:
+  - [ ] +15s timer interaction.
+  - [ ] Swipe vs Dropdown navigation logic.
+  - [ ] Suggested vs Forced sets behavior.
+- **Messaging**:
+  - [ ] Write exact user-facing copy for granular incomplete-workout warnings.
+
+### PHASE 1B — STATE & VALIDATION IMPLEMENTATION
+
+**Agent**: GPT-5.3 Codex
+**Scope**: Frontend Logic + Backend Validation
+
+- **Features**:
+  - [ ] Implement +15s timer increment.
+  - [ ] Enable next/previous exercise navigation.
+  - [ ] Allow skipping sets without blocking progress.
+  - [ ] Track per-exercise and per-set completion ratios.
+  - [ ] Trigger dynamic confirmation modals listing exact unfinished items on workout end.
+
+---
+
+## PHASE 1.5 — PROGRAM DAY REORDERING (UI)
+
+### UX DESIGN
+
+**Agent**: Gemini 3 Pro High
+**Scope**: UX ONLY
+
+- [ ] Design UX for reordering routine days (drag/drop vs arrows).
+- [ ] Define visual feedback and edge-case handling.
+
+### IMPLEMENTATION
+
+**Agent**: GPT-5.3 Codex
+**Scope**: Frontend Implementation
+
+- [ ] Implement reordering UI using existing reorder APIs.
+- [ ] Persist order optimistically.
+- [ ] Ensure streaks and history remain correct after reorder.
+
+---
+
+## PHASE 2 — PROFILE & HISTORY
+
+### PHASE 2A — UX STRUCTURE
+
+**Agent**: Gemini 3 Pro High
+**Scope**: UX / Semantics
+
+- [ ] Decide history layout structure (collapsible, drawers, or pages).
+- [ ] Define KPIs and grouping.
+- [ ] Decide "kCAL" vs "CAL" terminology.
+
+### PHASE 2B — DATA & UI IMPLEMENTATION
+
+**Agent**: GPT-5.3 Codex
+**Scope**: Backend + Frontend
+
+- [ ] Persist all sets, averages, and KPIs.
+- [ ] Implement collapsible/drawer UI.
+- [ ] Fix hover color bug on laptop (light changer).
+- [ ] Standardize calorie unit across system.
+
+---
+
+## PHASE 3 — EXERCISE BANK
+
+**Agent**: Gemini 3 Pro High
+**Scope**: Semantics
+
+- [ ] Define authenticity criteria and sourcing rules for videos/gifs.
+
+**Agent**: GPT-5.3 Codex
+**Scope**: Backend + Tooling
+
+- [ ] Build ingestion pipeline.
+- [ ] Validate authenticity.
+- [ ] Support scalable addition.
+
+---
+
+## PHASE 4 — FUEL SYSTEM
+
+### PHASE 4A — MEAL SEMANTICS
+
+**Agent**: Gemini 3 Pro High
+**Scope**: UX + Conceptual Modeling
+
+- [ ] Design composite meal mental model and UX (e.g., injera + wats).
+
+### PHASE 4B — CALCULATION ENGINE
+
+**Agent**: GPT-5.3 Codex
+**Scope**: Backend Logic
+
+- [ ] Normalize calorie data across units (100g vs serving).
+- [ ] Implement suggestion engine based on goals/stats.
+- [ ] Add hooks for adaptive future logic.
+
+---
+
+## PHASE 5 — PROGRESS TRACKER
+
+**Agent**: Gemini 3 Pro High
+**Scope**: UX / Messaging
+
+- [ ] Define progress messaging and nuance (muscle gain vs fat gain).
+
+**Agent**: GPT-5.3 Codex
+**Scope**: Logic + Notifications
+
+- [ ] Implement reminders, popups, weight updates.
+- [ ] Recalculate progress and suggestions.
+- [ ] Distinguish muscle vs fat gain.
+
+---
+
+## PHASE 6 — HOME PAGE
+
+**Agent**: Gemini 3 Pro High
+**Scope**: UX Strategy
+
+- [ ] Decide KPI selection and layout.
+
+**Agent**: GPT-5.3 Codex
+**Scope**: Implementation
+
+- [ ] Aggregate KPIs.
+- [ ] Remove redundant Protocol button.
+- [ ] Prepare analytics pipelines.
+
+---
+
+## PHASE 7 — PLATFORM ENHANCEMENT
+
+**Agent**: GPT-5.3 Codex
+**Scope**: Platform-specific UI
+
+- [ ] Detect Apple support.
+- [ ] Enable Liquid Glass (in-built) conditionally.
+- [ ] Ensure graceful fallback.
