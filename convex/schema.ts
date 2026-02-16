@@ -148,6 +148,40 @@ export default defineSchema({
     createdAt: v.number(),
   }).index("by_token", ["tokenIdentifier"]),
 
+  userActiveRoutines: defineTable({
+    userId: v.id("users"),
+    planId: v.id("derivedPlans"),
+    programId: v.id("programs"),
+    dayOrder: v.array(v.object({
+      dayIndex: v.number(),
+      day_order: v.number(),
+    })),
+    isActive: v.boolean(),
+    startedAt: v.number(),
+    lastReorderedAt: v.optional(v.number()),
+    updatedAt: v.number(),
+    createdAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_user_plan", ["userId", "planId"])
+    .index("by_user_active", ["userId", "isActive"]),
+
+  routineDayLogs: defineTable({
+    userId: v.id("users"),
+    planId: v.id("derivedPlans"),
+    programId: v.id("programs"),
+    dayIndex: v.number(),
+    day_order: v.number(),
+    completedAt: v.number(),
+    completedDayStart: v.number(),
+    sessionRef: v.optional(v.string()),
+    createdAt: v.number(),
+  })
+    .index("by_user_plan_completedAt", ["userId", "planId", "completedAt"])
+    .index("by_user_plan_day_start", ["userId", "planId", "completedDayStart"])
+    .index("by_user_plan_day_order", ["userId", "planId", "day_order", "completedAt"])
+    .index("by_user_day_start", ["userId", "completedDayStart"]),
+
   telebirrTransactions: defineTable({
     transactionId: v.string(),
     userId: v.id("users"),
