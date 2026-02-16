@@ -43,7 +43,7 @@ interface WorkoutPlan {
 }
 
 export function WorkoutSession({ planId }: { planId: string }) {
-  const { activeSession, logSet, nextExercise, finishSession, discardSession } = useActiveSession();
+   const { activeSession, logSet, skipSet, nextExercise, previousExercise, jumpToExercise, finishSession, discardSession } = useActiveSession();
   const { requestLock, releaseLock } = useWakeLock();
   
   // UX Hooks
@@ -52,7 +52,11 @@ export function WorkoutSession({ planId }: { planId: string }) {
   const plan = useQuery(api.programs.getPlan, { planId: planId as Id<'derivedPlans'> }) as WorkoutPlan | undefined;
   
   const [restTimer, setRestTimer] = useState<{ active: boolean; seconds: number }>({ active: false, seconds: 0 });
-  const [showWarningModal, setShowWarningModal] = useState<{ show: boolean, data: import("../../lib/workout/ux-constants").WorkoutWarning | null }>({ show: false, data: null });
+   const [showWarningModal, setShowWarningModal] = useState<{
+      show: boolean;
+      data: import("../../lib/workout/ux-constants").WorkoutWarning | null;
+      unfinished: { name: string; setsDone: number; setsTotal: number; setsLeft: number; ratio: number }[];
+   }>({ show: false, data: null, unfinished: [] });
 
   // Wake Lock
   useEffect(() => {
@@ -100,6 +104,83 @@ export function WorkoutSession({ planId }: { planId: string }) {
      return { allExercises: all, currentExercise: currentEx, phasesInfo: phases, currentPhaseIndex: phaseIdx };
   }, [currentDay, activeSession]);
 
+   const exerciseIds = useMemo(() => {
+      const seen = new Set<string>();
+      return allExercises
+         .map((exercise) => exercise.exerciseId)
+         .filter((exerciseId) => {
+            const value = exerciseId as string;
+            if (seen.has(value)) return false;
+            seen.add(value);
+            return true;
+         });
+   }, [allExercises]);
+
+   const exerciseMap = useQuery(
+      api.exercises.getExercisesByIds,
+      exerciseIds.length > 0 ? { ids: exerciseIds } : "skip"
+   );
+
+   const completion = useMemo(() => {
+      const sessionLogs = activeSession?.logs ?? [];
+      const summaries = allExercises.map((exercise, index) => {
+         const logsForExercise = sessionLogs.filter((log) => log.exerciseId === exercise.exerciseId);
+         const doneSetIndexes = new Set(logsForExercise.map((log) => log.setIndex));
+         const setsDone = Math.min(doneSetIndexes.size, exercise.sets);
+         const setsLeft = Math.max(0, exercise.sets - setsDone);
+         const ratio = exercise.sets > 0 ? setsDone / exercise.sets : 0;
+         const resolved = exerciseMap?.[exercise.exerciseId as string];
+         const name = resolved?.name ?? `Exercise ${index + 1}`;
+
+         return {
+            index,
+            name,
+            setsDone,
+            setsTotal: exercise.sets,
+            setsLeft,
+            ratio,
+         };
+      });
+
+      const totalSets = summaries.reduce((acc, item) => acc + item.setsTotal, 0);
+      const completedSetsCount = summaries.reduce((acc, item) => acc + item.setsDone, 0);
+      const completedExercisesCount = summaries.filter((item) => item.setsDone >= item.setsTotal).length;
+
+      return {
+         summaries,
+         totalSets,
+         completedSetsCount,
+         completedExercisesCount,
+         skippedExercisesNames: summaries.filter((item) => item.setsDone === 0).map((item) => item.name),
+         partialExerciseDetails: summaries
+            .filter((item) => item.setsDone > 0 && item.setsDone < item.setsTotal)
+            .map((item) => ({ name: item.name, setsDone: item.setsDone, setsTotal: item.setsTotal })),
+         unfinished: summaries.filter((item) => item.setsDone < item.setsTotal),
+      };
+   }, [allExercises, activeSession?.logs, exerciseMap]);
+
+   const handleFinishAttempt = () => {
+      const warning = getCompletionWarning({
+         totalExercises: allExercises.length,
+         completedExercisesCount: completion.completedExercisesCount,
+         totalSets: completion.totalSets,
+         completedSetsCount: completion.completedSetsCount,
+         skippedExercisesNames: completion.skippedExercisesNames,
+         partialExerciseDetails: completion.partialExerciseDetails,
+      });
+
+      if (warning.severity !== 'none') {
+         setShowWarningModal({
+            show: true,
+            data: warning,
+            unfinished: completion.unfinished,
+         });
+         return;
+      }
+
+      void finishSession();
+   };
+
    // Loading State
    if (plan === null) {
      return (
@@ -135,56 +216,49 @@ export function WorkoutSession({ planId }: { planId: string }) {
       );
    }
 
-  // Session Completion View
-  if (!currentExercise) {
-     const handleFinishClick = () => {
-        // Calculate completion stats for warning
-        // This is a simplified calculation for now, assuming if we are at this screen we are done.
-        // In reality we should check all logs against plan.
-        
-        // Use a dummy stats object for now since we are at the success screen
-        // Phase 1B will pass real stats here
-        const stats = {
-            totalExercises: allExercises.length,
-            completedExercisesCount: allExercises.length, // Optimistic
-            totalSets: allExercises.reduce((acc, ex) => acc + ex.sets, 0),
-            completedSetsCount: activeSession.logs.length,
-            skippedExercisesNames: [],
-            partialExerciseDetails: []
-        };
-
-        const warning = getCompletionWarning(stats);
-        
-        if (warning.severity !== 'none') {
-            setShowWarningModal({ show: true, data: warning });
-        } else {
-            void finishSession();
-        }
-     };
+   // Session Completion View
+   if (!currentExercise) {
 
      return (
         <Page className="flex flex-col items-center justify-center min-h-screen text-center space-y-8">
            <div className="w-24 h-24 bg-hayl-text text-hayl-bg rounded-full flex items-center justify-center text-5xl font-heading font-black italic shadow-lg animate-bounce">✓</div>
            <div>
-              <h1 className="font-heading text-6xl font-black uppercase italic tracking-tighter leading-none mb-4 lowercase">Session Complete.</h1>
+              <h1 className="font-heading text-6xl font-black uppercase italic tracking-tighter leading-none mb-4">Session Complete.</h1>
               <p className="font-sans text-xs font-bold uppercase tracking-[0.3em] text-hayl-muted">Data synced to local core</p>
            </div>
            
-           <Button size="lg" onClick={handleFinishClick} className="w-full max-w-xs animate-in fade-in slide-in-from-bottom-8 duration-700">
+           <Button size="lg" onClick={handleFinishAttempt} className="w-full max-w-xs animate-in fade-in slide-in-from-bottom-8 duration-700">
               FINALIZE LOG
            </Button>
 
             {/* Simple Warning Modal fallback if needed */}
-            {showWarningModal.show && showWarningModal.data && (
+                  {showWarningModal.show && showWarningModal.data && (
                 <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
-                    <div className="bg-hayl-bg border border-hayl-border p-6 rounded-2xl max-w-sm w-full space-y-4">
+                              <div className="bg-hayl-bg border border-hayl-border p-6 rounded-2xl max-w-md w-full space-y-4">
                         <h3 className="font-heading text-xl uppercase">{showWarningModal.data.title}</h3>
                         <p className="whitespace-pre-wrap text-sm text-hayl-text/80">{showWarningModal.data.message}</p>
+                                    {showWarningModal.unfinished.length > 0 && (
+                                       <div className="rounded-xl border border-hayl-border bg-hayl-surface/40 p-3">
+                                          <p className="text-[10px] font-heading font-bold uppercase tracking-widest text-hayl-muted mb-2">
+                                             Remaining Items
+                                          </p>
+                                          <div className="space-y-2 max-h-56 overflow-y-auto">
+                                             {showWarningModal.unfinished.map((item) => (
+                                                <div key={item.name} className="flex items-center justify-between text-xs">
+                                                   <span className="font-semibold text-hayl-text/90">{item.name}</span>
+                                                   <span className="font-mono text-hayl-muted">
+                                                      {item.setsDone}/{item.setsTotal} · left {item.setsLeft}
+                                                   </span>
+                                                </div>
+                                             ))}
+                                          </div>
+                                       </div>
+                                    )}
                         <div className="flex gap-2 pt-2">
-                             <Button variant="outline" fullWidth onClick={() => setShowWarningModal({ show: false, data: null })}>
+                                           <Button variant="outline" fullWidth onClick={() => setShowWarningModal({ show: false, data: null, unfinished: [] })}>
                                 {showWarningModal.data.cancelLabel}
                              </Button>
-                             <Button fullWidth onClick={() => { setShowWarningModal({ show: false, data: null }); void finishSession(); }}>
+                                           <Button fullWidth onClick={() => { setShowWarningModal({ show: false, data: null, unfinished: [] }); void finishSession(); }}>
                                 {showWarningModal.data.confirmLabel}
                              </Button>
                         </div>
@@ -232,6 +306,38 @@ export function WorkoutSession({ planId }: { planId: string }) {
          totalExercises={allExercises.length}
       />
 
+         <div className="mb-4 rounded-2xl border border-hayl-border bg-hayl-surface/50 p-4 space-y-3">
+            <div className="flex items-center justify-between gap-3">
+               <label htmlFor="exercise-jump" className="text-[10px] font-heading font-bold uppercase tracking-widest text-hayl-muted">
+                  Exercise Navigation
+               </label>
+               <span className="text-xs font-mono text-hayl-muted">
+                  {completion.completedSetsCount}/{completion.totalSets} sets
+               </span>
+            </div>
+            <select
+               id="exercise-jump"
+               className="w-full rounded-xl border border-hayl-border bg-hayl-bg px-3 py-2 text-sm text-hayl-text"
+               value={activeSession.currentExerciseIndex}
+               onChange={(event) => {
+                  const targetIndex = Number(event.target.value);
+                  const target = allExercises[targetIndex];
+                  if (!target) return;
+                  void jumpToExercise(targetIndex, target.exerciseId);
+               }}
+            >
+               {completion.summaries.map((item) => (
+                  <option key={`${item.name}-${item.index}`} value={item.index}>
+                     {`#${item.index + 1} ${item.name} · ${item.setsDone}/${item.setsTotal}`}
+                  </option>
+               ))}
+            </select>
+            <div className="grid grid-cols-2 gap-3 text-xs">
+               <p className="text-hayl-muted">Current exercise: <span className="font-mono text-hayl-text">{currentLogs.length}/{currentExercise.sets}</span></p>
+               <p className="text-hayl-muted text-right">Workout volume: <span className="font-mono text-hayl-text">{completion.completedSetsCount}/{completion.totalSets}</span></p>
+            </div>
+         </div>
+
       <SetLogger 
          currentSetIndex={activeSession.currentSetIndex}
          totalSets={currentExercise.sets}
@@ -239,21 +345,79 @@ export function WorkoutSession({ planId }: { planId: string }) {
          previousWeight={currentLogs[currentLogs.length - 1]?.weight} // heuristic: use last set weight
          logs={currentLogs}
          onLog={handleLog}
+             onSkipSet={() => {
+               void skipSet();
+             }}
       />
 
-      {/* Next Exercise Action */}
-      {activeSession.currentSetIndex >= currentExercise.sets && (
          <div className="fixed bottom-0 left-0 right-0 p-4 bg-hayl-bg border-t border-hayl-border z-40 md:static md:bg-transparent md:border-0 md:mt-8">
-            <Button 
-                size="lg" 
-                fullWidth 
-                onClick={nextExercise}
-                className="shadow-xl"
-            >
-                NEXT EXERCISE →
-            </Button>
+            <div className="grid grid-cols-3 gap-2">
+               <Button
+                  size="md"
+                  variant="outline"
+                  disabled={activeSession.currentExerciseIndex <= 0}
+                  onClick={() => {
+                     const previousIndex = activeSession.currentExerciseIndex - 1;
+                     const previous = allExercises[previousIndex];
+                     if (!previous) return;
+                     void previousExercise(previous.exerciseId);
+                  }}
+               >
+                  ← PREV
+               </Button>
+               <Button
+                  size="md"
+                  onClick={() => {
+                     const nextIndex = activeSession.currentExerciseIndex + 1;
+                     const next = allExercises[nextIndex];
+                     void nextExercise(next?.exerciseId);
+                  }}
+               >
+                  NEXT →
+               </Button>
+               <Button
+                  size="md"
+                  variant="ghost"
+                  onClick={handleFinishAttempt}
+               >
+                  END NOW
+               </Button>
+            </div>
          </div>
-      )}
+
+         {showWarningModal.show && showWarningModal.data && (
+            <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
+               <div className="bg-hayl-bg border border-hayl-border p-6 rounded-2xl max-w-md w-full space-y-4">
+                  <h3 className="font-heading text-xl uppercase">{showWarningModal.data.title}</h3>
+                  <p className="whitespace-pre-wrap text-sm text-hayl-text/80">{showWarningModal.data.message}</p>
+                  {showWarningModal.unfinished.length > 0 && (
+                     <div className="rounded-xl border border-hayl-border bg-hayl-surface/40 p-3">
+                        <p className="text-[10px] font-heading font-bold uppercase tracking-widest text-hayl-muted mb-2">
+                           Remaining Items
+                        </p>
+                        <div className="space-y-2 max-h-56 overflow-y-auto">
+                           {showWarningModal.unfinished.map((item) => (
+                              <div key={`${item.name}-${item.setsTotal}`} className="flex items-center justify-between text-xs">
+                                 <span className="font-semibold text-hayl-text/90">{item.name}</span>
+                                 <span className="font-mono text-hayl-muted">
+                                    {item.setsDone}/{item.setsTotal} · left {item.setsLeft} · {Math.floor(item.ratio * 100)}%
+                                 </span>
+                              </div>
+                           ))}
+                        </div>
+                     </div>
+                  )}
+                  <div className="flex gap-2 pt-2">
+                     <Button variant="outline" fullWidth onClick={() => setShowWarningModal({ show: false, data: null, unfinished: [] })}>
+                        {showWarningModal.data.cancelLabel}
+                     </Button>
+                     <Button fullWidth onClick={() => { setShowWarningModal({ show: false, data: null, unfinished: [] }); void finishSession(); }}>
+                        {showWarningModal.data.confirmLabel}
+                     </Button>
+                  </div>
+               </div>
+            </div>
+         )}
 
       {/* Rest Timer Overlay */}
       {restTimer.active && (

@@ -10,6 +10,7 @@ interface SetLoggerProps {
   repsTarget: string;
   previousWeight?: number;
   onLog: (reps: number, weight?: number, rpe?: number) => void;
+   onSkipSet: () => void;
   logs: { weight?: number, reps: number }[];
 }
 
@@ -19,6 +20,7 @@ export function SetLogger({
   repsTarget, 
   previousWeight,
   onLog,
+   onSkipSet,
   logs 
 }: SetLoggerProps) {
   const weightRef = useRef<HTMLInputElement>(null);
@@ -89,9 +91,14 @@ export function SetLogger({
               </div>
            </div>
 
-           <Button size="lg" fullWidth className="mt-6" onClick={handleLog}>
-              LOG SET & REST
-           </Button>
+           <div className="mt-6 grid grid-cols-2 gap-3">
+              <Button size="lg" fullWidth onClick={handleLog}>
+                 LOG SET & REST
+              </Button>
+              <Button size="lg" variant="outline" fullWidth onClick={onSkipSet}>
+                 SKIP SET
+              </Button>
+           </div>
         </Card>
       )}
 

@@ -118,4 +118,51 @@ describe('useActiveSession', () => {
       state: 'completed',
     }));
   });
+
+  it('should skip current set by incrementing currentSetIndex', async () => {
+    mockActiveSession = { id: 1, state: 'active', currentSetIndex: 1 };
+
+    (db.sessions.get as Mock).mockResolvedValue({
+      id: 1,
+      state: 'active',
+      currentSetIndex: 1,
+      logs: [],
+    });
+
+    const { result } = renderHook(() => useActiveSession());
+
+    await act(async () => {
+      await result.current.skipSet();
+    });
+
+    expect(db.sessions.update).toHaveBeenCalledWith(1, expect.objectContaining({
+      currentSetIndex: 2,
+    }));
+  });
+
+  it('should jump to exercise and restore set progress from logs', async () => {
+    mockActiveSession = { id: 1, state: 'active', currentExerciseIndex: 0, currentSetIndex: 0 };
+
+    (db.sessions.get as Mock).mockResolvedValue({
+      id: 1,
+      state: 'active',
+      currentExerciseIndex: 0,
+      currentSetIndex: 0,
+      logs: [
+        { exerciseId: 'ex_2', setIndex: 0 },
+        { exerciseId: 'ex_2', setIndex: 1 },
+      ],
+    });
+
+    const { result } = renderHook(() => useActiveSession());
+
+    await act(async () => {
+      await result.current.jumpToExercise(1, 'ex_2');
+    });
+
+    expect(db.sessions.update).toHaveBeenCalledWith(1, expect.objectContaining({
+      currentExerciseIndex: 1,
+      currentSetIndex: 2,
+    }));
+  });
 });

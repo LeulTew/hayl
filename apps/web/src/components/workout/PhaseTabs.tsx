@@ -75,7 +75,7 @@ function PhaseTabsComponent({ phases, activeIndex, onTabClick }: PhaseTabsProps)
             aria-controls={`phase-panel-${phase.name}`}
             onClick={() => onTabClick(index)}
             className={`
-              flex-shrink-0 px-6 py-2.5 rounded-full font-heading font-bold text-sm uppercase tracking-widest
+              shrink-0 px-6 py-2.5 rounded-full font-heading font-bold text-sm uppercase tracking-widest
               transition-all duration-300 relative overflow-hidden border
               ${isActive 
                 ? 'bg-hayl-text text-hayl-bg border-hayl-text' 
@@ -86,7 +86,7 @@ function PhaseTabsComponent({ phases, activeIndex, onTabClick }: PhaseTabsProps)
             {/* Subtle Progress indicator */}
             {!isActive && progress > 0 && (
               <div 
-                className="absolute bottom-0 left-0 h-[2px] bg-hayl-text/20 transition-all"
+                className="absolute bottom-0 left-0 h-0.5 bg-hayl-text/20 transition-all"
                 style={{ width: `${progress}%` }}
               />
             )}

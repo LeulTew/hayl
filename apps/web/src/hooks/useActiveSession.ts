@@ -71,18 +71,77 @@ export function useActiveSession() {
     });
   }, [activeSession]);
 
+  const skipSet = useCallback(async () => {
+    if (!activeSession?.id) return;
+
+    await db.transaction('rw', db.sessions, async () => {
+      const latestSession = await db.sessions.get(activeSession.id as number);
+      if (!latestSession?.id || latestSession.state !== 'active') return;
+
+      await db.sessions.update(latestSession.id, {
+        currentSetIndex: latestSession.currentSetIndex + 1,
+        lastModifiedTs: Date.now(),
+      });
+    });
+  }, [activeSession]);
+
+  const countLoggedSetsForExercise = useCallback((session: LocalSession, exerciseId: string) => {
+    const indexes = new Set(
+      session.logs
+        .filter((log) => log.exerciseId === exerciseId)
+        .map((log) => log.setIndex)
+    );
+    return indexes.size;
+  }, []);
+
+  const jumpToExercise = useCallback(async (targetExerciseIndex: number, exerciseId: string) => {
+    if (!activeSession?.id) return;
+
+    await db.transaction('rw', db.sessions, async () => {
+      const latestSession = await db.sessions.get(activeSession.id as number);
+      if (!latestSession?.id || latestSession.state !== 'active') return;
+
+      const boundedIndex = Math.max(0, targetExerciseIndex);
+      const completedSetsForTarget = countLoggedSetsForExercise(latestSession, exerciseId);
+
+      await db.sessions.update(latestSession.id, {
+        currentExerciseIndex: boundedIndex,
+        currentSetIndex: completedSetsForTarget,
+        lastModifiedTs: Date.now(),
+      });
+    });
+  }, [activeSession, countLoggedSetsForExercise]);
+
   /**
    * Advances to the next exercise
    */
-  const nextExercise = useCallback(async () => {
+  const nextExercise = useCallback(async (exerciseId?: string) => {
       if (!activeSession?.id) return;
-      
-      await db.sessions.update(activeSession.id, {
-          currentExerciseIndex: activeSession.currentExerciseIndex + 1,
-          currentSetIndex: 0, // Reset set counter for new exercise
+
+      const nextIndex = activeSession.currentExerciseIndex + 1;
+
+      await db.transaction('rw', db.sessions, async () => {
+        const latestSession = await db.sessions.get(activeSession.id as number);
+        if (!latestSession?.id || latestSession.state !== 'active') return;
+
+        const nextSetIndex = exerciseId
+          ? countLoggedSetsForExercise(latestSession, exerciseId)
+          : 0;
+
+        await db.sessions.update(latestSession.id, {
+          currentExerciseIndex: nextIndex,
+          currentSetIndex: nextSetIndex,
           lastModifiedTs: Date.now(),
+        });
       });
-  }, [activeSession]);
+  }, [activeSession, countLoggedSetsForExercise]);
+
+  const previousExercise = useCallback(async (exerciseId: string) => {
+    if (!activeSession?.id) return;
+
+    const previousIndex = Math.max(0, activeSession.currentExerciseIndex - 1);
+    await jumpToExercise(previousIndex, exerciseId);
+  }, [activeSession, jumpToExercise]);
 
   /**
    * Ends the current session
@@ -115,7 +174,10 @@ export function useActiveSession() {
     isLoading: activeSession === undefined,
     startSession,
     logSet,
+    skipSet,
+    jumpToExercise,
     nextExercise,
+    previousExercise,
     finishSession,
     discardSession,
   };
