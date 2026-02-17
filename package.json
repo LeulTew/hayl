@@ -7,7 +7,7 @@
   ],
   "scripts": {
     "dev": "bun run --filter '*' dev",
-    "build": "bunx convex codegen && bun run --filter '*' build",
+    "build": "bun run --filter '*' build",
     "test": "bun run --filter '*' test"
   },
   "devDependencies": {
