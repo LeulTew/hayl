@@ -1,5 +1,47 @@
 import { mutation, query, type QueryCtx, type MutationCtx } from "./_generated/server";
+import type { Id } from "./_generated/dataModel";
 import { v } from "convex/values";
+
+async function resolveExerciseMediaUrls(
+  ctx: QueryCtx,
+  media:
+    | {
+        variants: {
+          mp4?: { storageId: Id<"_storage"> };
+          webm?: { storageId: Id<"_storage"> };
+        };
+        placeholder?: {
+          posterStorageId?: Id<"_storage">;
+          blurhash?: string;
+          lqipBase64?: string;
+        };
+        aspectRatio: number;
+      }
+    | undefined,
+) {
+  if (!media) return undefined;
+
+  const mp4Url = media.variants.mp4?.storageId
+    ? await ctx.storage.getUrl(media.variants.mp4.storageId)
+    : null;
+  const webmUrl = media.variants.webm?.storageId
+    ? await ctx.storage.getUrl(media.variants.webm.storageId)
+    : null;
+  const posterUrl = media.placeholder?.posterStorageId
+    ? await ctx.storage.getUrl(media.placeholder.posterStorageId)
+    : null;
+
+  return {
+    aspectRatio: media.aspectRatio,
+    blurhash: media.placeholder?.blurhash,
+    lqipBase64: media.placeholder?.lqipBase64,
+    urls: {
+      mp4: mp4Url,
+      webm: webmUrl,
+      poster: posterUrl,
+    },
+  };
+}
 
 /**
  * Seeds the exercise library with core exercises.
@@ -58,7 +100,134 @@ export const seedExercises = mutation({
 export const getExercise = query({
   args: { id: v.id("exercises") },
   handler: async (ctx: QueryCtx, args) => {
-    return await ctx.db.get(args.id);
+    const exercise = await ctx.db.get(args.id);
+    if (!exercise) return null;
+
+    const mediaResolved = await resolveExerciseMediaUrls(ctx, exercise.media);
+
+    return {
+      ...exercise,
+      mediaResolved,
+    };
+  },
+});
+
+export const createExercise = mutation({
+  args: {
+    name: v.string(),
+    muscleGroup: v.string(),
+    instructions: v.string(),
+    adminSecret: v.string(),
+  },
+  handler: async (ctx: MutationCtx, args) => {
+    if (args.adminSecret !== process.env.ADMIN_SECRET) {
+      throw new Error("❌ Unauthorized: Invalid Admin Secret");
+    }
+
+    const existing = await ctx.db
+      .query("exercises")
+      .withIndex("by_name", (q) => q.eq("name", args.name))
+      .first();
+
+    if (existing) return existing._id;
+
+    return await ctx.db.insert("exercises", {
+      name: args.name,
+      muscleGroup: args.muscleGroup,
+      instructions: args.instructions,
+    });
+  },
+});
+
+export const generateMediaUploadUrls = mutation({
+  args: {
+    adminSecret: v.string(),
+    includeMp4: v.boolean(),
+    includeWebm: v.boolean(),
+    includePoster: v.boolean(),
+  },
+  handler: async (ctx: MutationCtx, args) => {
+    if (args.adminSecret !== process.env.ADMIN_SECRET) {
+      throw new Error("❌ Unauthorized: Invalid Admin Secret");
+    }
+
+    const result: {
+      mp4UploadUrl?: string;
+      webmUploadUrl?: string;
+      posterUploadUrl?: string;
+    } = {};
+
+    if (args.includeMp4) result.mp4UploadUrl = await ctx.storage.generateUploadUrl();
+    if (args.includeWebm) result.webmUploadUrl = await ctx.storage.generateUploadUrl();
+    if (args.includePoster) result.posterUploadUrl = await ctx.storage.generateUploadUrl();
+
+    return result;
+  },
+});
+
+export const finalizeExerciseMedia = mutation({
+  args: {
+    adminSecret: v.string(),
+    exerciseId: v.id("exercises"),
+    sourceUrl: v.string(),
+    ingestedBy: v.string(),
+    checksum: v.string(),
+    aspectRatio: v.number(),
+    width: v.number(),
+    height: v.number(),
+    durationMs: v.number(),
+    placeholder: v.optional(
+      v.object({
+        blurhash: v.optional(v.string()),
+        lqipBase64: v.optional(v.string()),
+        posterStorageId: v.optional(v.id("_storage")),
+      }),
+    ),
+    mp4: v.optional(
+      v.object({
+        storageId: v.id("_storage"),
+        bytes: v.number(),
+        mime: v.string(),
+      }),
+    ),
+    webm: v.optional(
+      v.object({
+        storageId: v.id("_storage"),
+        bytes: v.number(),
+        mime: v.string(),
+      }),
+    ),
+  },
+  handler: async (ctx: MutationCtx, args) => {
+    if (args.adminSecret !== process.env.ADMIN_SECRET) {
+      throw new Error("❌ Unauthorized: Invalid Admin Secret");
+    }
+
+    const exercise = await ctx.db.get(args.exerciseId);
+    if (!exercise) throw new Error("Exercise not found");
+    if (!args.mp4 && !args.webm) {
+      throw new Error("At least one video format (mp4 or webm) is required");
+    }
+
+    await ctx.db.patch(args.exerciseId, {
+      media: {
+        sourceUrl: args.sourceUrl,
+        ingestedBy: args.ingestedBy,
+        checksum: args.checksum,
+        width: args.width,
+        height: args.height,
+        aspectRatio: args.aspectRatio,
+        durationMs: args.durationMs,
+        variants: {
+          mp4: args.mp4,
+          webm: args.webm,
+        },
+        placeholder: args.placeholder,
+        updatedAt: Date.now(),
+      },
+    });
+
+    return { ok: true };
   },
 });
 

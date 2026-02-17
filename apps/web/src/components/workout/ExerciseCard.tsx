@@ -2,6 +2,7 @@ import { useQuery } from 'convex/react';
 import { api } from '../../../../../convex/_generated/api';
 import type { Id } from '../../../../../convex/_generated/dataModel';
 import { memo } from 'react';
+import { ExerciseMediaPlayer } from './ExerciseMediaPlayer';
 
 interface ExerciseCardProps {
   /** Convex exercise ID */
@@ -80,12 +81,8 @@ function ExerciseCardComponent({
 
       {/* Visual Hub */}
       <div className="px-8 pb-8">
-        <div className="aspect-video bg-hayl-bg rounded-[2rem] border border-hayl-border flex items-center justify-center relative overflow-hidden group">
-          <div className="text-center opacity-30 group-hover:opacity-100 transition-opacity">
-            <p className="font-heading font-bold text-hayl-muted uppercase tracking-[0.4em] text-[10px]">
-              Visual Stream Pending
-            </p>
-          </div>
+        <div className="rounded-4xl border border-hayl-border relative overflow-hidden group">
+          <ExerciseMediaPlayer media={exercise.mediaResolved} fallbackLabel="VISUAL STREAM PENDING" />
           {/* Workload Badge */}
           <div className="absolute top-6 right-6 bg-hayl-text text-hayl-bg px-5 py-2 rounded-full font-heading font-bold uppercase italic text-sm tracking-widest shadow-premium">
             {sets} × {reps}
@@ -99,7 +96,7 @@ function ExerciseCardComponent({
           <blockquote className="text-base font-heading font-bold uppercase italic tracking-tight leading-snug">
             "{quote.text}"
             <footer className="text-[9px] opacity-40 mt-3 flex items-center gap-3 tracking-widest">
-              <span className="w-6 h-[1px] bg-hayl-text/20" /> {quote.author}
+              <span className="w-6 h-px bg-hayl-text/20" /> {quote.author}
             </footer>
           </blockquote>
         </div>

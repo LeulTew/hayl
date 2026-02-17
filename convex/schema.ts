@@ -96,6 +96,34 @@ export default defineSchema({
     name: v.string(),
     muscleGroup: v.string(),
 
+    media: v.optional(v.object({
+      sourceUrl: v.string(),
+      ingestedBy: v.string(),
+      checksum: v.string(),
+      width: v.number(),
+      height: v.number(),
+      aspectRatio: v.number(),
+      durationMs: v.number(),
+      variants: v.object({
+        mp4: v.optional(v.object({
+          storageId: v.id("_storage"),
+          bytes: v.number(),
+          mime: v.string(),
+        })),
+        webm: v.optional(v.object({
+          storageId: v.id("_storage"),
+          bytes: v.number(),
+          mime: v.string(),
+        })),
+      }),
+      placeholder: v.optional(v.object({
+        posterStorageId: v.optional(v.id("_storage")),
+        blurhash: v.optional(v.string()),
+        lqipBase64: v.optional(v.string()),
+      })),
+      updatedAt: v.number(),
+    })),
+
     visualAsset: v.optional(v.object({
       url: v.string(),
       type: v.union(

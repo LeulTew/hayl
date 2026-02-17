@@ -8,7 +8,8 @@
   "scripts": {
     "dev": "bun run --filter '*' dev",
     "build": "bun run --filter '*' build",
-    "test": "bun run --filter '*' test"
+    "test": "bun run --filter '*' test",
+    "ingest:exercise": "bun scripts/ingest-exercise.ts"
   },
   "devDependencies": {
     "@types/node": "25.2.3",

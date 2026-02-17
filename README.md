@@ -71,6 +71,41 @@ npx convex dev
 bun run dev
 ```
 
+### Exercise Media Ingestion (Phase 3)
+
+Hayl now includes a local ingest pipeline for exercise demonstration media.
+
+Prerequisites:
+
+- `ffmpeg`
+- `ffprobe`
+- `yt-dlp`
+- `CONVEX_URL` (or `VITE_CONVEX_URL`) and `ADMIN_SECRET` in environment
+
+Example (existing exercise):
+
+```bash
+bun run ingest:exercise -- \
+	--source "https://www.youtube.com/watch?v=..." \
+	--exercise-id "<convex_exercise_id>" \
+	--start "00:00:12" \
+	--duration "00:00:06" \
+	--admin-secret "$ADMIN_SECRET"
+```
+
+Example (create + ingest):
+
+```bash
+bun run ingest:exercise -- \
+	--source "./assets/raw/bench-demo.mp4" \
+	--name "Barbell Bench Press" \
+	--muscle-group "Chest" \
+	--instructions "Lower to mid-chest with control and press to lockout." \
+	--start "00:00:03" \
+	--duration "00:00:05" \
+	--admin-secret "$ADMIN_SECRET"
+```
+
 ### Environment Variables
 
 Create `.env.local` in the project root:

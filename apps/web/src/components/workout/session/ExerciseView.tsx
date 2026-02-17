@@ -5,6 +5,7 @@ import { Card } from '../../ui/Card';
 import { Badge } from '../../ui/Badge';
 import { Skeleton } from '../../ui/Skeleton';
 import { ChevronDown, Info } from 'lucide-react';
+import { ExerciseMediaPlayer } from '../ExerciseMediaPlayer';
 
 interface ExerciseViewProps {
   exerciseId: Id<'exercises'>;
@@ -31,8 +32,8 @@ export function ExerciseView({
   return (
     <Card className="mb-6 overflow-hidden">
       {/* Media Area (Placeholder) */}
-      <div className="aspect-video bg-hayl-bg relative flex items-center justify-center border-b border-hayl-border">
-        <p className="font-heading text-xl text-hayl-muted uppercase tracking-widest opacity-20">VISUAL FEED ABSENT</p>
+         <div className="relative border-b border-hayl-border">
+            <ExerciseMediaPlayer media={exercise.mediaResolved} />
         
         {/* Progress Overlay */}
         <div className="absolute top-4 left-4 flex gap-2">
