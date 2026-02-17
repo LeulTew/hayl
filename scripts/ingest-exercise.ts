@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { mkdtemp, readFile, rm, stat } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { basename, extname, join, resolve } from 'node:path';
+import { basename, join, resolve } from 'node:path';
 import { spawn } from 'node:child_process';
 import { ConvexHttpClient } from 'convex/browser';
 import { api } from '../convex/_generated/api.js';
@@ -18,10 +18,10 @@ type ProbeData = {
 function parseArgs(argv: string[]): ArgsMap {
   const parsed: ArgsMap = {};
   for (let index = 0; index < argv.length; index += 1) {
-    const token = argv[index];
-    if (!token?.startsWith('--')) continue;
+    const token = argv[index] ?? '';
+    if (!token.startsWith('--')) continue;
     const key = token.slice(2);
-    const next = argv[index + 1];
+    const next = argv[index + 1] ?? '';
     if (!next || next.startsWith('--')) {
       parsed[key] = true;
       continue;
@@ -34,10 +34,10 @@ function parseArgs(argv: string[]): ArgsMap {
 
 function getRequired(args: ArgsMap, key: string): string {
   const value = args[key];
-  if (typeof value !== 'string' || !value.trim()) {
-    throw new Error(`Missing required argument --${key}`);
+  if (typeof value === 'string' && value.trim()) {
+    return value;
   }
-  return value;
+  throw new Error(`Missing required argument --${key}`);
 }
 
 function getOptional(args: ArgsMap, key: string): string | undefined {
@@ -53,7 +53,7 @@ async function run(cmd: string, cmdArgs: string[]) {
       if (code === 0) {
         resolvePromise();
       } else {
-        rejectPromise(new Error(`${cmd} failed with exit code ${code}`));
+        rejectPromise(new Error(`${cmd} failed with exit code ${code ?? 'unknown'}`));
       }
     });
   });
@@ -69,7 +69,7 @@ async function runCapture(cmd: string, cmdArgs: string[]): Promise<string> {
       if (code === 0) {
         resolvePromise();
       } else {
-        rejectPromise(new Error(`${cmd} failed with exit code ${code}`));
+        rejectPromise(new Error(`${cmd} failed with exit code ${code ?? 'unknown'}`));
       }
     });
   });
