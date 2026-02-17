@@ -3,5 +3,11 @@
   "buildCommand": "bun run build",
   "outputDirectory": "apps/web/dist",
   "ignoreCommand": "git diff --quiet HEAD^ HEAD .",
-  "framework": "vite"
+  "framework": "vite",
+  "rewrites": [
+    {
+      "source": "/webhooks/telebirr",
+      "destination": "/api/webhooks/telebirr"
+    }
+  ]
 }
