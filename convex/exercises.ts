@@ -117,6 +117,7 @@ export const createExercise = mutation({
     name: v.string(),
     muscleGroup: v.string(),
     instructions: v.string(),
+    tutorialUrl: v.optional(v.string()),
     adminSecret: v.string(),
   },
   handler: async (ctx: MutationCtx, args) => {
@@ -135,6 +136,7 @@ export const createExercise = mutation({
       name: args.name,
       muscleGroup: args.muscleGroup,
       instructions: args.instructions,
+      tutorialUrl: args.tutorialUrl,
     });
   },
 });
@@ -240,27 +242,35 @@ export const finalizeExerciseMedia = mutation({
 export const searchExercises = query({
   args: { query: v.string() },
   handler: async (ctx: QueryCtx, args) => {
+    let exercises;
     if (!args.query.trim()) {
-      // Return all exercises if no query (limited)
-      return await ctx.db.query("exercises").take(20);
+      exercises = await ctx.db.query("exercises").take(20);
+    } else {
+      exercises = await ctx.db
+        .query("exercises")
+        .withSearchIndex("search_name", (q) => q.search("name", args.query))
+        .take(20);
     }
 
-    return await ctx.db
-      .query("exercises")
-      .withSearchIndex("search_name", (q) => q.search("name", args.query))
-      .take(20);
+    return await Promise.all(
+      exercises.map(async (e) => ({
+        ...e,
+        mediaResolved: await resolveExerciseMediaUrls(ctx, e.media),
+      }))
+    );
   },
 });
 
-/**
- * Lists all exercises (for admin/dashboard views).
- * 
- * @returns All exercises in the database
- */
 export const listAll = query({
   args: {},
   handler: async (ctx: QueryCtx) => {
-    return await ctx.db.query("exercises").collect();
+    const exercises = await ctx.db.query("exercises").collect();
+    return await Promise.all(
+      exercises.map(async (e) => ({
+        ...e,
+        mediaResolved: await resolveExerciseMediaUrls(ctx, e.media),
+      }))
+    );
   },
 });
 

@@ -95,6 +95,7 @@ export default defineSchema({
   exercises: defineTable({
     name: v.string(),
     muscleGroup: v.string(),
+    tutorialUrl: v.optional(v.string()), // Full instructional video (e.g. YouTube embed)
 
     media: v.optional(v.object({
       sourceUrl: v.string(),
@@ -269,4 +270,5 @@ export default defineSchema({
       })),
     })),
   }),
+
 });

@@ -6,8 +6,22 @@ import { Page } from "../ui/Page";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
 import { Skeleton } from "../ui/Skeleton";
-import { Search, Play, ArrowLeft } from "lucide-react";
+import { Search, ArrowLeft } from "lucide-react";
 import type { NavigationState } from "../../types/navigation";
+import { ExerciseMediaPlayer } from "../workout/ExerciseMediaPlayer";
+
+type ExerciseWithMedia = Doc<"exercises"> & {
+  mediaResolved?: {
+    aspectRatio: number;
+    blurhash?: string;
+    lqipBase64?: string;
+    urls: {
+      mp4: string | null;
+      webm: string | null;
+      poster: string | null;
+    };
+  };
+};
 
 interface ExerciseLibraryProps {
   view?: 'home' | 'list' | 'detail';
@@ -28,7 +42,7 @@ const MUSCLE_GROUPS = [
 ];
 
 export function ExerciseLibrary({ view = 'home', filter, exerciseId, onNavigate }: ExerciseLibraryProps) {
-  const allExercises = useQuery(api.exercises.listAll);
+  const allExercises = useQuery(api.exercises.listAll) as ExerciseWithMedia[] | undefined;
   const [search, setSearch] = useState("");
 
   const handleNavigate = (newState: NavigationState) => {
@@ -37,7 +51,7 @@ export function ExerciseLibrary({ view = 'home', filter, exerciseId, onNavigate 
 
   // Detail View
   if (view === 'detail' && exerciseId) {
-    const exercise = allExercises?.find((e: Doc<"exercises">) => e._id === exerciseId);
+    const exercise = allExercises?.find((e) => e._id === exerciseId);
     
     if (!allExercises) return <Page><Skeleton className="h-96 w-full" /></Page>;
     if (!exercise) return <Page>Exercise not found</Page>;
@@ -51,10 +65,8 @@ export function ExerciseLibrary({ view = 'home', filter, exerciseId, onNavigate 
             </Button>
         </div>
 
-        <div className="aspect-video bg-hayl-surface border border-hayl-border rounded-xl flex items-center justify-center mb-8 relative overflow-hidden group">
-            <div className="absolute inset-0 bg-black/5 group-hover:bg-black/0 transition-colors" />
-            <Play className="w-16 h-16 text-hayl-text opacity-50 group-hover:opacity-100 group-hover:scale-110 transition-all pointer-events-none" />
-            <p className="absolute bottom-4 right-4 font-mono text-xs opacity-50">VIDEO COMING SOON</p>
+        <div className="rounded-xl border border-hayl-border relative overflow-hidden group mb-8">
+            <ExerciseMediaPlayer media={exercise.mediaResolved} />
         </div>
 
         <header className="mb-8">

@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { mkdtemp, readFile, rm, stat } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm, stat } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { basename, join, resolve } from 'node:path';
 import { spawn } from 'node:child_process';
@@ -119,11 +119,11 @@ async function probeVideo(filePath: string): Promise<ProbeData> {
 }
 
 async function uploadToConvexStorage(uploadUrl: string, filePath: string, mime: string): Promise<Id<'_storage'>> {
-  const file = Bun.file(filePath);
+  const fileContent = await readFile(filePath);
   const response = await fetch(uploadUrl, {
     method: 'POST',
     headers: { 'Content-Type': mime },
-    body: file,
+    body: fileContent,
   });
 
   if (!response.ok) {
@@ -138,6 +138,7 @@ async function uploadToConvexStorage(uploadUrl: string, filePath: string, mime: 
 
 async function main() {
   const args = parseArgs(process.argv.slice(2));
+  const skipUpload = args['skip-upload'] === true;
 
   const source = getRequired(args, 'source');
   const adminSecret = getRequired(args, 'admin-secret');
@@ -158,8 +159,13 @@ async function main() {
   const name = getOptional(args, 'name');
   const muscleGroup = getOptional(args, 'muscle-group');
   const instructions = getOptional(args, 'instructions');
+  const tutorialUrl = getOptional(args, 'tutorial-url');
 
-  const tempDir = await mkdtemp(join(tmpdir(), 'hayl-ingest-'));
+  // Use a project-local temp dir so yt-dlp (snap) can write to it.
+  // The snap sandbox isolates /tmp, making files written there invisible to Node.js.
+  const projectTmpBase = join(process.cwd(), '.hayl-tmp');
+  await mkdir(projectTmpBase, { recursive: true });
+  const tempDir = await mkdtemp(join(projectTmpBase, 'ingest-'));
 
   try {
     const sourceFile = join(tempDir, 'source.mp4');
@@ -170,7 +176,17 @@ async function main() {
     const tinyFile = join(tempDir, 'tiny.webp');
 
     if (isUrl(source)) {
-      await run('yt-dlp', ['-o', sourceFile, '-f', 'mp4', source]);
+      // Download directly to sourceFile. yt-dlp (snap) can access project-local paths.
+      // With --merge-output-format mp4, the merged file is written to the -o path.
+      await run('yt-dlp', [
+        '-o', sourceFile,
+        '-f', 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
+        '--merge-output-format', 'mp4',
+        '--no-part',
+        source,
+      ]);
+      // Verify the file was written
+      await stat(sourceFile);
     } else {
       const resolvedSource = resolve(source);
       await run('cp', [resolvedSource, sourceFile]);
@@ -229,22 +245,45 @@ async function main() {
     const lqipBase64 = (await readFile(tinyFile)).toString('base64');
     const checksum = await sha256Of(trimmedFile);
 
+    if (skipUpload) {
+      console.log('✅ Processing complete (Upload skipped)');
+      console.log(`MP4: ${basename(mp4File)} (${mp4Stat.size} bytes)`);
+      console.log(`WEBM: ${basename(webmFile)} (${webmStat.size} bytes)`);
+      console.log(`Poster: ${basename(posterFile)} (${posterStat.size} bytes)`);
+      console.log(`LQIP Base64: ${lqipBase64.slice(0, 50)}...`);
+      return;
+    }
+
     const client = new ConvexHttpClient(convexUrl);
 
     let exerciseId: Id<'exercises'>;
     if (exerciseIdArg) {
       exerciseId = exerciseIdArg as Id<'exercises'>;
     } else {
-      if (!name || !muscleGroup || !instructions) {
-        throw new Error('Provide --exercise-id OR all of --name --muscle-group --instructions');
+      // Try to find by name first
+      if (name) {
+        const allExercises = await client.query(api.exercises.listAll, {});
+        const existing = allExercises.find((e) => e.name === name);
+        if (existing) {
+          console.log(`ℹ️ Found existing exercise: ${existing.name} (${existing._id})`);
+          exerciseId = existing._id;
+        }
       }
 
-      exerciseId = await client.mutation(api.exercises.createExercise, {
-        name,
-        muscleGroup,
-        instructions,
-        adminSecret,
-      });
+      // If still no ID, we need to create it
+      if (!exerciseId!) {
+        if (!name || !muscleGroup || !instructions) {
+          throw new Error('Provide --exercise-id OR all of --name --muscle-group --instructions');
+        }
+
+        exerciseId = await client.mutation(api.exercises.createExercise, {
+          name,
+          muscleGroup,
+          instructions,
+          tutorialUrl,
+          adminSecret,
+        });
+      }
     }
 
     const uploadUrls = await client.mutation(api.exercises.generateMediaUploadUrls, {
