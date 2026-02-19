@@ -13,6 +13,18 @@ export default defineConfig(({ mode }) => {
     define: {
       __HAYL_CONVEX_URL__: JSON.stringify(convexUrl),
     },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            react: ["react", "react-dom"],
+            convex: ["convex/react", "convex/browser"],
+            storage: ["dexie", "dexie-react-hooks"],
+            motion_icons: ["framer-motion", "lucide-react"],
+          },
+        },
+      },
+    },
     test: {
       globals: true,
       environment: 'jsdom',
