@@ -293,7 +293,8 @@ export default defineSchema({
   })
     .index("by_name", ["name"])
     .index("by_isLocal", ["isLocal"])
-    .searchIndex("search_name", { searchField: "name" }),
+    .searchIndex("search_name", { searchField: "name" })
+    .searchIndex("search_amharic", { searchField: "amharicName" }),
 
   dishes: defineTable({
     name: v.string(),
@@ -352,13 +353,15 @@ export default defineSchema({
       fiber: v.number(),
       servingGrams: v.number(),
     }),
+    amharicName: v.optional(v.string()),
     isPublic: v.boolean(),
     createdBy: v.string(),
     createdAt: v.number(),
     updatedAt: v.number(),
   })
     .index("by_public", ["isPublic"])
-    .searchIndex("search_name", { searchField: "name" }),
+    .searchIndex("search_name", { searchField: "name" })
+    .searchIndex("search_amharic", { searchField: "amharicName" }),
 
   mealLogs: defineTable({
     userId: v.id("users"),
@@ -389,6 +392,7 @@ export default defineSchema({
     normalizedComponents: v.array(v.object({
       itemId: v.union(v.id("ingredients"), v.id("dishes")),
       itemType: v.union(v.literal("ingredient"), v.literal("dish")),
+      name: v.optional(v.string()),
       amount: v.number(),
       unit: v.union(
         v.literal("grams"),

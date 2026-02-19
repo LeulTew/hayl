@@ -37,16 +37,64 @@ async function resolveMealComponent(
     amount: number;
     unit: FuelUnit;
   },
-): Promise<{ grams: number; macros: MacroVector } | null> {
+): Promise<{ grams: number; macros: MacroVector; name: string } | null> {
   if (component.itemType === "ingredient") {
     const ingredient = await ctx.db.get(component.itemId as Id<"ingredients">);
     if (!ingredient) return null;
-    return macrosFromIngredient(ingredient, component.amount, component.unit);
+    const normalized = macrosFromIngredient(ingredient, component.amount, component.unit);
+    return {
+      ...normalized,
+      name: ingredient.name,
+    };
   }
 
   const dish = await ctx.db.get(component.itemId as Id<"dishes">);
   if (!dish) return null;
-  return macrosFromDish(dish, component.amount, component.unit);
+  const normalized = macrosFromDish(dish, component.amount, component.unit);
+  return {
+    ...normalized,
+    name: dish.name,
+  };
+}
+
+function isBaseName(name: string): boolean {
+  return /(injera|rice|bread|kocho|kinche|genfo|nifro|oats|pasta|quinoa|bulgur|teff)/i.test(name);
+}
+
+function isSideName(name: string): boolean {
+  return /(salad|fruit|sauce|dip|yogurt|banana|avocado|salsa|pickle|ayib|egg|olive|peanut|sesame|gomen|fosolia|atkilt)/i.test(name);
+}
+
+function isLayerName(name: string): boolean {
+  return /(wat|wot|stew|sauce|tibs|kitfo|dulet|alicha|misir|shiro|bolognese|alfredo|arrabbiata|pesto)/i.test(name);
+}
+
+function matchesSearchContext(
+  context: "base" | "topping" | "side" | undefined,
+  params: { name: string; category?: "grain" | "legume" | "meat" | "vegetable" | "other"; type: "ingredient" | "dish" },
+): boolean {
+  if (!context) return true;
+
+  const { name, category } = params;
+  if (context === "base") {
+    return category === "grain" || isBaseName(name);
+  }
+
+  if (context === "side") {
+    // Side is intentionally broad enough to avoid "no results" frustration.
+    return category === "other" || category === "vegetable" || isSideName(name);
+  }
+
+  // topping/layer should be substantial meal components, not bases or light sides.
+  if (context === "topping") {
+    if (isBaseName(name)) return false;
+    if (isSideName(name) && !isLayerName(name)) return false;
+    if (category === "meat" || category === "legume" || category === "vegetable") return true;
+    if (params.type === "dish") return true;
+    return isLayerName(name);
+  }
+
+  return true;
 }
 
 async function calculateDishNutrition(
@@ -165,6 +213,7 @@ export const logMeal = mutation({
     const normalizedComponents: {
       itemId: Id<"ingredients"> | Id<"dishes">;
       itemType: "ingredient" | "dish";
+      name: string;
       amount: number;
       unit: FuelUnit;
       grams: number;
@@ -182,6 +231,7 @@ export const logMeal = mutation({
       normalizedComponents.push({
         itemId: component.itemId,
         itemType: component.itemType,
+        name: normalized.name,
         amount: component.amount,
         unit: component.unit,
         grams: round1(normalized.grams),
@@ -239,23 +289,53 @@ export const logMeal = mutation({
 // --- QUERIES ---
 
 export const searchFoods = query({
-  args: { query: v.string() },
+  args: {
+    query: v.string(),
+    page: v.optional(v.number()),
+    pageSize: v.optional(v.number()),
+    context: v.optional(v.union(v.literal("base"), v.literal("topping"), v.literal("side"))),
+  },
   handler: async (ctx, args) => {
     const query = args.query.trim();
-    if (!query) return [];
+    if (!query) {
+      return {
+        items: [],
+        total: 0,
+        page: 1,
+        pageSize: 10,
+      };
+    }
 
-    const [ingredients, dishes] = await Promise.all([
+    const page = Math.max(1, Math.floor(args.page ?? 1));
+    const pageSize = Math.min(25, Math.max(1, Math.floor(args.pageSize ?? 10)));
+
+    const [ingNames, ingAmharic, dishNames, dishAmharic] = await Promise.all([
       ctx.db.query("ingredients")
         .withSearchIndex("search_name", (q) => q.search("name", query))
-        .take(10),
+        .take(60),
+      ctx.db.query("ingredients")
+        .withSearchIndex("search_amharic", (q) => q.search("amharicName", query))
+        .take(60),
       ctx.db.query("dishes")
         .withSearchIndex("search_name", (q) => q.search("name", query))
-        .take(10),
+        .take(60),
+      ctx.db.query("dishes")
+        .withSearchIndex("search_amharic", (q) => q.search("amharicName", query))
+        .take(60),
     ]);
+
+    // Unique ingredients/dishes
+    const ingredients = [...ingNames, ...ingAmharic].filter(
+      (v, i, a) => a.findIndex(t => t._id === v._id) === i
+    );
+    const dishes = [...dishNames, ...dishAmharic].filter(
+      (v, i, a) => a.findIndex(t => t._id === v._id) === i
+    );
 
     const mappedIngredients = ingredients.map(i => ({
       _id: i._id,
       name: i.name,
+      amharicName: i.amharicName,
       type: "ingredient" as const,
       calories: i.nutritionBasis === "per_serving" && i.servingSizeGrams
         ? round1((i.calories / i.servingSizeGrams) * 100)
@@ -272,9 +352,10 @@ export const searchFoods = query({
       fiber: i.nutritionBasis === "per_serving" && i.servingSizeGrams
         ? round1((i.fiber / i.servingSizeGrams) * 100)
         : i.fiber,
-      description: i.servingLabel ? `Ingredient • ${i.servingLabel}` : "Raw Ingredient",
+      description: i.amharicName ? `${i.amharicName} • Ingredient` : (i.servingLabel ? `Ingredient • ${i.servingLabel}` : "Raw Ingredient"),
       servingSizeGrams: i.servingSizeGrams,
       measures: i.commonMeasures ?? [],
+      category: i.category,
     }));
 
     const mappedDishes = dishes.map(d => ({
@@ -291,7 +372,73 @@ export const searchFoods = query({
       measures: d.commonMeasures ?? [],
     }));
 
-    return [...mappedIngredients, ...mappedDishes];
+    const allItems = [...mappedIngredients, ...mappedDishes].filter((item) =>
+      matchesSearchContext(args.context, {
+        name: item.name,
+        category: "category" in item ? item.category : undefined,
+        type: item.type,
+      }),
+    );
+    const total = allItems.length;
+    const start = (page - 1) * pageSize;
+    const items = allItems.slice(start, start + pageSize);
+
+    return {
+      items,
+      total,
+      page,
+      pageSize,
+    };
+  },
+});
+
+export const seedEthiopianFoods = mutation({
+  args: {
+    foods: v.array(v.object({
+      name: v.string(),
+      amharicName: v.optional(v.string()),
+      calories: v.number(),
+      protein: v.number(),
+      carbs: v.number(),
+      fats: v.number(),
+      fiber: v.number(),
+      category: v.union(v.literal("grain"), v.literal("legume"), v.literal("meat"), v.literal("vegetable"), v.literal("other")),
+      isLocal: v.boolean(),
+      nutritionBasis: v.string(), // "per_100g"
+      commonMeasures: v.optional(v.array(v.object({
+        unit: fuelUnitValidator,
+        grams: v.number(),
+        label: v.optional(v.string()),
+      }))),
+    })),
+  },
+  handler: async (ctx, args) => {
+    let count = 0;
+    for (const food of args.foods) {
+      const existing = await ctx.db
+        .query("ingredients")
+        .withIndex("by_name", (q) => q.eq("name", food.name))
+        .first();
+
+      if (!existing) {
+        await ctx.db.insert("ingredients", {
+            name: food.name,
+            amharicName: food.amharicName,
+            calories: food.calories,
+            protein: food.protein,
+            carbs: food.carbs,
+            fats: food.fats,
+            fiber: food.fiber,
+            category: food.category,
+            isLocal: food.isLocal,
+            commonMeasures: food.commonMeasures,
+            nutritionBasis: food.nutritionBasis as "per_100g" | "per_serving",
+        }); 
+        // Force cast for now, will update schema in next step to be safe.
+        count++;
+      }
+    }
+    return `Seeded ${count} items.`;
   },
 });
 

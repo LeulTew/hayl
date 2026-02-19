@@ -1,15 +1,17 @@
 import { Page } from "../ui/Page";
 import { Button } from "../ui/Button";
-import { ArrowLeft, BookOpen, Utensils, Apple } from "lucide-react";
+import { ArrowLeft, BookOpen, Utensils, History, Plus as PlusIcon, Clock } from "lucide-react";
 import type { NavigationState } from "../../types/navigation";
 import { IngredientSearch } from './IngredientSearch';
 import { MacroCalculator } from './MacroCalculator';
 import { MythBuster } from './MythBuster';
 import { MarkdownText } from "../ui/MarkdownText";
 import { MealBuilder } from "./MealBuilder";
+import { useQuery } from "convex/react";
+import { api } from "../../../../../convex/_generated/api";
 
 interface NutritionHubProps {
-  view?: 'home' | 'article' | 'plan-list' | 'plan-detail' | 'meal-builder';
+  view?: 'home' | 'article' | 'plan-list' | 'plan-detail' | 'meal-builder' | 'history';
   contentId?: string;
   onNavigate?: (newState: NavigationState) => void;
 }
@@ -83,6 +85,17 @@ export function NutritionHub({ view = 'home', contentId, onNavigate }: Nutrition
     if (onNavigate) onNavigate(newState);
   };
 
+  type MealHistoryRow = {
+    _id: string;
+    name: string;
+    timestamp: number;
+    totals?: { calories?: number };
+    normalizedComponents?: Array<{ name?: string }>;
+  };
+
+  const token = typeof window !== "undefined" ? localStorage.getItem("hayl-token") || "" : "";
+  const meals = useQuery(api.food.listMeals, token ? { tokenIdentifier: token } : "skip") as MealHistoryRow[] | undefined;
+
   // Meal Builder View
   if (view === 'meal-builder') {
     return (
@@ -111,8 +124,8 @@ export function NutritionHub({ view = 'home', contentId, onNavigate }: Nutrition
         </div>
         
         <header className="mb-8">
-            <h1 className="text-3xl md:text-5xl font-heading font-black italic tracking-tighter uppercase leading-none mb-2 break-words">{article.title}</h1>
-            <p className="text-lg font-sans text-hayl-muted uppercase tracking-widest text-xs font-bold">{article.subtitle}</p>
+            <h1 className="text-3xl md:text-5xl font-heading font-black italic tracking-tighter uppercase leading-none mb-2 wrap-break-word">{article.title}</h1>
+            <p className="text-xs font-sans text-hayl-muted uppercase tracking-widest font-bold">{article.subtitle}</p>
         </header>
 
         <div className="prose prose-hayl text-hayl-text whitespace-pre-line font-sans leading-relaxed">
@@ -146,7 +159,7 @@ export function NutritionHub({ view = 'home', contentId, onNavigate }: Nutrition
                     onClick={() => handleNavigate({ type: 'nutrition', view: 'plan-detail', contentId: plan.id })}
                 >
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2 gap-2">
-                        <h3 className="text-xl md:text-2xl font-heading font-bold uppercase italic break-words leading-tight">{plan.title}</h3>
+                        <h3 className="text-xl md:text-2xl font-heading font-bold uppercase italic wrap-break-word leading-tight">{plan.title}</h3>
                         <span className="font-mono text-sm border border-hayl-text px-2 py-0.5 rounded-full self-start shrink-0">{plan.calories} kcal</span>
                     </div>
                     <p className="text-hayl-muted text-sm mb-4 line-clamp-2">{plan.description}</p>
@@ -192,6 +205,67 @@ export function NutritionHub({ view = 'home', contentId, onNavigate }: Nutrition
        </Page>
     );
   }
+  if (view === 'history') {
+    return (
+       <Page className="pb-32 pt-4 animate-in slide-in-from-right duration-500">
+        <div className="mb-6 flex justify-between items-center">
+            <Button variant="ghost" className="pl-0 hover:pl-2 transition-all" onClick={() => handleNavigate({ type: 'nutrition', view: 'home' })}>
+                <ArrowLeft className="w-4 h-4 mr-2" /> BACK TO HUB
+            </Button>
+            <Button onClick={() => handleNavigate({ type: 'nutrition', view: 'meal-builder' })} size="sm" className="bg-hayl-text text-hayl-bg hover:bg-hayl-text/90">
+                <PlusIcon className="w-4 h-4 mr-2" /> LOG NEW
+            </Button>
+        </div>
+        
+        <header className="mb-8">
+            <h1 className="text-5xl font-heading font-black italic tracking-tighter uppercase leading-none mb-2">Meal History</h1>
+            <p className="text-xs font-sans text-hayl-muted uppercase tracking-widest font-bold">Your Daily Fuel Records</p>
+        </header>
+
+        <div className="space-y-4">
+            {!meals && (
+                <div className="py-20 text-center text-hayl-muted animate-pulse font-heading font-bold uppercase tracking-widest text-xs">
+                    Fetching records...
+                </div>
+            )}
+            {meals && meals.length === 0 && (
+                <div className="py-20 border border-dashed border-hayl-border rounded-3xl text-center px-8">
+                    <History className="w-12 h-12 text-hayl-muted/20 mx-auto mb-4" />
+                    <p className="font-heading font-bold uppercase text-xl text-hayl-muted">No Meals Logged Yet</p>
+                    <p className="text-xs text-hayl-muted/50 mt-2">Start building your plate to track your fuel.</p>
+                </div>
+            )}
+            {meals?.map((meal) => (
+                <div key={meal._id} className="p-6 bg-hayl-surface border border-hayl-border rounded-2xl hover:border-hayl-text transition-all group">
+                    <div className="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 className="text-2xl font-heading font-black italic uppercase leading-none mb-1 group-hover:text-hayl-accent transition-colors">
+                                {meal.name}
+                            </h3>
+                            <div className="flex items-center gap-2 text-[10px] text-hayl-muted font-mono uppercase tracking-wider">
+                                <Clock className="w-3 h-3" />
+                                {new Date(meal.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </div>
+                        </div>
+                        <div className="text-right">
+                            <div className="text-3xl font-heading font-black italic leading-none">
+                            {Math.round(meal.totals?.calories ?? 0)} <span className="text-[10px] not-italic text-hayl-muted">KCAL</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                        {(meal.normalizedComponents ?? []).slice(0, 6).map((c, i: number) => (
+                            <span key={i} className="px-2 py-0.5 rounded-full bg-hayl-bg border border-hayl-border text-[9px] font-heading font-bold uppercase text-hayl-muted">
+                            {c.name}
+                            </span>
+                        ))}
+                    </div>
+                </div>
+            ))}
+        </div>
+       </Page>
+    );
+  }
 
   // Home View
   return (
@@ -205,17 +279,24 @@ export function NutritionHub({ view = 'home', contentId, onNavigate }: Nutrition
       <section className="grid grid-cols-2 gap-4">
          <div 
             onClick={() => handleNavigate({ type: 'nutrition', view: 'plan-list' })}
-            className="p-6 bg-hayl-surface border border-hayl-border rounded-xl aspect-[4/3] flex flex-col justify-between hover:border-hayl-text cursor-pointer transition-all group"
+            className="p-6 bg-hayl-surface border border-hayl-border rounded-xl aspect-4/3 flex flex-col justify-between hover:border-hayl-text cursor-pointer transition-all group"
          >
             <Utensils className="w-8 h-8 text-hayl-muted group-hover:text-hayl-accent transition-colors" />
             <span className="font-heading font-bold text-2xl uppercase italic leading-none">Meal<br/>Plans</span>
          </div>
           <div 
               onClick={() => handleNavigate({ type: 'nutrition', view: 'meal-builder' })}
-              className="p-6 bg-hayl-surface border border-hayl-border rounded-xl aspect-[4/3] flex flex-col justify-between hover:border-hayl-text cursor-pointer transition-all group"
+              className="p-6 bg-hayl-surface border border-hayl-border rounded-xl aspect-4/3 flex flex-col justify-between hover:border-hayl-text cursor-pointer transition-all group"
           >
-             <Apple className="w-8 h-8 text-hayl-muted group-hover:text-hayl-accent transition-colors" />
-             <span className="font-heading font-bold text-2xl uppercase italic leading-none">Food<br/>Log</span>
+             <PlusIcon className="w-8 h-8 text-hayl-muted group-hover:text-hayl-accent transition-colors" />
+             <span className="font-heading font-bold text-2xl uppercase italic leading-none">Log<br/>Meal</span>
+          </div>
+          <div 
+              onClick={() => handleNavigate({ type: 'nutrition', view: 'history' })}
+              className="p-6 bg-hayl-surface border border-hayl-border rounded-xl aspect-4/3 flex flex-col justify-between hover:border-hayl-text cursor-pointer transition-all group"
+          >
+             <History className="w-8 h-8 text-hayl-muted group-hover:text-hayl-accent transition-colors" />
+             <span className="font-heading font-bold text-2xl uppercase italic leading-none">Fuel<br/>History</span>
           </div>
       </section>
 

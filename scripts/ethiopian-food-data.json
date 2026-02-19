@@ -1,0 +1,307 @@
+[
+  {
+    "name": "Injera (100% Teff)",
+    "amharicName": "እንጀራ (ጤፍ)",
+    "calories": 140,
+    "protein": 4.5,
+    "carbs": 28,
+    "fats": 0.8,
+    "fiber": 3,
+    "category": "grain",
+    "isLocal": true,
+    "nutritionBasis": "per_100g",
+    "commonMeasures": [
+      { "unit": "rolls", "grams": 160, "label": "Standard Roll" },
+      { "unit": "pieces", "grams": 400, "label": "Full Injera (Flat)" }
+    ]
+  },
+  {
+    "name": "Doro Wat (Chicken Stew)",
+    "amharicName": "ዶሮ ወጥ",
+    "calories": 160,
+    "protein": 15,
+    "carbs": 6,
+    "fats": 9,
+    "fiber": 1.5,
+    "category": "meat",
+    "isLocal": true,
+    "nutritionBasis": "per_100g",
+    "commonMeasures": [
+      { "unit": "ladles", "grams": 200, "label": "Standard Ladle" },
+      { "unit": "servings", "grams": 250, "label": "Bowl (1 Leg + Egg)" }
+    ]
+  },
+  {
+    "name": "Shiro Wat",
+    "amharicName": "ሽሮ ወጥ",
+    "calories": 125,
+    "protein": 7,
+    "carbs": 18,
+    "fats": 3.5,
+    "fiber": 4,
+    "category": "legume",
+    "isLocal": true,
+    "nutritionBasis": "per_100g",
+    "commonMeasures": [
+      { "unit": "ladles", "grams": 180, "label": "Standard Ladle" }
+    ]
+  },
+  {
+    "name": "Misir Wat (Red Lentils)",
+    "amharicName": "ምስር ወጥ",
+    "calories": 115,
+    "protein": 6.5,
+    "carbs": 16,
+    "fats": 3,
+    "fiber": 5,
+    "category": "legume",
+    "isLocal": true,
+    "nutritionBasis": "per_100g",
+    "commonMeasures": [
+      { "unit": "ladles", "grams": 180, "label": "Standard Ladle" }
+    ]
+  },
+  {
+    "name": "Kik Alicha (Split Peas)",
+    "amharicName": "ክክ አልጫ",
+    "calories": 120,
+    "protein": 6,
+    "carbs": 20,
+    "fats": 2,
+    "fiber": 5.5,
+    "category": "legume",
+    "isLocal": true,
+    "nutritionBasis": "per_100g",
+    "commonMeasures": [
+      { "unit": "ladles", "grams": 180, "label": "Standard Ladle" }
+    ]
+  },
+  {
+    "name": "Gomen (Collard Greens)",
+    "amharicName": "ጎመን",
+    "calories": 45,
+    "protein": 3,
+    "carbs": 6,
+    "fats": 1.5,
+    "fiber": 3,
+    "category": "vegetable",
+    "isLocal": true,
+    "nutritionBasis": "per_100g",
+    "commonMeasures": [
+      { "unit": "ladles", "grams": 150, "label": "Standard Ladle" }
+    ]
+  },
+  {
+    "name": "Atakilt Wat (Cabbage & Potato)",
+    "amharicName": "አትክልት ወጥ",
+    "calories": 85,
+    "protein": 1.5,
+    "carbs": 14,
+    "fats": 3,
+    "fiber": 2.5,
+    "category": "vegetable",
+    "isLocal": true,
+    "nutritionBasis": "per_100g",
+    "commonMeasures": [
+      { "unit": "ladles", "grams": 180, "label": "Standard Ladle" }
+    ]
+  },
+  {
+    "name": "Beef Tibs (Derek/Dry)",
+    "amharicName": "ደርቅ ቲብስ",
+    "calories": 240,
+    "protein": 28,
+    "carbs": 1,
+    "fats": 13,
+    "fiber": 0,
+    "category": "meat",
+    "isLocal": true,
+    "nutritionBasis": "per_100g",
+    "commonMeasures": [
+      { "unit": "servings", "grams": 200, "label": "Plate Portion" }
+    ]
+  },
+  {
+    "name": "Beef Tibs (Shekla/Juicy)",
+    "amharicName": "ሸክላ ቲብስ",
+    "calories": 190,
+    "protein": 22,
+    "carbs": 3,
+    "fats": 10,
+    "fiber": 0.5,
+    "category": "meat",
+    "isLocal": true,
+    "nutritionBasis": "per_100g",
+    "commonMeasures": [
+      { "unit": "servings", "grams": 250, "label": "Plate Portion" }
+    ]
+  },
+  {
+    "name": "Kitfo (Raw/Rare)",
+    "amharicName": "ክትፎ",
+    "calories": 220,
+    "protein": 24,
+    "carbs": 1,
+    "fats": 14,
+    "fiber": 0,
+    "category": "meat",
+    "isLocal": true,
+    "nutritionBasis": "per_100g",
+    "commonMeasures": [
+      { "unit": "servings", "grams": 200, "label": "Traditional Serving" }
+    ]
+  },
+  {
+    "name": "Dulet (Tripe & Liver)",
+    "amharicName": "ዱለት",
+    "calories": 180,
+    "protein": 20,
+    "carbs": 2,
+    "fats": 10,
+    "fiber": 0,
+    "category": "meat",
+    "isLocal": true,
+    "nutritionBasis": "per_100g",
+    "commonMeasures": [
+      { "unit": "servings", "grams": 150, "label": "Serving" }
+    ]
+  },
+  {
+    "name": "Firfir (Injera w/ Berbere)",
+    "amharicName": "ፍርፍር",
+    "calories": 160,
+    "protein": 4,
+    "carbs": 28,
+    "fats": 4,
+    "fiber": 3,
+    "category": "grain",
+    "isLocal": true,
+    "nutritionBasis": "per_100g",
+    "commonMeasures": [
+      { "unit": "servings", "grams": 300, "label": "Plate" }
+    ]
+  },
+  {
+    "name": "Quanta Firfir (Dried Beef)",
+    "amharicName": "ቋንጣ ፍርፍር",
+    "calories": 190,
+    "protein": 12,
+    "carbs": 25,
+    "fats": 6,
+    "fiber": 2.5,
+    "category": "meat",
+    "isLocal": true,
+    "nutritionBasis": "per_100g",
+    "commonMeasures": [
+      { "unit": "servings", "grams": 300, "label": "Plate" }
+    ]
+  },
+  {
+    "name": "Chechebsa (Kita Firfir)",
+    "amharicName": "ጨጨብሳ",
+    "calories": 260,
+    "protein": 5,
+    "carbs": 35,
+    "fats": 12,
+    "fiber": 2,
+    "category": "grain",
+    "isLocal": true,
+    "nutritionBasis": "per_100g",
+    "commonMeasures": [
+      { "unit": "servings", "grams": 250, "label": "Plate" }
+    ]
+  },
+  {
+    "name": "Genfo (Porridge)",
+    "amharicName": "ገንፎ",
+    "calories": 210,
+    "protein": 6,
+    "carbs": 30,
+    "fats": 8,
+    "fiber": 4,
+    "category": "grain",
+    "isLocal": true,
+    "nutritionBasis": "per_100g",
+    "commonMeasures": [
+      { "unit": "servings", "grams": 350, "label": "Bowl" },
+      { "unit": "bowls", "grams": 350, "label": "Standard Bowl" }
+    ]
+  },
+  {
+    "name": "Kinche (Cracked Wheat)",
+    "amharicName": "ቂንጬ",
+    "calories": 140,
+    "protein": 4,
+    "carbs": 28,
+    "fats": 3,
+    "fiber": 5,
+    "category": "grain",
+    "isLocal": true,
+    "nutritionBasis": "per_100g",
+    "commonMeasures": [
+      { "unit": "ladles", "grams": 150, "label": "Ladle" },
+      { "unit": "bowls", "grams": 250, "label": "Bowl" }
+    ]
+  },
+  {
+    "name": "Suf Fitfit (Sunflower Seeds)",
+    "amharicName": "ሱፍ ፍርፍር",
+    "calories": 155,
+    "protein": 5,
+    "carbs": 18,
+    "fats": 8,
+    "fiber": 3,
+    "category": "vegetable",
+    "isLocal": true,
+    "nutritionBasis": "per_100g",
+    "commonMeasures": [
+      { "unit": "servings", "grams": 250, "label": "Plate" }
+    ]
+  },
+  {
+    "name": "Kocho (Enset Bread)",
+    "amharicName": "ቆጮ",
+    "calories": 190,
+    "protein": 1.5,
+    "carbs": 42,
+    "fats": 0.5,
+    "fiber": 6,
+    "category": "grain",
+    "isLocal": true,
+    "nutritionBasis": "per_100g",
+    "commonMeasures": [
+      { "unit": "pieces", "grams": 100, "label": "Slice" }
+    ]
+  },
+  {
+    "name": "Bulla (Enset Porridge)",
+    "amharicName": "ቡላ",
+    "calories": 180,
+    "protein": 1,
+    "carbs": 40,
+    "fats": 2,
+    "fiber": 1,
+    "category": "grain",
+    "isLocal": true,
+    "nutritionBasis": "per_100g",
+    "commonMeasures": [
+      { "unit": "bowls", "grams": 250, "label": "Bowl" }
+    ]
+  },
+  {
+    "name": "Tej (Honey Wine)",
+    "amharicName": "ጠጅ",
+    "calories": 110,
+    "protein": 0.5,
+    "carbs": 15,
+    "fats": 0,
+    "fiber": 0,
+    "category": "other",
+    "isLocal": true,
+    "nutritionBasis": "per_100g",
+    "commonMeasures": [
+      { "unit": "ml", "grams": 1, "label": "100ml" },
+      { "unit": "cups", "grams": 250, "label": "Berele (Standard)" }
+    ]
+  }
+]

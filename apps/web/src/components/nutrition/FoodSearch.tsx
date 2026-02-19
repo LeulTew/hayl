@@ -36,11 +36,25 @@ export interface FoodItem {
 
 interface FoodSearchProps {
   onSelect: (item: FoodItem) => void;
+  context: "base" | "topping" | "side";
+  suggestions?: string[];
 }
 
-export function FoodSearch({ onSelect }: FoodSearchProps) {
+export function FoodSearch({ onSelect, context, suggestions = [] }: FoodSearchProps) {
+  const PAGE_SIZE = 8;
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [page, setPage] = useState(1);
+
+  const DEFAULT_SUGGESTIONS: Record<"base" | "topping" | "side", string[]> = {
+    base: ["Injera", "Nifro", "Kocho", "Rice"],
+    topping: ["Shiro", "Misir Wat", "Doro Wat", "Tibs"],
+    side: ["Gomen", "Ayib", "Avocado", "Banana"],
+  };
+
+  const mergedSuggestions = [
+    ...new Set([...suggestions, ...DEFAULT_SUGGESTIONS[context]]),
+  ].slice(0, 6);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -50,8 +64,18 @@ export function FoodSearch({ onSelect }: FoodSearchProps) {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  // We only enable the query if there's a search term
-  const results = useQuery(api.food.searchFoods, { query: debouncedSearchTerm });
+  const results = useQuery(api.food.searchFoods, {
+    query: debouncedSearchTerm,
+    page,
+    pageSize: PAGE_SIZE,
+    context,
+  });
+
+  const totalResults = results?.total ?? 0;
+  const totalPages = Math.max(1, Math.ceil(totalResults / PAGE_SIZE));
+  const currentPage = Math.min(results?.page ?? page, totalPages);
+  const rangeStart = totalResults === 0 ? 0 : (currentPage - 1) * PAGE_SIZE + 1;
+  const rangeEnd = Math.min(currentPage * PAGE_SIZE, totalResults);
 
   return (
     <div className="w-full">
@@ -61,15 +85,34 @@ export function FoodSearch({ onSelect }: FoodSearchProps) {
           type="text"
           placeholder="SEARCH WATS, INGREDIENTS..."
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            setPage(1);
+          }}
           className="w-full bg-hayl-surface border border-hayl-border rounded-xl pl-12 pr-4 py-4 font-heading font-bold uppercase text-lg focus:border-hayl-text outline-none transition-all placeholder:text-hayl-muted/30"
         />
       </div>
 
       <div className="space-y-2 max-h-60 overflow-y-auto custom-scrollbar">
         {!debouncedSearchTerm && (
-            <div className="text-center py-4 text-hayl-muted/40 text-xs font-heading font-bold uppercase tracking-widest">
-                START TYPING TO SEARCH
+            <div className="space-y-4">
+               <div className="text-center py-2 text-hayl-muted/40 text-[10px] font-heading font-bold uppercase tracking-widest">
+                  Suggested {context}
+              </div>
+              <div className="flex flex-wrap gap-2 justify-center">
+                {mergedSuggestions.map((label) => (
+                  <button
+                    key={label}
+                    onClick={() => setSearchTerm(label)}
+                    className="px-3 py-1.5 rounded-full bg-hayl-surface border border-hayl-border text-[10px] font-heading font-bold uppercase hover:border-hayl-text transition-all"
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              <div className="text-center pt-4 text-hayl-muted/20 text-[9px] font-heading font-bold uppercase tracking-widest">
+                  OR START TYPING TO SEARCH
+              </div>
             </div>
         )}
         
@@ -79,7 +122,7 @@ export function FoodSearch({ onSelect }: FoodSearchProps) {
             </div>
         )}
 
-        {results?.map((item: FoodItem) => (
+        {results?.items?.map((item: FoodItem) => (
           <button
             key={item._id}
             onClick={() => onSelect(item)}
@@ -107,12 +150,41 @@ export function FoodSearch({ onSelect }: FoodSearchProps) {
           </button>
         ))}
         
-        {results && results.length === 0 && (
+        {results && results.items.length === 0 && (
              <div className="text-center py-4 text-hayl-muted/40 text-xs font-heading font-bold uppercase tracking-widest">
                 NO MATCHES FOUND
             </div>
         )}
       </div>
+
+      {debouncedSearchTerm && totalResults > 0 && (
+        <div className="mt-3 flex items-center justify-between border-t border-hayl-border pt-3">
+          <p className="text-[10px] uppercase tracking-widest text-hayl-muted font-heading font-bold">
+            Showing {rangeStart}-{rangeEnd} of {totalResults}
+          </p>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+              disabled={currentPage <= 1}
+              className="px-2.5 py-1 text-[10px] font-heading font-bold uppercase tracking-widest border border-hayl-border rounded disabled:opacity-30 disabled:cursor-not-allowed hover:border-hayl-text transition-colors"
+            >
+              Prev
+            </button>
+            <span className="text-[10px] text-hayl-muted font-mono">
+              {currentPage}/{totalPages}
+            </span>
+            <button
+              type="button"
+              onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
+              disabled={currentPage >= totalPages}
+              className="px-2.5 py-1 text-[10px] font-heading font-bold uppercase tracking-widest border border-hayl-border rounded disabled:opacity-30 disabled:cursor-not-allowed hover:border-hayl-text transition-colors"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
