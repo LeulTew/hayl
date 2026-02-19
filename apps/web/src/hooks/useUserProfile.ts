@@ -51,7 +51,17 @@ export function useUserProfile() {
             currentPlanId: finalProfile.activePlanId as Id<"derivedPlans"> | undefined,
             programStartDate: finalProfile.programStartDate,
             experience: finalProfile.experience,
-            goal: finalProfile.goal
+            goal: finalProfile.goal,
+            nutritionGoal: finalProfile.goal,
+            weightKg: finalProfile.weight,
+            heightCm: finalProfile.height,
+            age: finalProfile.age,
+            gender: finalProfile.gender,
+            activityLevel: finalProfile.experience === 'elite'
+              ? 'active'
+              : finalProfile.experience === 'intermediate'
+                ? 'moderate'
+                : 'light',
         });
     } catch (e) {
         console.warn("Sync failed (offline?)", e);

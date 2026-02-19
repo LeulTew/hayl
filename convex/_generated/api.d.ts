@@ -9,6 +9,8 @@
  */
 
 import type * as exercises from "../exercises.js";
+import type * as food from "../food.js";
+import type * as fuelEngine from "../fuelEngine.js";
 import type * as nutrition from "../nutrition.js";
 import type * as programs from "../programs.js";
 import type * as quotes from "../quotes.js";
@@ -24,6 +26,8 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   exercises: typeof exercises;
+  food: typeof food;
+  fuelEngine: typeof fuelEngine;
   nutrition: typeof nutrition;
   programs: typeof programs;
   quotes: typeof quotes;

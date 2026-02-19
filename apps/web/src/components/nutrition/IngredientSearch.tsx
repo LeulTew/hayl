@@ -22,7 +22,7 @@ export function IngredientSearch() {
     <div className="bg-hayl-surface p-10 rounded-[2.5rem] border border-hayl-border">
        <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-6 mb-12">
         <div>
-          <h2 className="text-5xl font-heading font-black uppercase italic tracking-tighter leading-none mb-2 lowercase">Engine search.</h2>
+          <h2 className="text-5xl font-heading font-black lowercase italic tracking-tighter leading-none mb-2">Engine search.</h2>
           <p className="text-[10px] font-sans font-bold text-hayl-muted uppercase tracking-[0.3em] opacity-60">Addis performance nutrition</p>
         </div>
         <button 
@@ -77,7 +77,7 @@ function IngredientCard({ ingredient }: { ingredient: Ingredient }) {
         <div className="bg-hayl-bg p-6 rounded-2xl border border-hayl-border flex justify-between items-center group hover:border-hayl-text transition-all cursor-default">
             <div className="flex-1 min-w-0 mr-4">
                 <div className="flex items-baseline gap-4 flex-wrap">
-                    <h3 className="font-heading font-bold text-xl md:text-2xl uppercase italic tracking-tighter leading-none break-words">{ingredient.name}</h3>
+                    <h3 className="font-heading font-bold text-xl md:text-2xl uppercase italic tracking-tighter leading-none wrap-break-word">{ingredient.name}</h3>
                     {ingredient.amharicName && <span className="text-[10px] text-hayl-muted font-heading font-bold uppercase tracking-[0.3em] opacity-40 whitespace-nowrap">[{ingredient.amharicName}]</span>}
                 </div>
                 <div className="text-[10px] font-heading font-bold text-hayl-muted uppercase tracking-[0.2em] mt-3 flex items-center gap-3">

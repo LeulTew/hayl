@@ -6,12 +6,14 @@ import { IngredientSearch } from './IngredientSearch';
 import { MacroCalculator } from './MacroCalculator';
 import { MythBuster } from './MythBuster';
 import { MarkdownText } from "../ui/MarkdownText";
+import { MealBuilder } from "./MealBuilder";
 
 interface NutritionHubProps {
-  view?: 'home' | 'article' | 'plan-list' | 'plan-detail';
+  view?: 'home' | 'article' | 'plan-list' | 'plan-detail' | 'meal-builder';
   contentId?: string;
   onNavigate?: (newState: NavigationState) => void;
 }
+
 
 // Static Content Data
 const ARTICLES: Record<string, { title: string; subtitle: string; content: string }> = {
@@ -80,6 +82,21 @@ export function NutritionHub({ view = 'home', contentId, onNavigate }: Nutrition
   const handleNavigate = (newState: NavigationState) => {
     if (onNavigate) onNavigate(newState);
   };
+
+  // Meal Builder View
+  if (view === 'meal-builder') {
+    return (
+       <Page className="pb-32 pt-4 animate-in slide-in-from-right duration-500">
+        <div className="mb-6">
+            <Button variant="ghost" className="pl-0 hover:pl-2 transition-all" onClick={() => handleNavigate({ type: 'nutrition', view: 'home' })}>
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            BACK TO HUB
+            </Button>
+        </div>
+        <MealBuilder />
+       </Page>
+    );
+  }
 
   // Article View
   if (view === 'article' && contentId && ARTICLES[contentId]) {
@@ -193,12 +210,13 @@ export function NutritionHub({ view = 'home', contentId, onNavigate }: Nutrition
             <Utensils className="w-8 h-8 text-hayl-muted group-hover:text-hayl-accent transition-colors" />
             <span className="font-heading font-bold text-2xl uppercase italic leading-none">Meal<br/>Plans</span>
          </div>
-         <div 
-             className="p-6 bg-hayl-surface border border-hayl-border rounded-xl aspect-[4/3] flex flex-col justify-between opacity-50 cursor-not-allowed"
-         >
-            <Apple className="w-8 h-8 text-hayl-muted" />
-            <span className="font-heading font-bold text-2xl uppercase italic leading-none">Food<br/>Log</span>
-         </div>
+          <div 
+              onClick={() => handleNavigate({ type: 'nutrition', view: 'meal-builder' })}
+              className="p-6 bg-hayl-surface border border-hayl-border rounded-xl aspect-[4/3] flex flex-col justify-between hover:border-hayl-text cursor-pointer transition-all group"
+          >
+             <Apple className="w-8 h-8 text-hayl-muted group-hover:text-hayl-accent transition-colors" />
+             <span className="font-heading font-bold text-2xl uppercase italic leading-none">Food<br/>Log</span>
+          </div>
       </section>
 
       {/* Knowledge Base */}

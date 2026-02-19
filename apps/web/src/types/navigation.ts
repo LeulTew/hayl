@@ -30,7 +30,7 @@ export type NavigationState =
     }
   | { 
       type: 'nutrition'; 
-      view: 'home' | 'article' | 'plan-list' | 'plan-detail'; 
+      view: 'home' | 'article' | 'plan-list' | 'plan-detail' | 'meal-builder'; 
       contentId?: string; // Article ID or Plan ID
     }
   

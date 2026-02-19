@@ -87,7 +87,21 @@ export const syncUserProfile = mutation({
     programStartDate: v.optional(v.number()),
     // Phase 7: Profile Expansion
     experience: v.optional(v.union(v.literal("beginner"), v.literal("intermediate"), v.literal("elite"))),
-    goal: v.optional(v.string())
+    goal: v.optional(v.string()),
+    nutritionGoal: v.optional(v.union(v.literal("cut"), v.literal("maintain"), v.literal("bulk"))),
+    weightKg: v.optional(v.number()),
+    heightCm: v.optional(v.number()),
+    age: v.optional(v.number()),
+    gender: v.optional(v.union(v.literal("male"), v.literal("female"))),
+    activityLevel: v.optional(v.union(
+      v.literal("sedentary"),
+      v.literal("light"),
+      v.literal("moderate"),
+      v.literal("active"),
+      v.literal("athlete"),
+    )),
+    bodyFatPercent: v.optional(v.number()),
+    preferredMealsPerDay: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     const existing = await ctx.db
@@ -101,7 +115,15 @@ export const syncUserProfile = mutation({
         currentPlanId: args.currentPlanId,
         programStartDate: args.programStartDate,
         experienceLevel: args.experience,
-        primaryGoal: args.goal
+        primaryGoal: args.goal,
+        nutritionGoal: args.nutritionGoal,
+        weightKg: args.weightKg,
+        heightCm: args.heightCm,
+        age: args.age,
+        gender: args.gender,
+        activityLevel: args.activityLevel,
+        bodyFatPercent: args.bodyFatPercent,
+        preferredMealsPerDay: args.preferredMealsPerDay,
       });
 
       if (args.currentPlanId) {
@@ -123,6 +145,14 @@ export const syncUserProfile = mutation({
         programStartDate: args.programStartDate,
         experienceLevel: args.experience,
         primaryGoal: args.goal,
+        nutritionGoal: args.nutritionGoal,
+        weightKg: args.weightKg,
+        heightCm: args.heightCm,
+        age: args.age,
+        gender: args.gender,
+        activityLevel: args.activityLevel,
+        bodyFatPercent: args.bodyFatPercent,
+        preferredMealsPerDay: args.preferredMealsPerDay,
         createdAt: Date.now(),
       });
 
