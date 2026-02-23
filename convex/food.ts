@@ -318,13 +318,20 @@ export const searchFoods = query({
         .take(60),
     ]);
 
+    const dedupeById = <T extends { _id: string }>(rows: T[]): T[] => {
+      const seen = new Set<string>();
+      const unique: T[] = [];
+      for (const row of rows) {
+        if (seen.has(row._id)) continue;
+        seen.add(row._id);
+        unique.push(row);
+      }
+      return unique;
+    };
+
     // Unique ingredients/dishes
-    const ingredients = [...ingNames, ...ingAmharic].filter(
-      (v, i, a) => a.findIndex(t => t._id === v._id) === i
-    );
-    const dishes = [...dishNames, ...dishAmharic].filter(
-      (v, i, a) => a.findIndex(t => t._id === v._id) === i
-    );
+    const ingredients = dedupeById([...ingNames, ...ingAmharic]);
+    const dishes = dedupeById([...dishNames, ...dishAmharic]);
 
     const mappedIngredients = ingredients.map(i => ({
       _id: i._id,

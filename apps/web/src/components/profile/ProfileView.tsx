@@ -16,6 +16,7 @@ import { StatBlock } from '../ui/StatBlock';
 import { BottomSheet } from '../ui/BottomSheet';
 import { Input } from '../ui/Input';
 import { Settings, LogOut, History, Loader2, AlertTriangle, Pencil, TrendingUp, TrendingDown, Minus, Dumbbell, ShieldCheck, Flame, Activity } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 type ProgressClassification =
   | "insufficient_data"
@@ -26,7 +27,7 @@ type ProgressClassification =
   | "muscle_loss_risk"
   | "stable";
 
-const PROGRESS_UI_CONFIG: Record<ProgressClassification, { bg: string, text: string, border: string, icon: any, label: string }> = {
+const PROGRESS_UI_CONFIG: Record<ProgressClassification, { bg: string, text: string, border: string, icon: LucideIcon, label: string }> = {
   insufficient_data: { bg: 'bg-hayl-muted/10', text: 'text-hayl-muted', border: 'border-hayl-border', icon: Minus, label: 'Needs More Data' },
   muscle_gain_likely: { bg: 'bg-emerald-500/10', text: 'text-emerald-600 dark:text-emerald-400', border: 'border-emerald-500/20', icon: Dumbbell, label: 'Muscle Gain' },
   fat_gain_likely: { bg: 'bg-rose-500/10', text: 'text-rose-600 dark:text-rose-400', border: 'border-rose-500/20', icon: AlertTriangle, label: 'Fat Gain Likely' },

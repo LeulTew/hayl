@@ -58,8 +58,9 @@ async function recomputeAdaptiveSignals(
 
   const logs28 = await ctx.db
     .query("mealLogs")
-    .withIndex("by_user_time", (q) => q.eq("userId", args.userId))
-    .filter((q) => q.gte(q.field("timestamp"), twentyEightDaysAgo))
+    .withIndex("by_user_time", (q) =>
+      q.eq("userId", args.userId).gte("timestamp", twentyEightDaysAgo),
+    )
     .collect();
 
   const logs7 = logs28.filter((log) => log.timestamp >= sevenDaysAgo);

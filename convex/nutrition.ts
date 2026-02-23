@@ -237,8 +237,9 @@ export const suggestFuelPlan = query({
 
     const logs28 = await ctx.db
       .query("mealLogs")
-      .withIndex("by_user_time", (q) => q.eq("userId", user._id))
-      .filter((q) => q.gte(q.field("timestamp"), twentyEightDaysAgo))
+      .withIndex("by_user_time", (q) =>
+        q.eq("userId", user._id).gte("timestamp", twentyEightDaysAgo),
+      )
       .collect();
 
     const logs7 = logs28.filter((log) => log.timestamp >= sevenDaysAgo);
@@ -352,8 +353,9 @@ export const updateAdaptiveSignals = mutation({
 
     const logs28 = await ctx.db
       .query("mealLogs")
-      .withIndex("by_user_time", (q) => q.eq("userId", user._id))
-      .filter((q) => q.gte(q.field("timestamp"), twentyEightDaysAgo))
+      .withIndex("by_user_time", (q) =>
+        q.eq("userId", user._id).gte("timestamp", twentyEightDaysAgo),
+      )
       .collect();
 
     const logs7 = logs28.filter((log) => log.timestamp >= sevenDaysAgo);
