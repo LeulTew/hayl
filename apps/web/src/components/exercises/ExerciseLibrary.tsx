@@ -28,11 +28,14 @@ const MUSCLE_GROUPS = [
   { id: 'full_body', label: 'Full Body', emoji: '⚡' },
 ];
 
+const PAGE_SIZE = 20;
+
 export function ExerciseLibrary({ view = 'home', filter, exerciseId, onNavigate }: ExerciseLibraryProps) {
   const allExercises = useQuery(api.exercises.listAll, {
     muscleGroup: filter?.muscle,
   });
   const [search, setSearch] = useState("");
+  const [displayLimit, setDisplayLimit] = useState(PAGE_SIZE);
 
   const handleNavigate = (newState: NavigationState) => {
     if (onNavigate) onNavigate(newState);
@@ -82,6 +85,9 @@ export function ExerciseLibrary({ view = 'home', filter, exerciseId, onNavigate 
         return matchesSearch;
     });
 
+    const visibleExercises = filteredExercises.slice(0, displayLimit);
+    const hasMore = filteredExercises.length > displayLimit;
+
     return (
       <Page className="pb-24 pt-4 animate-in fade-in duration-300">
         <div className="mb-6 flex items-center gap-4">
@@ -99,7 +105,10 @@ export function ExerciseLibrary({ view = 'home', filter, exerciseId, onNavigate 
                 className="pl-10" 
                 placeholder="Search movement..." 
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setDisplayLimit(PAGE_SIZE);
+                }}
             />
         </div>
 
@@ -111,10 +120,14 @@ export function ExerciseLibrary({ view = 'home', filter, exerciseId, onNavigate 
             </div>
         ) : (
             <div className="space-y-3">
+                <div className="text-[10px] text-hayl-muted font-heading font-bold uppercase tracking-[0.2em] mb-4">
+                  {filteredExercises.length} exercise{filteredExercises.length !== 1 ? "s" : ""}
+                </div>
+
                 {filteredExercises.length === 0 && (
                     <div className="text-center py-12 text-hayl-muted font-mono text-sm uppercase">No exercises found</div>
                 )}
-                {filteredExercises.map((exercise) => (
+                {visibleExercises.map((exercise) => (
                     <div 
                         key={exercise._id}
                         onClick={() => handleNavigate({ 
@@ -129,6 +142,15 @@ export function ExerciseLibrary({ view = 'home', filter, exerciseId, onNavigate 
                         <ArrowLeft className="w-4 h-4 rotate-180 opacity-0 group-hover:opacity-100 transition-opacity -mr-2" />
                     </div>
                 ))}
+
+                {hasMore && (
+                  <button
+                    onClick={() => setDisplayLimit((prev) => prev + PAGE_SIZE)}
+                    className="w-full mt-4 py-4 border border-hayl-border rounded-xl font-heading font-bold uppercase text-sm tracking-widest text-hayl-muted hover:border-hayl-text hover:text-hayl-text transition-all"
+                  >
+                    Load More ({filteredExercises.length - displayLimit} remaining)
+                  </button>
+                )}
             </div>
         )}
       </Page>

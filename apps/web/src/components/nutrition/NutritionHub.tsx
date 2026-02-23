@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Page } from "../ui/Page";
 import { Button } from "../ui/Button";
 import { ArrowLeft, BookOpen, Utensils, History, Plus as PlusIcon, Clock } from "lucide-react";
@@ -85,8 +86,11 @@ export function NutritionHub({ view = 'home', contentId, onNavigate }: Nutrition
     if (onNavigate) onNavigate(newState);
   };
 
+  const HISTORY_PAGE = 10;
+  const [historyLimit, setHistoryLimit] = useState(HISTORY_PAGE);
+
   const token = typeof window !== "undefined" ? localStorage.getItem("hayl-token") || "" : "";
-  const meals = useQuery(api.food.listMeals, token ? { tokenIdentifier: token } : "skip");
+  const meals = useQuery(api.food.listMeals, token ? { tokenIdentifier: token, limit: historyLimit } : "skip");
 
   // Meal Builder View
   if (view === 'meal-builder') {
@@ -198,6 +202,8 @@ export function NutritionHub({ view = 'home', contentId, onNavigate }: Nutrition
     );
   }
   if (view === 'history') {
+    const hasMoreMeals = meals !== undefined && meals.length === historyLimit;
+
     return (
        <Page className="pb-32 pt-4 animate-in slide-in-from-right duration-500">
         <div className="mb-6 flex justify-between items-center">
@@ -227,6 +233,13 @@ export function NutritionHub({ view = 'home', contentId, onNavigate }: Nutrition
                     <p className="text-xs text-hayl-muted/50 mt-2">Start building your plate to track your fuel.</p>
                 </div>
             )}
+
+            {meals && meals.length > 0 && (
+              <div className="text-[10px] text-hayl-muted font-heading font-bold uppercase tracking-[0.2em] mb-2">
+                Showing {meals.length} meal{meals.length !== 1 ? "s" : ""}
+              </div>
+            )}
+
             {meals?.map((meal) => (
                 <div key={meal._id} className="p-6 bg-hayl-surface border border-hayl-border rounded-2xl hover:border-hayl-text transition-all group">
                     <div className="flex justify-between items-start mb-4">
@@ -254,6 +267,15 @@ export function NutritionHub({ view = 'home', contentId, onNavigate }: Nutrition
                     </div>
                 </div>
             ))}
+
+            {hasMoreMeals && (
+              <button
+                onClick={() => setHistoryLimit((prev: number) => prev + HISTORY_PAGE)}
+                className="w-full mt-2 py-4 border border-hayl-border rounded-xl font-heading font-bold uppercase text-sm tracking-widest text-hayl-muted hover:border-hayl-text hover:text-hayl-text transition-all"
+              >
+                Load Older Meals
+              </button>
+            )}
         </div>
        </Page>
     );
