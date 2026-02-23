@@ -1,48 +1,47 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
 import type { Id } from "../../../../../convex/_generated/dataModel";
-import { ArrowRight, Trophy, Activity, Dumbbell, Zap, CalendarDays, CheckCircle2, Clock3 } from 'lucide-react';
+import { Activity, Zap, CalendarDays, CheckCircle2, Clock3, Flame, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
 import { Page } from "../ui/Page";
 import { SectionHeader } from "../ui/SectionHeader";
 import { Card } from "../ui/Card";
 import { Badge } from "../ui/Badge";
-import { StatBlock } from "../ui/StatBlock";
+import { PROGRESS_UI_CONFIG, type ProgressClassification } from '../../constants/progress';
 import { Button } from "../ui/Button";
 
 import { useUserProfile } from '../../hooks/useUserProfile';
 import { useTranslation } from '../../hooks/useTranslation';
 import { useSafeActiveRoutine } from '../../hooks/useSafeActiveRoutine';
+import { useHomeKpiSnapshot } from '../../hooks/useHomeKpiSnapshot';
+import { trackEvent } from '../../lib/analytics';
 
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, type LocalSession } from '../../lib/db';
 import type { NavigationState } from '../../types/navigation';
 
-// Helper to get active program from history
+// ──────────────────────────────────────────────
+// Pure helpers (no hooks, no side-effects)
+// ──────────────────────────────────────────────
+
+/**
+ * Returns the most recent programId from completed local sessions.
+ * Used as a fallback when no active routine is explicitly set.
+ */
 function getMostRecentProgramId(history: LocalSession[]): string | undefined {
   if (!history || history.length === 0) return undefined;
   const sorted = [...history].sort((a, b) => b.startTime - a.startTime);
   return sorted[0]?.programId;
 }
 
-const numberFormatter = new Intl.NumberFormat('en-US', {
-  notation: 'compact',
-  maximumFractionDigits: 1,
-});
-
-function formatNumber(num: number) {
-  if (num <= 9999) {
-    return String(Math.round(num));
-  }
-  return numberFormatter.format(num);
-}
-
+/** Normalises a timestamp to midnight of its calendar day. */
 function getDayStartTimestamp(ts: number): number {
   const date = new Date(ts);
   return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
 }
 
+/** Formats a timestamp as "Feb 24" style. */
 function formatShortDate(ts: number) {
   return new Intl.DateTimeFormat('en-US', {
     month: 'short',
@@ -50,6 +49,7 @@ function formatShortDate(ts: number) {
   }).format(new Date(ts));
 }
 
+/** Formats a timestamp as "February 2026" style. */
 function formatMonthYear(ts: number) {
   return new Intl.DateTimeFormat('en-US', {
     month: 'long',
@@ -57,6 +57,10 @@ function formatMonthYear(ts: number) {
   }).format(new Date(ts));
 }
 
+/**
+ * Computes the current workout streak in consecutive days.
+ * Streak must include today or yesterday to be non-zero.
+ */
 function getStreakDays(sessionStartTimes: number[]): number {
   if (sessionStartTimes.length === 0) return 0;
 
@@ -84,6 +88,10 @@ function getStreakDays(sessionStartTimes: number[]): number {
   return streak;
 }
 
+// ──────────────────────────────────────────────
+// Component
+// ──────────────────────────────────────────────
+
 interface DashboardProps {
   onNavigate: (view: NavigationState) => void;
   onStartSession: (dayIndex: number, programId: string, planId: string) => void;
@@ -96,53 +104,57 @@ export function Dashboard({ onNavigate, onStartSession }: DashboardProps) {
   const token = typeof window !== 'undefined' ? localStorage.getItem("hayl-token") : null;
   const { activeRoutine } = useSafeActiveRoutine(token);
 
-  // Real Stats from Local DB
+  // ── Server KPI Snapshot (single query) ──
+  const { snapshot, isLoading: isSnapshotLoading } = useHomeKpiSnapshot(token);
+
+  // ── Local Workout History (Dexie) ──
   const rawHistory = useLiveQuery(() => db.sessions.where('state').equals('completed').toArray());
   const history = useMemo(
     () => (rawHistory || []).filter((session) => (session.logs?.length ?? 0) > 0),
     [rawHistory],
   );
-  
+
   const [stableNow] = useState(() => Date.now());
 
-  const weeklyWorkouts = useMemo(() => {
-    const sevenDaysAgo = stableNow - 7 * 24 * 60 * 60 * 1000;
+  const consistency28d = useMemo(() => {
+    const twentyEightDaysAgo = stableNow - 28 * 24 * 60 * 60 * 1000;
     const workoutDays = new Set(
       history
-        .filter((session) => session.startTime >= sevenDaysAgo)
+        .filter((session) => session.startTime >= twentyEightDaysAgo)
         .map((session) => getDayStartTimestamp(session.startTime)),
     );
     return workoutDays.size;
   }, [history, stableNow]);
 
-  const averageVolume = useMemo(() => {
-    if (history.length === 0) return 0;
-    const totalVolume = history.reduce((acc, s) => {
-      const sessionVol = s.logs.reduce((vol, log) => vol + (log.weight || 0) * log.reps, 0);
-      return acc + sessionVol;
-    }, 0);
-    return totalVolume / history.length;
-  }, [history]);
-
   const streak = useMemo(() => getStreakDays(history.map((session) => session.startTime)), [history]);
-  
-  // Phase 6: Active Routine Logic
+
+  // ── Active Routine Logic ──
   const activePlanId = profile?.activePlanId || activeRoutine?.planId;
   const activePlan = useQuery(api.programs.getPlan, activePlanId ? { planId: activePlanId as Id<"derivedPlans"> } : "skip");
   const consistencyTarget = activePlan?.days?.length ?? 4;
-  
-  // Fallback to history if no active plan set
+
+  // ── KPI Snapshot Values ──
+  const progressClassification: ProgressClassification = (snapshot?.progress?.classification as ProgressClassification) || 'insufficient_data';
+  const progressSummary = snapshot?.progress?.summary ?? null;
+  const weeklyWeightDeltaKg = snapshot?.progress?.weeklyWeightDeltaKg ?? 0;
+  const isImperial = profile?.unitPreference === 'imperial';
+  const uiConfig = PROGRESS_UI_CONFIG[progressClassification];
+  const TrendIcon = uiConfig.icon;
+  const proteinRatio = snapshot?.nutrition?.proteinAdequacyRatio7d ?? 0;
+  const calorieDelta = snapshot?.nutrition?.dailyCalorieDelta7d ?? 0;
+
+  // ── Fallback Routing ──
   const recentProgramId = getMostRecentProgramId(history);
   const displayProgramId = activePlan?.programId || recentProgramId;
   const activeProgram = programs?.find(p => p._id === displayProgramId);
 
-  // Next Session Calculation
-  const routineHistory = history.filter(s => 
-    s.planId === activePlanId && 
-    profile?.programStartDate && 
+  // ── Next Session Calculation ──
+  const routineHistory = history.filter(s =>
+    s.planId === activePlanId &&
+    profile?.programStartDate &&
     s.startTime >= profile.programStartDate
   );
-  
+
   const fallbackNextDayIndex = activePlan?.days ? routineHistory.length % activePlan.days.length : 0;
   const nextDayIndex = activeRoutine?.nextDayIndex ?? fallbackNextDayIndex;
   const nextDay = activePlan?.days?.find((day) => day.dayIndex === nextDayIndex) ?? activePlan?.days?.[nextDayIndex];
@@ -228,35 +240,46 @@ export function Dashboard({ onNavigate, onStartSession }: DashboardProps) {
     };
   }, [completedDayStarts, upcomingDayStarts, stableNow]);
 
+  // ── Analytics: Home KPI Impression ──
+  useEffect(() => {
+    if (isSnapshotLoading) return;
+    trackEvent('home_kpi_impression', {
+      visibleCards: ['streak', 'quick_start', 'progress_signal', 'consistency_28d', 'nutrition_7d'],
+      progressClassification,
+    });
+  }, [isSnapshotLoading, progressClassification]);
+
   return (
     <Page className="pt-8">
       {/* 1. Header with Greeting */}
       <header className="mb-8">
-        <SectionHeader 
+        <SectionHeader
           title={t('dashboard')}
-          subtitle={`${t('welcome_back')}, ${profile?.name?.split(' ')[0] || t('athlete')}`}
+          subtitle={`${t('welcome_back')}, ${snapshot?.userName?.split(' ')[0] || profile?.name?.split(' ')[0] || t('athlete')}`}
           size="lg"
         />
       </header>
 
-      {/* 2. Weekly Snapshot Grid */}
-      <section className="mb-12 grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="p-4 flex flex-col justify-between h-32">
-          <Activity className="text-hayl-accent mb-2" size={20} />
-          <StatBlock label={t('consistency')} value={weeklyWorkouts} unit={`/ ${consistencyTarget}`} size="md" />
+      {/* 2. Hero KPI Strip */}
+      <section className="mb-6 grid grid-cols-2 gap-4">
+        <Card className="p-4 flex flex-col justify-center h-24">
+          <div className="flex items-center gap-3">
+             <div className="w-10 h-10 rounded-full bg-orange-500/10 text-orange-500 flex items-center justify-center">
+                <Flame size={20} className={streak > 0 ? "fill-orange-500" : ""} />
+             </div>
+             <div>
+                <p className="text-[10px] font-heading uppercase tracking-widest text-hayl-muted mb-0.5">{t('streak')}</p>
+                <div className="flex items-end gap-1">
+                   <span className="font-heading text-2xl font-bold leading-none">{streak}</span>
+                   <span className="font-heading text-sm text-hayl-muted uppercase pb-0.5">{t('days')}</span>
+                </div>
+             </div>
+          </div>
         </Card>
-        <Card className="p-4 flex flex-col justify-between h-32">
-          <Dumbbell className="text-hayl-muted mb-2" size={20} />
-          <StatBlock label={`AVG ${t('volume')} (KG)`} value={formatNumber(averageVolume)} size="md" />
-        </Card>
-        <Card className="p-4 flex flex-col justify-between h-32">
-          <Trophy className="text-hayl-muted mb-2" size={20} />
-          <StatBlock label={t('streak')} value={streak} unit={t('days')} size="md" />
-        </Card>
-        
+
         {/* Next Session / Quick Start */}
-        <Card 
-            className="p-4 flex flex-col justify-between h-32 bg-hayl-text text-hayl-bg border-transparent cursor-pointer hover:opacity-90 transition-opacity"
+        <Card
+            className="p-4 flex flex-col justify-center h-24 border border-hayl-border cursor-pointer hover:border-hayl-accent transition-colors group"
             onClick={() => {
                 if (activeProgram && activePlan) {
                     onStartSession(nextDayIndex, activeProgram._id, activePlan._id);
@@ -265,29 +288,112 @@ export function Dashboard({ onNavigate, onStartSession }: DashboardProps) {
                 } else {
                     onNavigate({ type: 'programs', view: 'home' });
                 }
+                trackEvent('home_cta_click', { ctaId: 'start_session', destination: 'workout' });
             }}
         >
-          <div className="font-heading uppercase text-[10px] tracking-widest opacity-60">
-              {activeProgram ? t('deploy_session') : t('start_training')}
-          </div>
-          <div className="font-heading text-2xl font-bold leading-none truncate">
-              {activeProgram ? nextDayTitle : t('find_protocol')}
-          </div>
-          <div className="flex items-center gap-2 text-[10px] font-mono opacity-60">
-             <span>{t('go_now')}</span>
-             <ArrowRight size={12} />
+          <div className="flex items-center gap-3">
+             <div className="w-10 h-10 rounded-full bg-hayl-surface text-hayl-muted flex items-center justify-center group-hover:bg-hayl-accent/10 group-hover:text-hayl-accent transition-colors">
+                <Zap size={20} />
+             </div>
+             <div className="flex-1 truncate">
+                <p className="text-[10px] font-heading uppercase tracking-widest text-hayl-muted mb-0.5">{activeProgram ? t('deploy_session') : t('start_training')}</p>
+                <p className="font-heading text-xl font-bold leading-none truncate pr-2">
+                   {activeProgram ? nextDayTitle : t('find_protocol')}
+                </p>
+             </div>
           </div>
         </Card>
       </section>
 
-      {/* 3. Active Protocol (or Call to Action) */}
+      {/* 3. Progress Signal Card */}
+      <section className="mb-6">
+        <Card className={`p-5 pl-6 border ${uiConfig.border} transition-colors flex flex-col sm:flex-row gap-5 items-start sm:items-center justify-between`}>
+          <div className="flex items-center gap-4">
+            <div className={`p-3 rounded-2xl ${uiConfig.bg} ${uiConfig.text} shrink-0`}>
+              <TrendIcon size={32} />
+            </div>
+            <div>
+              <p className="text-[10px] font-heading uppercase tracking-widest text-hayl-muted mb-0.5">Primary Signal</p>
+              <h3 className={`font-heading text-2xl sm:text-3xl uppercase font-bold leading-none ${uiConfig.text}`}>
+                {uiConfig.label}
+              </h3>
+              <p className="text-xs text-hayl-muted mt-1.5 line-clamp-2 md:line-clamp-none max-w-sm">
+                {progressSummary ?? 'Log weight and meals consistently for confident progress trends.'}
+              </p>
+            </div>
+          </div>
+
+          {progressClassification !== 'insufficient_data' && (
+            <div className="shrink-0 flex items-center justify-between sm:flex-col sm:items-end w-full sm:w-auto mt-2 sm:mt-0 pt-4 sm:pt-0 border-t sm:border-0 border-hayl-border/50">
+              <div className="flex items-center gap-1.5 sm:mb-1">
+                {weeklyWeightDeltaKg > 0 ? <TrendingUp size={18} className="text-hayl-muted" /> : weeklyWeightDeltaKg < 0 ? <TrendingDown size={18} className="text-hayl-muted" /> : <Minus size={18} className="text-hayl-muted" />}
+                <span className="font-mono text-2xl font-bold">
+                  {weeklyWeightDeltaKg > 0 ? '+' : ''}
+                  {isImperial ? (weeklyWeightDeltaKg * 2.20462).toFixed(1) : weeklyWeightDeltaKg.toFixed(1)}
+                </span>
+              </div>
+              <p className="text-[10px] font-heading text-hayl-muted uppercase">{isImperial ? 'LBS / WEEK' : 'KG / WEEK'}</p>
+            </div>
+          )}
+        </Card>
+      </section>
+
+      {/* 4. Twin Analytics Panels */}
+      <section className="mb-12 grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Training Consistency */}
+        <Card className="p-5 flex flex-col">
+          <div className="flex justify-between items-start mb-4">
+             <div>
+                <p className="text-[10px] font-heading uppercase tracking-widest text-hayl-muted mb-1">Consistency (28d)</p>
+                <h4 className="font-heading text-2xl font-bold uppercase">{consistency28d} <span className="text-sm text-hayl-muted">WORKOUTS</span></h4>
+             </div>
+             <Activity className="text-hayl-accent opacity-50" size={24} />
+          </div>
+          <div className="mt-auto">
+             <div className="w-full bg-hayl-surface rounded-full h-1.5 mb-2 overflow-hidden">
+                <div
+                  className="bg-hayl-accent h-full rounded-full transition-all duration-1000"
+                  style={{ width: `${Math.min((consistency28d / (consistencyTarget * 4)) * 100, 100)}%` }}
+                />
+             </div>
+             <p className="text-xs font-mono text-hayl-muted text-right">Target: {consistencyTarget * 4} / month</p>
+          </div>
+        </Card>
+
+        {/* Nutrition Adherence */}
+        <Card className="p-5 flex flex-col">
+          <div className="flex justify-between items-start mb-4">
+             <div>
+                <p className="text-[10px] font-heading uppercase tracking-widest text-hayl-muted mb-1">Nutrition (7d)</p>
+                <h4 className="font-heading text-2xl font-bold uppercase">{(proteinRatio * 100).toFixed(0)}% <span className="text-sm text-hayl-muted">PROTEIN</span></h4>
+             </div>
+             <div className="p-1.5 bg-hayl-surface rounded-md border border-hayl-border text-xs font-mono font-bold">
+                 {calorieDelta > 0 ? '+' : ''}{Math.round(calorieDelta)} CAL
+             </div>
+          </div>
+          <div className="mt-auto">
+             <div className="w-full bg-hayl-surface rounded-full h-1.5 mb-2 overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all duration-1000 ${proteinRatio >= 0.85 ? 'bg-emerald-500' : 'bg-amber-500'}`}
+                  style={{ width: `${Math.min(proteinRatio * 100, 100)}%` }}
+                />
+             </div>
+             <p className="text-xs font-mono text-hayl-muted text-right">Protein Adherence</p>
+          </div>
+        </Card>
+      </section>
+
+      {/* 5. Active Protocol (or Call to Action) */}
       <section className="mb-12">
         <SectionHeader title={t('current_objective')} subtitle={t('active_deployment')} className="mb-6" />
-        
+
         {activePlan && activeProgram ? (
-             <Card 
-               hover 
-               onClick={() => onNavigate({ type: 'programs', view: 'detail', programId: activeProgram._id, planId: activePlan._id })}
+             <Card
+               hover
+               onClick={() => {
+                 onNavigate({ type: 'programs', view: 'detail', programId: activeProgram._id, planId: activePlan._id });
+                 trackEvent('drill_down_navigation', { sourceCard: 'active_protocol', targetView: 'program_detail' });
+               }}
                className="group relative overflow-hidden transition-all active:scale-[0.99]"
              >
                <div className="p-6 flex justify-between items-start">
@@ -305,10 +411,10 @@ export function Dashboard({ onNavigate, onStartSession }: DashboardProps) {
                      {activePlan.days.length} {t('sessions_week')} • {activePlan.variant.difficulty}
                    </p>
                  </div>
-                 
+
                  <div className="hidden md:flex flex-col items-end gap-2">
                      <span className="text-[10px] font-mono text-hayl-muted uppercase">{t('next_session')}</span>
-                     <div 
+                     <div
                         className="h-12 px-6 rounded-full bg-hayl-text text-hayl-bg flex items-center justify-center font-heading font-black italic uppercase tracking-wider group-hover:bg-hayl-accent transition-colors cursor-pointer"
                         onClick={(e) => {
                           e.stopPropagation();
@@ -321,8 +427,8 @@ export function Dashboard({ onNavigate, onStartSession }: DashboardProps) {
                </div>
              </Card>
         ) : (
-            <Card 
-               hover 
+            <Card
+               hover
                onClick={() => onNavigate({ type: 'programs', view: 'home' })}
                className="group relative overflow-hidden border-dashed border-hayl-muted/30"
              >

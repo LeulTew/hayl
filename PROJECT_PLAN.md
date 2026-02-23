@@ -453,7 +453,7 @@ _Last Updated: 2026-02-15_
 **Agent**: Gemini 3 Pro High
 **Scope**: UX Strategy
 
-- [ ] Decide KPI selection and layout.
+- [x] Decide KPI selection and layout.
 
 **Agent**: GPT-5.3 Codex
 **Scope**: Implementation
