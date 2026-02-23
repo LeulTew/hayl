@@ -1,6 +1,7 @@
 import { describe, expect, it } from "bun:test";
 import {
   assessAdherence,
+  classifyWeightProgress,
   clamp,
   computeTdee,
   deriveMacroTargets,
@@ -373,5 +374,62 @@ describe("assessAdherence", () => {
     const zeroTarget: MacroVector = { calories: 0, protein: 0, carbs: 0, fats: 0, fiber: 0 };
     const score = assessAdherence([target], zeroTarget);
     expect(score).toBe(100);
+  });
+});
+
+describe("classifyWeightProgress", () => {
+  it("returns insufficient_data when spacing is too short", () => {
+    const result = classifyWeightProgress({
+      goal: "bulk",
+      weightDeltaKg: 0.6,
+      daysBetweenLogs: 3,
+      calorieDeltaFromTdee: 250,
+      proteinAdequacyRatio: 1.05,
+    });
+    expect(result.classification).toBe("insufficient_data");
+  });
+
+  it("detects likely muscle gain", () => {
+    const result = classifyWeightProgress({
+      goal: "bulk",
+      weightDeltaKg: 0.4,
+      daysBetweenLogs: 10,
+      calorieDeltaFromTdee: 220,
+      proteinAdequacyRatio: 1.1,
+    });
+    expect(result.classification).toBe("muscle_gain_likely");
+  });
+
+  it("detects likely fat gain", () => {
+    const result = classifyWeightProgress({
+      goal: "bulk",
+      weightDeltaKg: 1.1,
+      daysBetweenLogs: 10,
+      calorieDeltaFromTdee: 450,
+      proteinAdequacyRatio: 0.75,
+    });
+    expect(result.classification).toBe("fat_gain_likely");
+  });
+
+  it("detects muscle loss risk on aggressive deficits", () => {
+    const result = classifyWeightProgress({
+      goal: "cut",
+      weightDeltaKg: -1.4,
+      daysBetweenLogs: 10,
+      calorieDeltaFromTdee: -850,
+      proteinAdequacyRatio: 0.7,
+    });
+    expect(result.classification).toBe("muscle_loss_risk");
+  });
+
+  it("detects stable trend around noise band", () => {
+    const result = classifyWeightProgress({
+      goal: "maintain",
+      weightDeltaKg: 0.1,
+      daysBetweenLogs: 8,
+      calorieDeltaFromTdee: 30,
+      proteinAdequacyRatio: 1,
+    });
+    expect(result.classification).toBe("stable");
   });
 });

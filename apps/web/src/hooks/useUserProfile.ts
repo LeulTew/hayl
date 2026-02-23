@@ -16,6 +16,7 @@ export function useUserProfile() {
 
   const updateProfile = useCallback(async (data: Partial<UserProfile>) => {
     let finalProfile: UserProfile;
+    const now = Date.now();
 
     if (!profile?.id) {
       // Create new local
@@ -30,6 +31,7 @@ export function useUserProfile() {
         unitPreference: 'metric',
         languagePreference: 'en',
         completedOnboarding: false,
+        lastWeightLogAt: typeof data.weight === 'number' ? now : undefined,
         ...data
       };
       await db.userProfile.add(newProfile);
@@ -38,6 +40,18 @@ export function useUserProfile() {
       // Update existing local
       await db.userProfile.update(profile.id, data);
       finalProfile = { ...profile, ...data };
+    }
+
+    const weightWasUpdated = typeof data.weight === 'number' && Number.isFinite(data.weight);
+    if (weightWasUpdated) {
+      finalProfile = {
+        ...finalProfile,
+        lastWeightLogAt: data.lastWeightLogAt ?? now,
+      };
+
+      if (profile?.id) {
+        await db.userProfile.update(profile.id, { lastWeightLogAt: finalProfile.lastWeightLogAt });
+      }
     }
 
     // Background Sync to Convex
@@ -62,6 +76,7 @@ export function useUserProfile() {
               : finalProfile.experience === 'intermediate'
                 ? 'moderate'
                 : 'light',
+            lastWeightLogAt: finalProfile.lastWeightLogAt,
         });
     } catch (e) {
         console.warn("Sync failed (offline?)", e);

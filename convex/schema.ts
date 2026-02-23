@@ -186,6 +186,7 @@ export default defineSchema({
     )),
     bodyFatPercent: v.optional(v.number()),
     preferredMealsPerDay: v.optional(v.number()),
+    lastWeightLogAt: v.optional(v.number()),
     
     
     createdAt: v.number(),
@@ -429,6 +430,15 @@ export default defineSchema({
     .index("by_user_time", ["userId", "timestamp"])
     .index("by_user_created", ["userId", "createdAt"]),
 
+  weightLogs: defineTable({
+    userId: v.id("users"),
+    weightKg: v.number(),
+    loggedAt: v.number(),
+    source: v.union(v.literal("onboarding"), v.literal("profile_edit"), v.literal("reminder")),
+    createdAt: v.number(),
+  })
+    .index("by_user_loggedAt", ["userId", "loggedAt"]),
+
   nutritionAdaptiveSignals: defineTable({
     userId: v.id("users"),
     consistency7d: v.number(),
@@ -437,6 +447,20 @@ export default defineSchema({
     averageDailyProtein7d: v.number(),
     lastRecommendationAt: v.optional(v.number()),
     adjustmentConfidence: v.number(),
+    weeklyWeightDeltaKg: v.optional(v.number()),
+    dailyCalorieDelta7d: v.optional(v.number()),
+    proteinAdequacyRatio7d: v.optional(v.number()),
+    progressClassification: v.optional(v.union(
+      v.literal("insufficient_data"),
+      v.literal("muscle_gain_likely"),
+      v.literal("fat_gain_likely"),
+      v.literal("mixed_gain"),
+      v.literal("fat_loss_likely"),
+      v.literal("muscle_loss_risk"),
+      v.literal("stable"),
+    )),
+    progressSummary: v.optional(v.string()),
+    lastWeightLogAt: v.optional(v.number()),
     notes: v.optional(v.string()),
     updatedAt: v.number(),
   }).index("by_user", ["userId"]),

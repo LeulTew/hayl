@@ -344,3 +344,101 @@ export function assessAdherence(
   return round1(scores.reduce((a, b) => a + b, 0) / scores.length);
 }
 
+export type ProgressClassification =
+  | "insufficient_data"
+  | "muscle_gain_likely"
+  | "fat_gain_likely"
+  | "mixed_gain"
+  | "fat_loss_likely"
+  | "muscle_loss_risk"
+  | "stable";
+
+export function classifyWeightProgress(params: {
+  goal: "cut" | "maintain" | "bulk";
+  weightDeltaKg: number;
+  daysBetweenLogs: number;
+  calorieDeltaFromTdee: number;
+  proteinAdequacyRatio: number;
+}): {
+  classification: ProgressClassification;
+  weeklyRateKg: number;
+  confidence: number;
+  summary: string;
+} {
+  if (!Number.isFinite(params.daysBetweenLogs) || params.daysBetweenLogs < 5) {
+    return {
+      classification: "insufficient_data",
+      weeklyRateKg: 0,
+      confidence: 20,
+      summary: "Need at least ~1 week between logs for a reliable signal.",
+    };
+  }
+
+  const weeklyRateKg = round1(params.weightDeltaKg / (params.daysBetweenLogs / 7));
+  const absWeeklyRate = Math.abs(weeklyRateKg);
+  const calorieDelta = params.calorieDeltaFromTdee;
+  const proteinRatio = params.proteinAdequacyRatio;
+
+  // Small movements are mostly noise from hydration, glycogen, and sodium changes.
+  if (absWeeklyRate < 0.15) {
+    return {
+      classification: "stable",
+      weeklyRateKg,
+      confidence: 70,
+      summary: "Weight trend is stable. Keep current plan and monitor weekly.",
+    };
+  }
+
+  if (weeklyRateKg > 0) {
+    if (calorieDelta >= 250 && proteinRatio < 0.9) {
+      return {
+        classification: "fat_gain_likely",
+        weeklyRateKg,
+        confidence: 82,
+        summary: "Gain trend likely includes excess fat. Reduce surplus and increase protein quality.",
+      };
+    }
+
+    if (calorieDelta >= 50 && calorieDelta <= 320 && proteinRatio >= 1) {
+      return {
+        classification: "muscle_gain_likely",
+        weeklyRateKg,
+        confidence: 78,
+        summary: "Gain trend aligns with lean mass accumulation.",
+      };
+    }
+
+    return {
+      classification: "mixed_gain",
+      weeklyRateKg,
+      confidence: 62,
+      summary: "Weight is increasing with mixed composition. Tune calories and protein for cleaner gain.",
+    };
+  }
+
+  if (calorieDelta <= -250 && proteinRatio >= 0.95) {
+    return {
+      classification: "fat_loss_likely",
+      weeklyRateKg,
+      confidence: params.goal === "cut" ? 84 : 72,
+      summary: "Loss trend is likely fat-dominant. Keep lifting performance stable.",
+    };
+  }
+
+  if (proteinRatio < 0.85 || calorieDelta <= -700) {
+    return {
+      classification: "muscle_loss_risk",
+      weeklyRateKg,
+      confidence: 80,
+      summary: "Loss pace is aggressive for recovery capacity. Raise protein and reduce deficit.",
+    };
+  }
+
+  return {
+    classification: "fat_loss_likely",
+    weeklyRateKg,
+    confidence: 60,
+    summary: "Loss trend is present but signal confidence is moderate.",
+  };
+}
+

@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTheme } from '../../hooks/useTheme';
 import type { NavigationState } from '../../types/navigation';
 import { useUserProfile } from '../../hooks/useUserProfile';
 import { useTranslation } from '../../hooks/useTranslation';
 import { db } from '../../lib/db';
+import { useQuery } from 'convex/react';
+import { api } from '../../../../../convex/_generated/api';
 import { Page } from '../ui/Page';
 import { SectionHeader } from '../ui/SectionHeader';
 import { Card } from '../ui/Card';
@@ -13,7 +15,26 @@ import { ThemeToggle } from '../ui/ThemeToggle';
 import { StatBlock } from '../ui/StatBlock';
 import { BottomSheet } from '../ui/BottomSheet';
 import { Input } from '../ui/Input';
-import { Settings, LogOut, History, Loader2, AlertTriangle, Pencil } from 'lucide-react';
+import { Settings, LogOut, History, Loader2, AlertTriangle, Pencil, TrendingUp, TrendingDown, Minus, Dumbbell, ShieldCheck, Flame, Activity } from 'lucide-react';
+
+type ProgressClassification =
+  | "insufficient_data"
+  | "muscle_gain_likely"
+  | "fat_gain_likely"
+  | "mixed_gain"
+  | "fat_loss_likely"
+  | "muscle_loss_risk"
+  | "stable";
+
+const PROGRESS_UI_CONFIG: Record<ProgressClassification, { bg: string, text: string, border: string, icon: any, label: string }> = {
+  insufficient_data: { bg: 'bg-hayl-muted/10', text: 'text-hayl-muted', border: 'border-hayl-border', icon: Minus, label: 'Needs More Data' },
+  muscle_gain_likely: { bg: 'bg-emerald-500/10', text: 'text-emerald-600 dark:text-emerald-400', border: 'border-emerald-500/20', icon: Dumbbell, label: 'Muscle Gain' },
+  fat_gain_likely: { bg: 'bg-rose-500/10', text: 'text-rose-600 dark:text-rose-400', border: 'border-rose-500/20', icon: AlertTriangle, label: 'Fat Gain Likely' },
+  mixed_gain: { bg: 'bg-amber-500/10', text: 'text-amber-600 dark:text-amber-400', border: 'border-amber-500/20', icon: TrendingUp, label: 'Mixed Gain' },
+  fat_loss_likely: { bg: 'bg-emerald-500/10', text: 'text-emerald-600 dark:text-emerald-400', border: 'border-emerald-500/20', icon: Flame, label: 'Fat Loss' },
+  muscle_loss_risk: { bg: 'bg-rose-500/10', text: 'text-rose-600 dark:text-rose-400', border: 'border-rose-500/20', icon: AlertTriangle, label: 'Muscle Loss Risk' },
+  stable: { bg: 'bg-blue-500/10', text: 'text-blue-600 dark:text-blue-400', border: 'border-blue-500/20', icon: ShieldCheck, label: 'Stable' },
+};
 
 interface ProfileViewProps {
    onNavigate?: (view: NavigationState) => void;
@@ -28,6 +49,9 @@ export function ProfileView({ onNavigate }: ProfileViewProps) {
   
   // Edit State
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [weightReminderDismissed, setWeightReminderDismissed] = useState(false);
+  const [weightReminderInput, setWeightReminderInput] = useState('');
+  const [mountTs] = useState(() => Date.now());
   const [editForm, setEditForm] = useState<{
     name: string;
     weight: string;
@@ -48,6 +72,32 @@ export function ProfileView({ onNavigate }: ProfileViewProps) {
   const displayHeight = profile?.height === undefined ? '--' : Math.round(isImperial ? profile.height / 2.54 : profile.height);
   const genderCode = profile?.gender === 'male' ? 'M' : profile?.gender === 'female' ? 'F' : '--';
   const ageLabel = profile?.age ?? '--';
+  const token = typeof window !== 'undefined' ? localStorage.getItem('hayl-token') || '' : '';
+  const fuelPlan = useQuery(api.nutrition.suggestFuelPlan, token ? { tokenIdentifier: token } : 'skip');
+
+  const progressClassification = (fuelPlan?.adaptiveHooks?.progressClassification as ProgressClassification) || 'insufficient_data';
+  const progressSummary = fuelPlan?.notes?.[0];
+  const weeklyWeightDeltaKg = fuelPlan?.adaptiveHooks?.weeklyWeightDeltaKg || 0;
+
+  const uiConfig = PROGRESS_UI_CONFIG[progressClassification];
+  const TrendIcon = uiConfig.icon;
+
+  const daysSinceWeightLog = useMemo(() => {
+    if (!profile?.lastWeightLogAt) return Infinity;
+    return Math.floor((mountTs - profile.lastWeightLogAt) / (24 * 60 * 60 * 1000));
+  }, [mountTs, profile?.lastWeightLogAt]);
+
+  const reminderSnoozedUntil = profile?.weightReminderSnoozedUntil ?? 0;
+  const shouldShowWeightReminder = Boolean(
+    profile?.completedOnboarding
+      && !weightReminderDismissed
+      && mountTs >= reminderSnoozedUntil
+      && daysSinceWeightLog >= 7,
+  );
+
+  const suggestedReminderWeight = !profile?.weight
+    ? ''
+    : String(Math.round(isImperial ? profile.weight * 2.20462 : profile.weight));
 
   const openEditModal = () => {
     setEditForm({
@@ -69,9 +119,30 @@ export function ProfileView({ onNavigate }: ProfileViewProps) {
       weight: isImperial ? weightVal / 2.20462 : weightVal,
       height: isImperial ? heightVal * 2.54 : heightVal,
       experience: editForm.experience,
-      goal: editForm.goal
+      goal: editForm.goal,
+      lastWeightLogAt: Number.isFinite(weightVal) ? Date.now() : profile?.lastWeightLogAt,
     });
     setIsEditModalOpen(false);
+  };
+
+  const handleWeightReminderSave = async () => {
+    const rawWeight = weightReminderInput || suggestedReminderWeight;
+    const weightVal = parseFloat(rawWeight);
+    if (!Number.isFinite(weightVal) || weightVal <= 0) return;
+
+    await updateProfile({
+      weight: isImperial ? weightVal / 2.20462 : weightVal,
+      lastWeightLogAt: Date.now(),
+      weightReminderSnoozedUntil: undefined,
+    });
+    setWeightReminderDismissed(true);
+  };
+
+  const handleWeightReminderSnooze = async () => {
+    await updateProfile({
+      weightReminderSnoozedUntil: Date.now() + 3 * 24 * 60 * 60 * 1000,
+    });
+    setWeightReminderDismissed(true);
   };
 
   const handleFactoryReset = async () => {
@@ -128,6 +199,47 @@ export function ProfileView({ onNavigate }: ProfileViewProps) {
            </div>
         </Card>
       </div>
+
+      {/* Progress Tracker */}
+      <section className="mb-8">
+        <SectionHeader title="Progress Tracker" subtitle="Adaptive Signals" size="sm" className="mb-4" />
+        <Card className={`p-5 border ${uiConfig.border} transition-colors`}>
+          <div className="flex items-start justify-between mb-4">
+             <div className="flex items-center gap-4">
+                <div className={`p-3 rounded-2xl ${uiConfig.bg} ${uiConfig.text}`}>
+                   <TrendIcon size={28} />
+                </div>
+                <div>
+                   <p className="text-[10px] font-heading uppercase tracking-widest text-hayl-muted mb-0.5">Current Trend</p>
+                   <h3 className={`font-heading text-xl uppercase font-bold leading-none ${uiConfig.text}`}>
+                     {uiConfig.label}
+                   </h3>
+                </div>
+             </div>
+             {progressClassification !== 'insufficient_data' && (
+                <div className="text-right flex flex-col items-end">
+                   <div className="flex items-center gap-1.5 mb-1">
+                      {weeklyWeightDeltaKg > 0 ? <TrendingUp size={16} className="text-hayl-muted" /> : weeklyWeightDeltaKg < 0 ? <TrendingDown size={16} className="text-hayl-muted" /> : <Minus size={16} className="text-hayl-muted" />}
+                      <span className="font-mono text-xl font-bold">
+                         {weeklyWeightDeltaKg > 0 ? '+' : ''}
+                         {isImperial ? (weeklyWeightDeltaKg * 2.20462).toFixed(1) : weeklyWeightDeltaKg.toFixed(1)}
+                      </span>
+                   </div>
+                   <p className="text-[10px] font-heading text-hayl-muted uppercase">{isImperial ? 'LBS / WK' : 'KG / WK'}</p>
+                </div>
+             )}
+          </div>
+          
+          <div className="bg-hayl-bg/50 rounded-xl p-4 border border-hayl-border/50">
+             <div className="flex gap-3 items-start">
+               <Activity className="text-hayl-muted shrink-0 mt-0.5" size={16} />
+               <p className="text-sm leading-relaxed text-hayl-text/90">
+                 {progressSummary ?? 'Log weight weekly and keep meal logs consistent for better signal quality.'}
+               </p>
+             </div>
+          </div>
+        </Card>
+      </section>
 
       {/* Actions */}
       <section className="space-y-4 mb-12">
@@ -330,6 +442,36 @@ export function ProfileView({ onNavigate }: ProfileViewProps) {
                CANCEL
              </Button>
            </div>
+        </div>
+      </BottomSheet>
+
+      <BottomSheet
+        isOpen={shouldShowWeightReminder}
+        onClose={() => setWeightReminderDismissed(true)}
+        title="Weekly Weight Check-In"
+      >
+        <div className="space-y-5">
+          <p className="text-sm text-hayl-muted">
+            It has been {Number.isFinite(daysSinceWeightLog) ? daysSinceWeightLog : 'many'} days since your last weight log.
+            Logging now refreshes progress analysis and plan suggestions.
+          </p>
+          <div className="space-y-2">
+            <label className="text-xs font-heading text-hayl-muted uppercase">Current Weight ({isImperial ? 'LBS' : 'KG'})</label>
+            <Input
+              type="number"
+              value={weightReminderInput}
+              onChange={(e) => setWeightReminderInput(e.target.value)}
+              placeholder={suggestedReminderWeight || (isImperial ? 'e.g. 165' : 'e.g. 75')}
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <Button variant="outline" onClick={handleWeightReminderSnooze}>
+              SNOOZE 3 DAYS
+            </Button>
+            <Button onClick={handleWeightReminderSave}>
+              LOG NOW
+            </Button>
+          </div>
         </div>
       </BottomSheet>
     </Page>

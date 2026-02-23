@@ -437,14 +437,14 @@ _Last Updated: 2026-02-15_
 **Agent**: Gemini 3 Pro High
 **Scope**: UX / Messaging
 
-- [ ] Define progress messaging and nuance (muscle gain vs fat gain).
+- [x] Define progress messaging and nuance (muscle gain vs fat gain).
 
 **Agent**: GPT-5.3 Codex
 **Scope**: Logic + Notifications
 
-- [ ] Implement reminders, popups, weight updates.
-- [ ] Recalculate progress and suggestions.
-- [ ] Distinguish muscle vs fat gain.
+- [x] Implement reminders, popups, weight updates.
+- [x] Recalculate progress and suggestions.
+- [x] Distinguish muscle vs fat gain.
 
 ---
 

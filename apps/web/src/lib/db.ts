@@ -49,6 +49,10 @@ export interface UserProfile {
   // Phase 6: Routine Management
   activePlanId?: string; // The specific derivedPlan ID (e.g. "casual-1-4day")
   programStartDate?: number; // Timestamp when they started this block
+
+  // Phase 5: Progress Tracker
+  lastWeightLogAt?: number;
+  weightReminderSnoozedUntil?: number;
 }
 
 export class HaylDatabase extends Dexie {

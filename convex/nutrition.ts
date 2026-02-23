@@ -296,6 +296,15 @@ export const suggestFuelPlan = query({
       suggestionNotes.push("Meal logging consistency is low. Prioritize logging 2+ meals/day before making aggressive adjustments.");
     }
 
+    const progressSignal = await ctx.db
+      .query("nutritionAdaptiveSignals")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .first();
+
+    if (progressSignal?.progressSummary) {
+      suggestionNotes.unshift(progressSignal.progressSummary);
+    }
+
     return {
       profile,
       energy,
@@ -314,6 +323,11 @@ export const suggestFuelPlan = query({
         avgDailyProtein7d,
         nextReviewAt: now + 7 * 24 * 60 * 60 * 1000,
         confidence: clamp((consistency28d + consistency7d) / 2, 0, 100),
+        progressClassification: progressSignal?.progressClassification,
+        weeklyWeightDeltaKg: progressSignal?.weeklyWeightDeltaKg,
+        dailyCalorieDelta7d: progressSignal?.dailyCalorieDelta7d,
+        proteinAdequacyRatio7d: progressSignal?.proteinAdequacyRatio7d,
+        lastWeightLogAt: progressSignal?.lastWeightLogAt,
       },
       notes: suggestionNotes,
     };
