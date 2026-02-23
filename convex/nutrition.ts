@@ -145,29 +145,33 @@ export const getIngredient = query({
 });
 
 /**
- * Lists all ingredients (for admin/dashboard).
- * 
- * @returns All ingredients in the database
+ * Lists ingredients for admin/dashboard views.
+ *
+ * @param limit - Maximum rows to return (default 200, max 500).
+ * @returns Up to `limit` ingredients.
  */
 export const listAll = query({
-  args: {},
-  handler: async (ctx: QueryCtx) => {
-    return await ctx.db.query("ingredients").collect();
+  args: { limit: v.optional(v.number()) },
+  handler: async (ctx: QueryCtx, args) => {
+    const cap = Math.min(args.limit ?? 200, 500);
+    return await ctx.db.query("ingredients").take(cap);
   },
 });
 
 /**
  * Lists only local Ethiopian ingredients.
- * 
- * @returns Ethiopian ingredients
+ *
+ * @param limit - Maximum rows to return (default 100, max 300).
+ * @returns Up to `limit` local ingredients.
  */
 export const listLocal = query({
-  args: {},
-  handler: async (ctx: QueryCtx) => {
+  args: { limit: v.optional(v.number()) },
+  handler: async (ctx: QueryCtx, args) => {
+    const cap = Math.min(args.limit ?? 100, 300);
     return await ctx.db
       .query("ingredients")
       .withIndex("by_isLocal", (q) => q.eq("isLocal", true))
-      .collect();
+      .take(cap);
   },
 });
 

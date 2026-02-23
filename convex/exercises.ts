@@ -261,12 +261,31 @@ export const searchExercises = query({
   },
 });
 
+/**
+ * Lists exercises, optionally filtered by muscle group.
+ * Resolves storage URLs for each result.
+ *
+ * @param muscleGroup - Optional filter (substring match on the muscleGroup field).
+ * @param limit - Maximum rows to return (default 100, max 500).
+ * @returns Up to `limit` exercises with resolved media URLs.
+ */
 export const listAll = query({
-  args: {},
-  handler: async (ctx: QueryCtx) => {
-    const exercises = await ctx.db.query("exercises").collect();
+  args: {
+    muscleGroup: v.optional(v.string()),
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx: QueryCtx, args) => {
+    const cap = Math.min(args.limit ?? 100, 500);
+
+    let rows = await ctx.db.query("exercises").take(cap);
+
+    if (args.muscleGroup) {
+      const needle = args.muscleGroup.toLowerCase();
+      rows = rows.filter((e) => e.muscleGroup.toLowerCase().includes(needle));
+    }
+
     return await Promise.all(
-      exercises.map(async (e) => ({
+      rows.map(async (e) => ({
         ...e,
         mediaResolved: await resolveExerciseMediaUrls(ctx, e.media),
       }))

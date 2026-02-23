@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useQuery } from "convex/react";
-import type { Doc } from "../../../../../convex/_generated/dataModel";
 import { api } from "../../../../../convex/_generated/api";
 import { Page } from "../ui/Page";
 import { Button } from "../ui/Button";
@@ -10,18 +9,6 @@ import { Search, ArrowLeft } from "lucide-react";
 import type { NavigationState } from "../../types/navigation";
 import { ExerciseMediaPlayer } from "../workout/ExerciseMediaPlayer";
 
-type ExerciseWithMedia = Doc<"exercises"> & {
-  mediaResolved?: {
-    aspectRatio: number;
-    blurhash?: string;
-    lqipBase64?: string;
-    urls: {
-      mp4: string | null;
-      webm: string | null;
-      poster: string | null;
-    };
-  };
-};
 
 interface ExerciseLibraryProps {
   view?: 'home' | 'list' | 'detail';
@@ -42,7 +29,9 @@ const MUSCLE_GROUPS = [
 ];
 
 export function ExerciseLibrary({ view = 'home', filter, exerciseId, onNavigate }: ExerciseLibraryProps) {
-  const allExercises = useQuery(api.exercises.listAll) as ExerciseWithMedia[] | undefined;
+  const allExercises = useQuery(api.exercises.listAll, {
+    muscleGroup: filter?.muscle,
+  });
   const [search, setSearch] = useState("");
 
   const handleNavigate = (newState: NavigationState) => {
@@ -88,11 +77,10 @@ export function ExerciseLibrary({ view = 'home', filter, exerciseId, onNavigate 
 
   // List View
   if (view === 'list') {
-    const filteredExercises = allExercises?.filter((e: Doc<"exercises">) => {
-        const matchesMuscle = filter?.muscle ? e.muscleGroup.toLowerCase().includes(filter.muscle.toLowerCase()) : true;
+    const filteredExercises = (allExercises ?? []).filter((e) => {
         const matchesSearch = search ? e.name.toLowerCase().includes(search.toLowerCase()) : true;
-        return matchesMuscle && matchesSearch;
-    }) ?? [];
+        return matchesSearch;
+    });
 
     return (
       <Page className="pb-24 pt-4 animate-in fade-in duration-300">
@@ -126,7 +114,7 @@ export function ExerciseLibrary({ view = 'home', filter, exerciseId, onNavigate 
                 {filteredExercises.length === 0 && (
                     <div className="text-center py-12 text-hayl-muted font-mono text-sm uppercase">No exercises found</div>
                 )}
-                {filteredExercises.map((exercise: Doc<"exercises">) => (
+                {filteredExercises.map((exercise) => (
                     <div 
                         key={exercise._id}
                         onClick={() => handleNavigate({ 

@@ -79,7 +79,10 @@ export function MacroCalculator() {
         <label className="block text-[10px] font-bold uppercase mb-3 text-hayl-muted tracking-[0.2em] pl-1">Activity Level</label>
         <select 
             value={stats.activityLevel} 
-            onChange={(e) => setStats({...stats, activityLevel: e.target.value as ActivityLevel})}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (val in ACTIVITIES) setStats({...stats, activityLevel: val as ActivityLevel});
+            }}
             className="w-full bg-hayl-bg rounded-2xl border border-hayl-border p-5 text-sm font-heading font-bold uppercase focus:border-hayl-text outline-none transition-all cursor-pointer appearance-none"
         >
             {Object.entries(ACTIVITIES).map(([key, val]) => (
