@@ -215,6 +215,22 @@ export function computeTdee(params: {
   };
 }
 
+/** Canonical list of supported fuel measurement units. */
+export const FUEL_UNITS = [
+  "grams", "kg", "ml", "cups", "tbsp", "tsp",
+  "pieces", "rolls", "ladles", "slices", "patties", "bowls", "servings",
+] as const;
+
+/**
+ * Derives recommended daily macronutrient targets based on calorie budget,
+ * body weight, training experience, and goal phase.
+ *
+ * @param params.calories - Daily calorie target (kcal).
+ * @param params.weightKg - Current body weight in kg.
+ * @param params.experienceLevel - Training experience tier.
+ * @param params.goal - Current nutrition phase (cut/maintain/bulk).
+ * @returns A MacroVector with gram targets for each macronutrient.
+ */
 export function deriveMacroTargets(params: {
   calories: number;
   weightKg: number;
@@ -250,3 +266,81 @@ export function deriveMacroTargets(params: {
     fiber: params.goal === "cut" ? 32 : 28,
   };
 }
+
+// ---------- ADAPTIVE HOOKS (Phase 4B) ----------
+
+/**
+ * Compares average recent daily calorie intake against a TDEE target
+ * and suggests an adjustment direction.
+ *
+ * @param recentDailyTotals - Array of daily calorie totals (most recent first).
+ * @param tdee - The user's target daily energy expenditure.
+ * @returns An object with the average intake, the delta from TDEE,
+ *          and a suggested action ("increase" | "decrease" | "maintain").
+ */
+export function suggestCalorieAdjustment(
+  recentDailyTotals: number[],
+  tdee: number,
+): { averageIntake: number; delta: number; suggestion: "increase" | "decrease" | "maintain" } {
+  if (recentDailyTotals.length === 0 || tdee <= 0) {
+    return { averageIntake: 0, delta: 0, suggestion: "maintain" };
+  }
+
+  const sum = recentDailyTotals.reduce((a, b) => a + b, 0);
+  const averageIntake = round1(sum / recentDailyTotals.length);
+  const delta = round1(averageIntake - tdee);
+
+  // ±10% tolerance band before suggesting changes
+  const threshold = tdee * 0.1;
+
+  let suggestion: "increase" | "decrease" | "maintain";
+  if (delta > threshold) {
+    suggestion = "decrease";
+  } else if (delta < -threshold) {
+    suggestion = "increase";
+  } else {
+    suggestion = "maintain";
+  }
+
+  return { averageIntake, delta, suggestion };
+}
+
+/**
+ * Computes an adherence score (0–100) based on how closely recent
+ * meal totals match a set of macro targets.
+ *
+ * Each macro (calories, protein, carbs, fats) is scored individually
+ * as `100 - |actual - target| / target * 100`, clamped to [0, 100].
+ * The final score is the average of all four macro scores.
+ *
+ * @param recentTotals - Array of daily macro snapshots.
+ * @param target - The target MacroVector (from deriveMacroTargets).
+ * @returns A score from 0 to 100 (higher is better), or 0 if no data.
+ */
+export function assessAdherence(
+  recentTotals: MacroVector[],
+  target: MacroVector,
+): number {
+  if (recentTotals.length === 0) return 0;
+
+  const totals = sumMacros(recentTotals);
+  const count = recentTotals.length;
+  const avg: MacroVector = {
+    calories: totals.calories / count,
+    protein: totals.protein / count,
+    carbs: totals.carbs / count,
+    fats: totals.fats / count,
+    fiber: totals.fiber / count,
+  };
+
+  const keys: (keyof MacroVector)[] = ["calories", "protein", "carbs", "fats"];
+  const scores = keys.map((key) => {
+    const t = target[key];
+    if (t <= 0) return 100;
+    const deviation = Math.abs(avg[key] - t) / t;
+    return clamp(100 - deviation * 100, 0, 100);
+  });
+
+  return round1(scores.reduce((a, b) => a + b, 0) / scores.length);
+}
+

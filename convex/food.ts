@@ -39,22 +39,16 @@ async function resolveMealComponent(
   },
 ): Promise<{ grams: number; macros: MacroVector; name: string } | null> {
   if (component.itemType === "ingredient") {
-    const ingredient = await ctx.db.get(component.itemId as Id<"ingredients">);
-    if (!ingredient) return null;
+    const ingredient = await ctx.db.get(component.itemId);
+    if (!ingredient || !("nutritionBasis" in ingredient)) return null;
     const normalized = macrosFromIngredient(ingredient, component.amount, component.unit);
-    return {
-      ...normalized,
-      name: ingredient.name,
-    };
+    return { ...normalized, name: ingredient.name };
   }
 
-  const dish = await ctx.db.get(component.itemId as Id<"dishes">);
-  if (!dish) return null;
+  const dish = await ctx.db.get(component.itemId);
+  if (!dish || !("defaultServingGrams" in dish)) return null;
   const normalized = macrosFromDish(dish, component.amount, component.unit);
-  return {
-    ...normalized,
-    name: dish.name,
-  };
+  return { ...normalized, name: dish.name };
 }
 
 function isBaseName(name: string): boolean {
@@ -208,7 +202,7 @@ export const logMeal = mutation({
       })),
   },
   handler: async (ctx, args) => {
-      const user = await getUserByTokenOrThrow(ctx, args.tokenIdentifier);
+    const user = await getUserByTokenOrThrow(ctx, args.tokenIdentifier);
 
     const normalizedComponents: {
       itemId: Id<"ingredients"> | Id<"dishes">;
@@ -404,7 +398,7 @@ export const seedEthiopianFoods = mutation({
       fiber: v.number(),
       category: v.union(v.literal("grain"), v.literal("legume"), v.literal("meat"), v.literal("vegetable"), v.literal("other")),
       isLocal: v.boolean(),
-      nutritionBasis: v.string(), // "per_100g"
+      nutritionBasis: v.union(v.literal("per_100g"), v.literal("per_serving")),
       commonMeasures: v.optional(v.array(v.object({
         unit: fuelUnitValidator,
         grams: v.number(),
@@ -422,19 +416,18 @@ export const seedEthiopianFoods = mutation({
 
       if (!existing) {
         await ctx.db.insert("ingredients", {
-            name: food.name,
-            amharicName: food.amharicName,
-            calories: food.calories,
-            protein: food.protein,
-            carbs: food.carbs,
-            fats: food.fats,
-            fiber: food.fiber,
-            category: food.category,
-            isLocal: food.isLocal,
-            commonMeasures: food.commonMeasures,
-            nutritionBasis: food.nutritionBasis as "per_100g" | "per_serving",
-        }); 
-        // Force cast for now, will update schema in next step to be safe.
+          name: food.name,
+          amharicName: food.amharicName,
+          calories: food.calories,
+          protein: food.protein,
+          carbs: food.carbs,
+          fats: food.fats,
+          fiber: food.fiber,
+          category: food.category,
+          isLocal: food.isLocal,
+          commonMeasures: food.commonMeasures,
+          nutritionBasis: food.nutritionBasis,
+        });
         count++;
       }
     }

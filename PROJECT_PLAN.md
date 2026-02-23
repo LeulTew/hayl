@@ -464,11 +464,51 @@ _Last Updated: 2026-02-15_
 
 ---
 
-## PHASE 7 — PLATFORM ENHANCEMENT
+## PHASE 8 — NUTRITION 2.0: CALENDAR & GOAL TRACKING (NEW)
 
-**Agent**: GPT-5.3 Codex
-**Scope**: Platform-specific UI
+**Goal**: Move from daily logging to long-term adherence tracking and data management.
 
-- [ ] Detect Apple support.
-- [ ] Enable Liquid Glass (in-built) conditionally.
-- [ ] Ensure graceful fallback.
+### 8.1 Data Management & Deletion
+
+- [ ] **Meal Deletion**: Implement `deleteMealLog` with cascade safety.
+- [ ] **Dynamic Labeling**: Replace hardcoded "Lunch" with dynamic meal types (Breakfast, Lunch, Dinner, Snack) or custom labels.
+
+### 8.2 The Fuel Calendar
+
+- [ ] **Full Calendar View**: Monthly grid showing calorie/macro adherence (Heatmap style).
+- [ ] **Goal Comparison Engine**:
+  - Compare actual logs against TDEE/Goal expectations.
+  - Calculate "Weekly Surplus/Deficit" trends.
+
+---
+
+## PHASE 9 — WORKOUT 2.0: WEEKLY SCHEDULING & AUTOMATION (NEW)
+
+**Goal**: Transition from "Day Sequence" to a "Weekly Routine" that repeats.
+
+### 9.1 Weekly Split Scheduler
+
+- [ ] **Monday -> Sunday Mapping**: New UI to map specific split days (e.g., Day 1: Push) to calendar days (e.g., Monday).
+- [ ] **Rest Day Logic**: Explicitly mark unmapped days as "Rest Days".
+- [ ] **Multi-Cycle Support**: Allow repeating a 3-day split twice in a week (6 active days).
+
+### 9.2 Adherence & Skip Logic
+
+- [ ] **Automated Skip Detection**: If a mapped workout day passes without a log, mark as "Skipped".
+- [ ] **Manual Override**: "Mark as Done" option for workouts completed outside the app.
+
+---
+
+## PHASE 10 — PLATFORM QOL & TREND ANALYSIS (NEW)
+
+**Goal**: Provide senior-level insights and professional-grade utility.
+
+### 10.1 Progress & Trends
+
+- [ ] **Volume Tracking**: Visualize "Total Tonnage" and 1RM trends per exercise.
+- [ ] **Body Metrics Sync**: Correlate weight changes with caloric adherence and workout volume.
+
+### 10.2 Intelligence & Notifications
+
+- [ ] **Smart Reminders**: Push notifications for missed sessions or weight log reminders.
+- [ ] **Adaptive Scheduling**: Suggest rest day shifts if high fatigue is detected via set performance.

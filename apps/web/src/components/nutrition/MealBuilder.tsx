@@ -21,9 +21,19 @@ type FoodUnit =
   | "bowls"
   | "servings";
 
+const FOOD_UNIT_SET = new Set<string>([
+  "grams", "kg", "ml", "cups", "tbsp", "tsp",
+  "pieces", "rolls", "ladles", "slices", "patties", "bowls", "servings",
+]);
+
+/** Type guard to validate that a string is a known FoodUnit. */
+function isFoodUnit(value: string): value is FoodUnit {
+  return FOOD_UNIT_SET.has(value);
+}
+
 interface MealComponent {
   id: string;
-  foodId: string;
+  foodId: Id<"ingredients"> | Id<"dishes">;
   type: "base" | "topping" | "side";
   foodType: "ingredient" | "dish";
   name: string;
@@ -141,7 +151,7 @@ export function MealBuilder() {
   const mealsHistory = useQuery(
     api.food.listMeals,
     token ? { tokenIdentifier: token, limit: 20 } : "skip",
-  ) as MealHistoryItem[] | undefined;
+  );
 
   const [mealName, setMealName] = useState("Lunch");
   const [components, setComponents] = useState<MealComponent[]>([]);
@@ -177,7 +187,7 @@ export function MealBuilder() {
 
     const nextComponent: MealComponent = {
       id: crypto.randomUUID(),
-      foodId: foodItem._id,
+      foodId: foodItem._id as Id<"ingredients"> | Id<"dishes">,
       type: searchTargetType,
       foodType: foodItem.type,
       name: foodItem.name,
@@ -240,7 +250,7 @@ export function MealBuilder() {
       timestamp: Date.now(),
       components: components.map((component) => ({
         type: component.type,
-        itemId: component.foodId as Id<"ingredients"> | Id<"dishes">,
+        itemId: component.foodId,
         itemType: component.foodType,
         amount: component.amount,
         unit: component.unit,
@@ -324,7 +334,10 @@ export function MealBuilder() {
                     <div className="mt-2">
                       <select
                         value={component.unit}
-                        onChange={(event) => handleUpdateUnit(component.id, event.target.value as FoodUnit)}
+                        onChange={(event) => {
+                          const val = event.target.value;
+                          if (isFoodUnit(val)) handleUpdateUnit(component.id, val);
+                        }}
                         className="bg-hayl-bg border border-hayl-border rounded px-2 py-1 text-[10px] font-mono uppercase"
                       >
                         {availableUnits.map((unit) => (

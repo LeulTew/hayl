@@ -85,16 +85,8 @@ export function NutritionHub({ view = 'home', contentId, onNavigate }: Nutrition
     if (onNavigate) onNavigate(newState);
   };
 
-  type MealHistoryRow = {
-    _id: string;
-    name: string;
-    timestamp: number;
-    totals?: { calories?: number };
-    normalizedComponents?: Array<{ name?: string }>;
-  };
-
   const token = typeof window !== "undefined" ? localStorage.getItem("hayl-token") || "" : "";
-  const meals = useQuery(api.food.listMeals, token ? { tokenIdentifier: token } : "skip") as MealHistoryRow[] | undefined;
+  const meals = useQuery(api.food.listMeals, token ? { tokenIdentifier: token } : "skip");
 
   // Meal Builder View
   if (view === 'meal-builder') {
