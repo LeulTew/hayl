@@ -72,7 +72,6 @@ export function trackEvent<T extends AnalyticsEventName>(
   };
 
   if (IS_DEV) {
-    // eslint-disable-next-line no-console
     console.info('[Analytics]', envelope.event, envelope.properties);
   }
 

@@ -9,6 +9,27 @@ export type ProgressClassification =
   | "muscle_loss_risk"
   | "stable";
 
+const PROGRESS_CLASSIFICATIONS: ReadonlySet<string> = new Set<ProgressClassification>([
+  "insufficient_data",
+  "muscle_gain_likely",
+  "fat_gain_likely",
+  "mixed_gain",
+  "fat_loss_likely",
+  "muscle_loss_risk",
+  "stable",
+]);
+
+/**
+ * Runtime type guard: narrows an unknown value to ProgressClassification.
+ * Returns true only for recognised classification strings.
+ *
+ * @param value - The value to check
+ * @returns Whether `value` is a valid ProgressClassification
+ */
+export function isProgressClassification(value: unknown): value is ProgressClassification {
+  return typeof value === "string" && PROGRESS_CLASSIFICATIONS.has(value);
+}
+
 export const PROGRESS_UI_CONFIG: Record<ProgressClassification, { bg: string, text: string, border: string, icon: LucideIcon, label: string }> = {
   insufficient_data: { bg: 'bg-hayl-muted/10', text: 'text-hayl-muted', border: 'border-hayl-border', icon: Minus, label: 'Needs More Data' },
   muscle_gain_likely: { bg: 'bg-emerald-500/10', text: 'text-emerald-600 dark:text-emerald-400', border: 'border-emerald-500/20', icon: Dumbbell, label: 'Muscle Gain' },

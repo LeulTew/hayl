@@ -8,7 +8,7 @@ import { Page } from "../ui/Page";
 import { SectionHeader } from "../ui/SectionHeader";
 import { Card } from "../ui/Card";
 import { Badge } from "../ui/Badge";
-import { PROGRESS_UI_CONFIG, type ProgressClassification } from '../../constants/progress';
+import { PROGRESS_UI_CONFIG, isProgressClassification } from '../../constants/progress';
 import { Button } from "../ui/Button";
 
 import { useUserProfile } from '../../hooks/useUserProfile';
@@ -129,12 +129,15 @@ export function Dashboard({ onNavigate, onStartSession }: DashboardProps) {
   const streak = useMemo(() => getStreakDays(history.map((session) => session.startTime)), [history]);
 
   // ── Active Routine Logic ──
+  // Dexie stores IDs as plain strings; Convex requires the branded Id type.
+  // This is a validated boundary crossing — the value originates from Convex.
   const activePlanId = profile?.activePlanId || activeRoutine?.planId;
   const activePlan = useQuery(api.programs.getPlan, activePlanId ? { planId: activePlanId as Id<"derivedPlans"> } : "skip");
   const consistencyTarget = activePlan?.days?.length ?? 4;
 
   // ── KPI Snapshot Values ──
-  const progressClassification: ProgressClassification = (snapshot?.progress?.classification as ProgressClassification) || 'insufficient_data';
+  const rawClassification = snapshot?.progress?.classification;
+  const progressClassification = isProgressClassification(rawClassification) ? rawClassification : 'insufficient_data';
   const progressSummary = snapshot?.progress?.summary ?? null;
   const weeklyWeightDeltaKg = snapshot?.progress?.weeklyWeightDeltaKg ?? 0;
   const isImperial = profile?.unitPreference === 'imperial';

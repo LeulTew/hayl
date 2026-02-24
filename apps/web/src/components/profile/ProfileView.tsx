@@ -16,7 +16,7 @@ import { StatBlock } from '../ui/StatBlock';
 import { BottomSheet } from '../ui/BottomSheet';
 import { Input } from '../ui/Input';
 import { Settings, LogOut, History, Loader2, Pencil, TrendingUp, TrendingDown, Minus, Activity, AlertTriangle } from 'lucide-react';
-import { PROGRESS_UI_CONFIG, type ProgressClassification } from '../../constants/progress';
+import { PROGRESS_UI_CONFIG, isProgressClassification } from '../../constants/progress';
 
 interface ProfileViewProps {
    onNavigate?: (view: NavigationState) => void;
@@ -57,7 +57,8 @@ export function ProfileView({ onNavigate }: ProfileViewProps) {
   const token = typeof window !== 'undefined' ? localStorage.getItem('hayl-token') || '' : '';
   const fuelPlan = useQuery(api.nutrition.suggestFuelPlan, token ? { tokenIdentifier: token } : 'skip');
 
-  const progressClassification = (fuelPlan?.adaptiveHooks?.progressClassification as ProgressClassification) || 'insufficient_data';
+  const rawClassification = fuelPlan?.adaptiveHooks?.progressClassification;
+  const progressClassification = isProgressClassification(rawClassification) ? rawClassification : 'insufficient_data';
   const progressSummary = fuelPlan?.notes?.[0];
   const weeklyWeightDeltaKg = fuelPlan?.adaptiveHooks?.weeklyWeightDeltaKg || 0;
 
