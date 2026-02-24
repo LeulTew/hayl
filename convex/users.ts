@@ -276,9 +276,10 @@ export const syncUserProfile = mutation({
         lastWeightLogAt: inferredLogAt,
       });
 
-      if (shouldTrackWeight) {
-        const currentWeightKg = args.weightKg as number;
-        const source = args.lastWeightLogAt ? "reminder" : existing.weightKg ? "profile_edit" : "onboarding";
+      if (shouldTrackWeight && typeof args.weightKg === "number") {
+        const currentWeightKg = args.weightKg;
+        const source: "onboarding" | "profile_edit" | "reminder" =
+          args.lastWeightLogAt ? "reminder" : existing.weightKg ? "profile_edit" : "onboarding";
         await maybeInsertWeightLog(
           ctx,
           existing._id,

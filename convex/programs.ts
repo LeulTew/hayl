@@ -34,6 +34,11 @@ export const listAll = query({
   },
 });
 
+/**
+ * Lists all programs with enriched metadata (e.g. available durations).
+ *
+ * @returns Programs with deduplicated duration variants from derived plans
+ */
 export const listWithMetadata = query({
   args: {},
   handler: async (ctx: QueryCtx) => {

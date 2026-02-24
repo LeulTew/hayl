@@ -166,6 +166,13 @@ async function buildRoutineState(
   };
 }
 
+/**
+ * Gets the user's currently active workout routine state.
+ *
+ * @param tokenIdentifier - User's auth token
+ * @returns Routine state (day order, streak, next day) or null if no user/plan
+ * @failure Returns null if user not found or no active plan set
+ */
 export const getActiveRoutine = query({
   args: { tokenIdentifier: v.string() },
   handler: async (ctx, args) => {
@@ -198,6 +205,15 @@ export const getActiveRoutine = query({
   },
 });
 
+/**
+ * Activates a workout routine for the user, deactivating any others.
+ *
+ * @param tokenIdentifier - User's auth token
+ * @param planId - The derived plan to activate
+ * @param startedAt - Optional start timestamp (defaults to now)
+ * @returns Updated routine state
+ * @failure Throws if user not found or plan not found
+ */
 export const activateRoutine = mutation({
   args: {
     tokenIdentifier: v.string(),
@@ -239,6 +255,15 @@ export const activateRoutine = mutation({
   },
 });
 
+/**
+ * Reorders the days within the user's active routine.
+ *
+ * @param tokenIdentifier - User's auth token
+ * @param orderedDayIndexes - New day order as array of day indexes
+ * @param planId - Optional plan ID (defaults to user's current plan)
+ * @returns Updated routine state with new day order
+ * @failure Throws if user not found or no active routine exists
+ */
 export const reorderActiveRoutineDays = mutation({
   args: {
     tokenIdentifier: v.string(),
@@ -292,6 +317,18 @@ export const reorderActiveRoutineDays = mutation({
   },
 });
 
+/**
+ * Logs completion of a specific training day within a routine.
+ * Inserts a routineDayLog record and updates the routine state.
+ *
+ * @param tokenIdentifier - User's auth token
+ * @param dayIndex - The day index that was completed
+ * @param planId - Optional plan ID (defaults to user's current plan)
+ * @param completedAt - Optional completion timestamp (defaults to now)
+ * @param sessionRef - Optional reference to the local workout session ID
+ * @returns Updated routine state with the logged day info
+ * @failure Throws if user/plan not found or day index is invalid
+ */
 export const logRoutineDayCompletion = mutation({
   args: {
     tokenIdentifier: v.string(),
